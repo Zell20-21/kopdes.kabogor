@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Kecamatan;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -63,7 +64,34 @@ class DashboardTest extends TestCase
             'captcha' => '2842',
         ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('admin.dashboard'));
         $response->assertSessionHas('success');
+        $this->assertAuthenticated();
+    }
+
+    public function test_unauthenticated_user_cannot_access_admin_dashboard(): void
+    {
+        $response = $this->get(route('admin.dashboard'));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_admin_can_access_admin_dashboard(): void
+    {
+        $admin = User::first();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('KOPERASI MERAH PUTIH');
+        $response->assertSee('DESK KOP');
+        $response->assertSee('KABUPATEN BOGOR');
+        $response->assertSee('INFORMASI KOPERASI');
+        $response->assertSee('435');
+        $response->assertSee('Anggota Koperasi');
+        $response->assertSee('OPERASIONAL');
+        $response->assertSee('PELATIHAN');
+        $response->assertSee('SERTIFIKAT');
+        $response->assertSee('Anggota UMKM');
     }
 }
