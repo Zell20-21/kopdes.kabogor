@@ -9,15 +9,25 @@
     <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-3">
-                    <div class="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-md shrink-0">
-                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="h-full w-auto object-contain">
+                <div class="flex items-center space-x-2.5 sm:space-x-3.5">
+                    <!-- Lambang Kabupaten Bogor (Tegar Beriman) -->
+                    <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-11 sm:h-13 w-auto object-contain drop-shadow shrink-0">
+
+                    <!-- Logo KOPDES Bulat (Di-gedein dan bulat sesuai gambar referensi) -->
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white flex items-center justify-center p-1.5 shadow-md shrink-0 border border-white/50 overflow-hidden">
+                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain">
                     </div>
-                    <div>
-                        <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
-                            Dashboard KMP Kabupaten Bogor
-                        </h1>
-                        <p class="text-xs text-red-200 font-medium leading-none">
+
+                    <div class="flex flex-col justify-center">
+                        <div class="flex items-baseline space-x-1.5">
+                            <span class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
+                                Dashboard
+                            </span>
+                            <span class="hidden sm:inline text-sm sm:text-base font-semibold text-red-100">
+                                KMP Kab. Bogor
+                            </span>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-red-200 font-medium leading-none mt-0.5">
                             Pemerintah Daerah Kabupaten Bogor
                         </p>
                     </div>
@@ -575,8 +585,9 @@
                 <!-- Col 1: Brand & Narasi RAPID / KMP -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-3">
-                        <div class="h-11 w-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-lg shrink-0">
-                            <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="h-full w-auto object-contain">
+                        <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-11 sm:h-12 w-auto object-contain drop-shadow shrink-0">
+                        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white p-1.5 flex items-center justify-center shadow-lg shrink-0 border border-white/50 overflow-hidden">
+                            <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="w-full h-full object-contain">
                         </div>
                         <div>
                             <h4 class="text-base font-extrabold text-white tracking-wide uppercase">
@@ -775,9 +786,10 @@
 <div id="loginModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div class="flex items-center space-x-3">
-                <div class="h-10 w-10 rounded-xl bg-red-50 p-1 flex items-center justify-center border border-red-100 shadow-sm shrink-0">
-                    <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="h-full w-auto object-contain">
+            <div class="flex items-center space-x-2.5">
+                <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-9 w-auto object-contain shrink-0">
+                <div class="w-10 h-10 rounded-full bg-white p-1 flex items-center justify-center border border-slate-200 shadow-sm shrink-0 overflow-hidden">
+                    <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h4 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">Login Operator Desa & Admin</h4>

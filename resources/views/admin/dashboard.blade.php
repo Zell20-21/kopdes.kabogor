@@ -9,21 +9,29 @@
     <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Left: Logo KOP DES KEL MERAH PUTIH & GovTech KOP Brand -->
-                <div class="flex items-center space-x-3">
-                    <div class="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-md shrink-0">
-                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="h-full w-auto object-contain">
+                <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Desain Referensi) -->
+                <div class="flex items-center space-x-2.5 sm:space-x-3.5">
+                    <!-- Lambang Kabupaten Bogor (Tegar Beriman) -->
+                    <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-11 sm:h-13 w-auto object-contain drop-shadow shrink-0">
+
+                    <!-- Logo KOPDES Bulat (Di-gedein dan bulat sesuai gambar referensi) -->
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white flex items-center justify-center p-1.5 shadow-md shrink-0 border border-white/50 overflow-hidden">
+                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain">
                     </div>
-                    <div>
+
+                    <div class="flex flex-col justify-center">
                         <div class="flex items-center space-x-2">
-                            <h1 class="text-base sm:text-lg font-black tracking-wide text-white uppercase leading-none">
+                            <span class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
+                                Dashboard
+                            </span>
+                            <span class="hidden sm:inline text-sm font-black tracking-wide text-red-100 uppercase">
                                 KOPERASI MERAH PUTIH
-                            </h1>
+                            </span>
                             <span class="text-[9px] sm:text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-white/30 text-white/95 bg-white/10 uppercase tracking-wider">
                                 GOVTECH KOP
                             </span>
                         </div>
-                        <p class="text-xs text-red-200 font-medium leading-none mt-1">
+                        <p class="text-[11px] sm:text-xs text-red-200 font-medium leading-none mt-0.5">
                             Pemerintah Kabupaten Bogor &bull; Dinas Koperasi & UKM
                         </p>
                     </div>
