@@ -46,10 +46,10 @@
                         <span>TA 2025/2026</span>
                     </div>
 
-                    <a href="#login-section" class="flex items-center space-x-2 bg-white text-red-700 hover:bg-red-50 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow transition-all duration-200 hover:shadow-md transform active:scale-95">
+                    <button type="button" onclick="openLoginModal()" class="flex items-center space-x-2 bg-white text-red-700 hover:bg-red-50 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow transition-all duration-200 hover:shadow-md transform active:scale-95 cursor-pointer">
                         <i class="fa-solid fa-arrow-right-to-bracket"></i>
                         <span>Login</span>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -568,168 +568,125 @@
                 </div>
             </section>
 
-            <!-- Section 5: Footer 3 Cards (Kontak, Login App, Tautan Cepat) -->
-            <div id="login-section" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-
-                <!-- Card 1: Kontak -->
-                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition">
-                    <div>
-                        <div class="flex items-center space-x-2 text-slate-800 font-bold text-base pb-3 border-b border-slate-100">
-                            <i class="fa-solid fa-headset text-red-600"></i>
-                            <span>Kontak</span>
-                        </div>
-
-                        <div class="mt-4 space-y-3 text-xs text-slate-600">
-                            <div>
-                                <h5 class="font-bold text-slate-800">Koperasi Desa / Kelurahan Merah Putih</h5>
-                                <p class="text-slate-500">Kabupaten Bogor</p>
-                            </div>
-
-                            <div class="flex items-start space-x-2.5">
-                                <i class="fa-solid fa-location-dot text-red-600 mt-0.5 text-xs"></i>
-                                <span>Jalan Tegar Beriman, Cibinong 16914, Jawa Barat</span>
-                            </div>
-
-                            <div class="flex items-center space-x-2.5">
-                                <i class="fa-solid fa-phone text-slate-400 text-xs"></i>
-                                <span>(021) 875-4001</span>
-                            </div>
-
-                            <div class="flex items-center space-x-2.5">
-                                <i class="fa-regular fa-envelope text-slate-400 text-xs"></i>
-                                <span>diskop@bogorkab.go.id</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 pt-3 border-t border-slate-100">
-                        <span class="text-[11px] text-slate-400 block mb-2">Layanan Pengaduan & Bantuan:</span>
-                        <div class="flex items-center space-x-2">
-                            <span class="px-2.5 py-1 rounded bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
-                                Helpdesk 24/7
-                            </span>
-                            <a href="https://wa.me/628111111111" target="_blank" class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 hover:bg-emerald-100 transition flex items-center space-x-1">
-                                <i class="fa-brands fa-whatsapp text-emerald-600"></i>
-                                <span>Dialog WA/CS</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2: Login App (Portal Petugas & Pengurus) -->
-                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 hover:shadow-md transition">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <div class="flex items-center space-x-2 text-slate-800 font-bold text-base">
-                            <i class="fa-solid fa-shield-halved text-red-600"></i>
-                            <span>Login App</span>
-                        </div>
-                        <span class="text-[11px] text-slate-400 font-medium">Portal Petugas & Pengurus</span>
-                    </div>
-
-                    <form action="{{ route('portal.login') }}" method="POST" class="mt-4 space-y-3 text-xs">
-                        @csrf
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Nama Pengguna:</label>
-                            <input
-                                type="text"
-                                name="username"
-                                required
-                                placeholder="Masukkan username / NIK..."
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-slate-50 focus:bg-white text-xs"
-                            >
-                        </div>
-
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Password:</label>
-                            <input
-                                type="password"
-                                name="password"
-                                required
-                                placeholder="••••••••"
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-slate-50 focus:bg-white text-xs"
-                            >
-                        </div>
-
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Captcha:</label>
-                            <input
-                                type="text"
-                                name="captcha"
-                                required
-                                placeholder="Tulis kode di samping..."
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-slate-50 focus:bg-white text-xs"
-                            >
-                        </div>
-
-                        <div class="flex items-center justify-between pt-1">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-[11px] text-slate-500">Captcha:</span>
-                                <div class="px-2.5 py-1 bg-slate-900 text-white font-mono font-bold tracking-widest text-sm rounded shadow-inner">
-                                    2842
-                                </div>
-                                <button type="button" title="Muat ulang kode" class="text-slate-400 hover:text-slate-600 text-xs">
-                                    <i class="fa-solid fa-rotate-right"></i>
-                                </button>
-                                <span class="text-[10px] text-slate-400">Reload</span>
-                            </div>
-
-                            <button type="submit" class="bg-red-700 hover:bg-red-800 text-white font-bold px-5 py-2 rounded-lg text-xs shadow-sm hover:shadow transition">
-                                Login
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Card 3: Tautan Cepat -->
-                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 hover:shadow-md transition">
-                    <div class="flex items-center space-x-2 text-slate-800 font-bold text-base pb-3 border-b border-slate-100">
-                        <i class="fa-solid fa-link text-slate-700"></i>
-                        <span>Tautan Cepat</span>
-                    </div>
-
-                    <div class="mt-4 space-y-2 text-xs">
-                        <a href="#beranda" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 text-slate-700 hover:text-red-700 transition">
-                            <span>Beranda Utama</span>
-                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-                        </a>
-                        <a href="#informasi" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 text-slate-700 hover:text-red-700 transition">
-                            <span>Informasi Program</span>
-                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-                        </a>
-                        <a href="#sebaran" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 text-slate-700 hover:text-red-700 transition">
-                            <span>Sebaran Data 40 Kecamatan</span>
-                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-                        </a>
-                        <button type="button" onclick="openRegulasiModal()" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 text-slate-700 hover:text-red-700 transition text-left">
-                            <span>Dokumen Regulasi (UU / SK)</span>
-                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-                        </button>
-                        <a href="#login-section" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 text-slate-700 hover:text-red-700 transition">
-                            <span>Portal Presensi Staf/Admin</span>
-                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-
         </div>
     </main>
 
-    <!-- Bottom Copyright Footer Bar -->
-    <footer class="bg-white border-t border-slate-200 text-slate-500 text-xs py-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-2 text-center md:text-left">
-            <div>
-                <strong class="text-slate-800">Dashboard KMP Kabupaten Bogor</strong> &bull; Dashboard Koperasi Merah Putih Kabupaten Bogor &mdash; Dokumen TA 2025
+    <!-- Footer Berdasarkan Referensi RAPID Pemerintah Kabupaten Bogor (Gambar 2) -->
+    <footer class="bg-[#0b1b16] text-slate-300 pt-12 pb-8 border-t border-emerald-950/70">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+                <!-- Col 1: Brand & Narasi RAPID / KMP -->
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-11 h-11 rounded-lg bg-red-600/90 border border-white/20 p-1 flex items-center justify-center shadow-lg">
+                            <span class="text-white font-black text-sm tracking-tighter">KMP</span>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-extrabold text-white tracking-wide uppercase">
+                                KMP BOGOR
+                            </h4>
+                            <p class="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider leading-none">
+                                Koperasi Merah Putih Terpadu
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        Memfasilitasi pemberdayaan dan kemandirian ekonomi desa/kelurahan di Kabupaten Bogor melalui penguatan kelembagaan koperasi gotong royong yang berdaya saing, modern, dan terintegrasi.
+                    </p>
+                    <div class="flex items-center space-x-3 pt-1">
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-red-600/80 transition">
+                            <i class="fa-brands fa-instagram text-sm"></i>
+                        </a>
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-red-600/80 transition">
+                            <i class="fa-brands fa-facebook-f text-xs"></i>
+                        </a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-red-600/80 transition">
+                            <i class="fa-brands fa-youtube text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Layanan -->
+                <div class="space-y-3">
+                    <h5 class="text-sm font-bold text-white tracking-wider">Layanan</h5>
+                    <ul class="space-y-2 text-xs text-slate-400">
+                        <li>
+                            <a href="#sebaran" class="hover:text-emerald-400 transition flex items-center space-x-2">
+                                <span>Pendaftaran Akun Koperasi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition flex items-center space-x-2">
+                                <span>Formulir Pengaduan</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition flex items-center space-x-2">
+                                <span>Helpdesk & Konsultasi 24/7</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Tautan -->
+                <div class="space-y-3">
+                    <h5 class="text-sm font-bold text-white tracking-wider">Tautan</h5>
+                    <ul class="space-y-2 text-xs text-slate-400">
+                        <li>
+                            <a href="#beranda" class="hover:text-emerald-400 transition">Beranda</a>
+                        </li>
+                        <li>
+                            <a href="#informasi" class="hover:text-emerald-400 transition">Informasi Program</a>
+                        </li>
+                        <li>
+                            <a href="#sebaran" class="hover:text-emerald-400 transition">Sebaran Data 40 Kecamatan</a>
+                        </li>
+                        <li>
+                            <button type="button" onclick="openRegulasiModal()" class="hover:text-emerald-400 transition text-left">Dokumen Regulasi (UU / SK)</button>
+                        </li>
+                        <li>
+                            <a href="{{ route('export.rekapitulasi') }}" class="hover:text-emerald-400 transition">Ekspor Rekapitulasi Data</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Kontak Kami -->
+                <div class="space-y-3">
+                    <h5 class="text-sm font-bold text-white tracking-wider">Kontak Kami</h5>
+                    <div class="space-y-3 text-xs text-slate-400">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-emerald-400 mt-0.5">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <span class="leading-relaxed">Jl. Tegar Beriman No.1, Pakansari, Kec. Cibinong, Kabupaten Bogor, Jawa Barat 16914</span>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-emerald-400">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <span>(021) 8758605</span>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-emerald-400">
+                                <i class="fa-regular fa-envelope"></i>
+                            </div>
+                            <span>diskop@bogorkab.go.id</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center space-x-3 text-slate-500 font-medium">
-                <a href="#beranda" class="hover:text-red-600 transition">Beranda</a>
-                <span>|</span>
-                <a href="#informasi" class="hover:text-red-600 transition">Informasi</a>
-                <span>|</span>
-                <a href="#sebaran" class="hover:text-red-600 transition">Sebaran Data</a>
-                <span>|</span>
-                <a href="#login-section" class="hover:text-red-600 transition">Portal Login</a>
+
+            <!-- Bottom Divider, Copyright & Button Login Admin -->
+            <div class="pt-6 border-t border-white/10 flex flex-col items-center justify-center space-y-3 text-center">
+                <p class="text-xs text-slate-400">
+                    &copy; 2026 KMP - Pemerintah Kabupaten Bogor. Hak cipta dilindungi.
+                </p>
+                <button type="button" onclick="openLoginModal()" class="px-5 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold border border-slate-700/80 shadow transition flex items-center space-x-2 cursor-pointer">
+                    <i class="fa-solid fa-lock text-[11px] text-emerald-400"></i>
+                    <span>Login Admin</span>
+                </button>
             </div>
         </div>
     </footer>
@@ -817,6 +774,73 @@
     </div>
 </div>
 
+<!-- Modal: Login Petugas & Admin -->
+<div id="loginModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center space-x-2 text-slate-800 font-bold text-base">
+                <i class="fa-solid fa-shield-halved text-red-600"></i>
+                <h4 class="text-base font-bold text-slate-800">Login Portal Petugas & Admin</h4>
+            </div>
+            <button type="button" onclick="closeLoginModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form action="{{ route('portal.login') }}" method="POST" class="mt-4 space-y-3.5 text-xs">
+            @csrf
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Nama Pengguna / NIK:</label>
+                <input
+                    type="text"
+                    name="username"
+                    required
+                    placeholder="Masukkan username / NIK..."
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-slate-50 focus:bg-white text-xs"
+                >
+            </div>
+
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Password:</label>
+                <input
+                    type="password"
+                    name="password"
+                    required
+                    placeholder="••••••••"
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-slate-50 focus:bg-white text-xs"
+                >
+            </div>
+
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Captcha:</label>
+                <input
+                    type="text"
+                    name="captcha"
+                    required
+                    placeholder="Tulis kode di samping..."
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-slate-50 focus:bg-white text-xs"
+                >
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+                <div class="flex items-center space-x-2">
+                    <span class="text-[11px] text-slate-500">Captcha:</span>
+                    <div class="px-2.5 py-1 bg-slate-900 text-white font-mono font-bold tracking-widest text-sm rounded shadow-inner">
+                        2842
+                    </div>
+                    <button type="button" title="Muat ulang kode" class="text-slate-400 hover:text-slate-600 text-xs">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+                <button type="submit" class="bg-red-700 hover:bg-red-800 text-white font-bold px-6 py-2 rounded-lg text-xs shadow-sm hover:shadow transition cursor-pointer">
+                    Masuk
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -855,9 +879,9 @@
             maxBoundsViscosity: 0.8
         });
 
-        // Map Tile Layers
-        tileLayers.osm = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        // Map Tile Layers - Official OpenStreetMap
+        tileLayers.osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
             maxZoom: 19
         });
 
@@ -1123,6 +1147,19 @@
                 row.style.display = 'none';
             }
         });
+    }
+
+    // Modal Handler for Login Petugas & Admin
+    function openLoginModal() {
+        const modal = document.getElementById('loginModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeLoginModal() {
+        const modal = document.getElementById('loginModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
 </script>
 @endpush
