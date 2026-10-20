@@ -571,36 +571,36 @@
         </div>
     </main>
 
-    <!-- Footer Berdasarkan Referensi RAPID Pemerintah Kabupaten Bogor (Gambar 2) -->
-    <footer class="bg-[#0b1b16] text-slate-300 pt-12 pb-8 border-t border-emerald-950/70">
+    <!-- Footer Berdasarkan Referensi RAPID Pemerintah Kabupaten Bogor (Warna Senada Navbar) -->
+    <footer class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-red-100 pt-12 pb-8 border-t border-red-950/40 shadow-inner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
                 <!-- Col 1: Brand & Narasi RAPID / KMP -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-3">
-                        <div class="w-11 h-11 rounded-lg bg-red-600/90 border border-white/20 p-1 flex items-center justify-center shadow-lg">
+                        <div class="w-11 h-11 rounded-lg bg-white/15 border border-white/30 p-1 flex items-center justify-center shadow-lg">
                             <span class="text-white font-black text-sm tracking-tighter">KMP</span>
                         </div>
                         <div>
                             <h4 class="text-base font-extrabold text-white tracking-wide uppercase">
                                 KMP BOGOR
                             </h4>
-                            <p class="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider leading-none">
+                            <p class="text-[10px] text-red-200 font-semibold uppercase tracking-wider leading-none">
                                 Koperasi Merah Putih Terpadu
                             </p>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                    <p class="text-xs text-red-100/90 leading-relaxed text-justify">
                         Memfasilitasi pemberdayaan dan kemandirian ekonomi desa/kelurahan di Kabupaten Bogor melalui penguatan kelembagaan koperasi gotong royong yang berdaya saing, modern, dan terintegrasi.
                     </p>
                     <div class="flex items-center space-x-3 pt-1">
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-red-600/80 transition">
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-instagram text-sm"></i>
                         </a>
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-red-600/80 transition">
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-facebook-f text-xs"></i>
                         </a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-red-600/80 transition">
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-youtube text-xs"></i>
                         </a>
                     </div>
@@ -609,19 +609,19 @@
                 <!-- Col 2: Layanan -->
                 <div class="space-y-3">
                     <h5 class="text-sm font-bold text-white tracking-wider">Layanan</h5>
-                    <ul class="space-y-2 text-xs text-slate-400">
+                    <ul class="space-y-2 text-xs text-red-200/90">
                         <li>
-                            <a href="#sebaran" class="hover:text-emerald-400 transition flex items-center space-x-2">
+                            <a href="#sebaran" class="hover:text-white transition flex items-center space-x-2">
                                 <span>Pendaftaran Akun Koperasi</span>
                             </a>
                         </li>
                         <li>
-                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition flex items-center space-x-2">
+                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-white transition flex items-center space-x-2">
                                 <span>Formulir Pengaduan</span>
                             </a>
                         </li>
                         <li>
-                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition flex items-center space-x-2">
+                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-white transition flex items-center space-x-2">
                                 <span>Helpdesk & Konsultasi 24/7</span>
                             </a>
                         </li>
@@ -631,21 +631,21 @@
                 <!-- Col 3: Tautan -->
                 <div class="space-y-3">
                     <h5 class="text-sm font-bold text-white tracking-wider">Tautan</h5>
-                    <ul class="space-y-2 text-xs text-slate-400">
+                    <ul class="space-y-2 text-xs text-red-200/90">
                         <li>
-                            <a href="#beranda" class="hover:text-emerald-400 transition">Beranda</a>
+                            <a href="#beranda" class="hover:text-white transition">Beranda</a>
                         </li>
                         <li>
-                            <a href="#informasi" class="hover:text-emerald-400 transition">Informasi Program</a>
+                            <a href="#informasi" class="hover:text-white transition">Informasi Program</a>
                         </li>
                         <li>
-                            <a href="#sebaran" class="hover:text-emerald-400 transition">Sebaran Data 40 Kecamatan</a>
+                            <a href="#sebaran" class="hover:text-white transition">Sebaran Data 40 Kecamatan</a>
                         </li>
                         <li>
-                            <button type="button" onclick="openRegulasiModal()" class="hover:text-emerald-400 transition text-left">Dokumen Regulasi (UU / SK)</button>
+                            <button type="button" onclick="openRegulasiModal()" class="hover:text-white transition text-left cursor-pointer">Dokumen Regulasi (UU / SK)</button>
                         </li>
                         <li>
-                            <a href="{{ route('export.rekapitulasi') }}" class="hover:text-emerald-400 transition">Ekspor Rekapitulasi Data</a>
+                            <a href="{{ route('export.rekapitulasi') }}" class="hover:text-white transition">Ekspor Rekapitulasi Data</a>
                         </li>
                     </ul>
                 </div>
@@ -653,23 +653,23 @@
                 <!-- Col 4: Kontak Kami -->
                 <div class="space-y-3">
                     <h5 class="text-sm font-bold text-white tracking-wider">Kontak Kami</h5>
-                    <div class="space-y-3 text-xs text-slate-400">
+                    <div class="space-y-3 text-xs text-red-100/90">
                         <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-emerald-400 mt-0.5">
+                            <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white mt-0.5">
                                 <i class="fa-solid fa-location-dot"></i>
                             </div>
                             <span class="leading-relaxed">Jl. Tegar Beriman No.1, Pakansari, Kec. Cibinong, Kabupaten Bogor, Jawa Barat 16914</span>
                         </div>
 
                         <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-emerald-400">
+                            <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white">
                                 <i class="fa-solid fa-phone"></i>
                             </div>
                             <span>(021) 8758605</span>
                         </div>
 
                         <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-emerald-400">
+                            <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white">
                                 <i class="fa-regular fa-envelope"></i>
                             </div>
                             <span>diskop@bogorkab.go.id</span>
@@ -679,12 +679,12 @@
             </div>
 
             <!-- Bottom Divider, Copyright & Button Login Admin -->
-            <div class="pt-6 border-t border-white/10 flex flex-col items-center justify-center space-y-3 text-center">
-                <p class="text-xs text-slate-400">
+            <div class="pt-6 border-t border-white/15 flex flex-col items-center justify-center space-y-3 text-center">
+                <p class="text-xs text-red-200/90">
                     &copy; 2026 KMP - Pemerintah Kabupaten Bogor. Hak cipta dilindungi.
                 </p>
-                <button type="button" onclick="openLoginModal()" class="px-5 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold border border-slate-700/80 shadow transition flex items-center space-x-2 cursor-pointer">
-                    <i class="fa-solid fa-lock text-[11px] text-emerald-400"></i>
+                <button type="button" onclick="openLoginModal()" class="px-5 py-2 rounded-full bg-white text-red-800 hover:bg-red-50 text-xs font-bold shadow-md transition flex items-center space-x-2 cursor-pointer">
+                    <i class="fa-solid fa-lock text-[11px] text-red-700"></i>
                     <span>Login Admin</span>
                 </button>
             </div>
