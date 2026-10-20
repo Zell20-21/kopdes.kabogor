@@ -226,7 +226,7 @@
                             </div>
                             <div class="z-10 text-xs text-white/90 flex items-center space-x-1.5 mt-4">
                                 <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-                                <span>Data Verifikasi Tahap Konsolidasi</span>
+                                <span>Jumlah anggota terdata sesuai cakupan akun</span>
                             </div>
 
                             <!-- Watermark House Icon -->
@@ -609,25 +609,50 @@
                 @elseif($activeTab === 'anggota')
                     <!-- ================= TAB: DATABASE ANGGOTA ================= -->
                     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-                        <div class="pb-4 border-b border-slate-100">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-slate-100">
                             <h2 class="text-xl font-black text-slate-900 tracking-tight uppercase">
                                 DATABASE ANGGOTA KOPERASI
                             </h2>
                             <p class="text-xs text-slate-500">
-                                Konsolidasi dan verifikasi data anggota per unit usaha desa
+                                Total {{ number_format($totalAnggota) }} anggota tercatat pada koperasi dalam cakupan akun
                             </p>
                         </div>
 
-                        <div class="text-center py-10 space-y-3">
-                            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400 text-2xl">
-                                <i class="fa-solid fa-users-gear"></i>
-                            </div>
-                            <h3 class="text-base font-bold text-slate-800">
-                                Data Keanggotaan Sedang Tahap Konsolidasi
-                            </h3>
-                            <p class="text-xs text-slate-500 max-w-md mx-auto">
-                                Proses sinkronisasi data NIK anggota UMKM dan kelompok binaan sedang divalidasi dengan Disdukcapil dan Dinas Koperasi & UKM Kabupaten Bogor.
-                            </p>
+                        <p class="text-xs text-slate-500">
+                            Database hanya menyediakan jumlah anggota per koperasi, belum data anggota perorangan.
+                        </p>
+
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+                                    <tr>
+                                        <th class="py-2.5 px-3">No</th>
+                                        <th class="py-2.5 px-3">Nama Koperasi</th>
+                                        <th class="py-2.5 px-3">Kecamatan</th>
+                                        <th class="py-2.5 px-3">Desa / Kelurahan</th>
+                                        <th class="py-2.5 px-3">Jumlah Anggota</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                    @forelse($anggotaKoperasis as $kop)
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="py-2.5 px-3 font-semibold text-slate-500">{{ $loop->iteration + ($anggotaKoperasis->currentPage() - 1) * $anggotaKoperasis->perPage() }}</td>
+                                            <td class="py-2.5 px-3 font-bold text-slate-900">{{ $kop->name_koperasi }}</td>
+                                            <td class="py-2.5 px-3">{{ $kop->kecamatan?->name_kopkec ?? '-' }}</td>
+                                            <td class="py-2.5 px-3">{{ $kop->kelurahan?->name_kopkel ?? '-' }}</td>
+                                            <td class="py-2.5 px-3 font-semibold">{{ number_format($kop->jum_anggota) }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center py-6 text-slate-400 italic">Data anggota tidak ditemukan.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pt-2">
+                            {{ $anggotaKoperasis->links() }}
                         </div>
                     </div>
 

@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Kecamatan;
+use App\Models\Koperasi;
+use App\Models\Kopsdm;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -147,5 +149,117 @@ class DashboardTest extends TestCase
         $response->assertSee('PELATIHAN');
         $response->assertSee('SERTIFIKAT');
         $response->assertSee('Anggota UMKM');
+    }
+
+    public function test_operator_desa_sees_only_its_own_cooperative_information(): void
+    {
+        $this->createCooperative(9001, 9001, 'KOPERASI DESA PONDOK RAJEG', 11);
+        $this->createCooperative(9002, 9002, 'KOPERASI DESA LAIN', 99);
+        $operator = $this->createOperatorDesa(9001);
+
+        $response = $this->actingAs($operator)->get(route('admin.dashboard'));
+
+        $response->assertOk();
+        $response->assertViewHas('totalKoperasi', 1);
+        $response->assertViewHas('totalAnggota', 11);
+        $response->assertSee('KOPERASI DESA PONDOK RAJEG');
+        $response->assertDontSee('KOPERASI DESA LAIN');
+    }
+
+    public function test_operator_desa_sees_only_its_own_cooperative_managers_and_member_count(): void
+    {
+        $this->createCooperative(9001, 9001, 'KOPERASI DESA PONDOK RAJEG', 11);
+        $this->createCooperative(9002, 9002, 'KOPERASI DESA LAIN', 99);
+        $this->createCooperativeManager(9001, 9001, 'PENGURUS PONDOK RAJEG');
+        $this->createCooperativeManager(9002, 9002, 'PENGURUS DESA LAIN');
+        $operator = $this->createOperatorDesa(9001);
+        $this->actingAs($operator);
+
+        $cooperativeResponse = $this->get(route('admin.dashboard', ['tab' => 'koperasi']));
+        $managerResponse = $this->get(route('admin.dashboard', ['tab' => 'pengurus']));
+        $memberResponse = $this->get(route('admin.dashboard', ['tab' => 'anggota']));
+
+        $cooperativeResponse->assertOk();
+        $managerResponse->assertOk();
+        $memberResponse->assertOk();
+        $cooperativeResponse->assertSee('KOPERASI DESA PONDOK RAJEG');
+        $cooperativeResponse->assertDontSee('KOPERASI DESA LAIN');
+        $managerResponse->assertSee('PENGURUS PONDOK RAJEG');
+        $managerResponse->assertDontSee('PENGURUS DESA LAIN');
+        $memberResponse->assertSee('Total 11 anggota tercatat');
+        $memberResponse->assertSee('KOPERASI DESA PONDOK RAJEG');
+        $memberResponse->assertDontSee('KOPERASI DESA LAIN');
+    }
+
+    public function test_operator_desa_manager_search_cannot_escape_its_cooperative_scope(): void
+    {
+        $this->createCooperative(9001, 9001, 'KOPERASI DESA PONDOK RAJEG', 11);
+        $this->createCooperative(9002, 9002, 'KOPERASI DESA LAIN', 99);
+        $this->createCooperativeManager(9002, 9002, 'PENGURUS DESA LAIN');
+        $operator = $this->createOperatorDesa(9001);
+
+        $response = $this->actingAs($operator)->get(route('admin.dashboard', [
+            'tab' => 'pengurus',
+            'search_pengurus' => 'PENGURUS DESA LAIN',
+        ]));
+
+        $response->assertOk();
+        $response->assertViewHas('penguruses', fn ($penguruses): bool => $penguruses->total() === 0);
+        $response->assertSee('Data pengurus tidak ditemukan.');
+    }
+
+    public function test_operator_without_a_village_assignment_sees_no_cooperative_data(): void
+    {
+        $this->createCooperative(9001, 9001, 'KOPERASI DESA PONDOK RAJEG', 11);
+        $operator = $this->createOperatorDesa(0);
+
+        $response = $this->actingAs($operator)->get(route('admin.dashboard', ['tab' => 'anggota']));
+
+        $response->assertOk();
+        $response->assertViewHas('totalKoperasi', 0);
+        $response->assertViewHas('totalAnggota', 0);
+        $response->assertDontSee('KOPERASI DESA PONDOK RAJEG');
+        $response->assertSee('Data anggota tidak ditemukan.');
+    }
+
+    private function createCooperative(int $id, int $villageId, string $name, int $memberCount): void
+    {
+        Koperasi::create([
+            'id_koperasi' => $id,
+            'name_koperasi' => $name,
+            'id_kec' => 1,
+            'id_kel' => $villageId,
+            'jum_anggota' => $memberCount,
+            'flag_del' => 0,
+        ]);
+    }
+
+    private function createCooperativeManager(int $id, int $cooperativeId, string $name): void
+    {
+        Kopsdm::create([
+            'id_kopsdm' => $id,
+            'id_koperasi' => $cooperativeId,
+            'name_kopsdm' => $name,
+            'jab_kopsdm' => 'KETUA KOPERASI',
+            'type_kopsdm' => 'PENGURUS',
+            'order_kopsdm' => '1',
+            'comt_kopsdm' => '-',
+            'id_user' => 1,
+            'flag_del' => 0,
+        ]);
+    }
+
+    private function createOperatorDesa(int $villageId): User
+    {
+        return User::create([
+            'id_user' => 9001,
+            'name_user' => 'Operator Desa',
+            'login_user' => 'operator_desa_9001',
+            'pswd' => 'password',
+            'level_user' => 15,
+            'id_company' => 1,
+            'id_branch' => $villageId,
+            'flag_del' => 0,
+        ]);
     }
 }

@@ -19,21 +19,31 @@ class AdminController extends Controller
         $activeTab = $request->get('tab', 'informasi');
 
         // Scoping based on user role
-        $baseQuery = Koperasi::query();
-        if ($user && $user->isOperatorDesa() && $user->id_branch > 0) {
-            $baseQuery->where('id_kel', $user->id_branch);
-        } elseif ($user && $user->isOperatorKecamatan() && $user->id_company > 0) {
-            $baseQuery->where('id_kec', $user->id_company);
+        $baseQuery = Koperasi::query()->where('flag_del', 0);
+        if ($user->isOperatorDesa()) {
+            if ($user->id_branch > 0) {
+                $baseQuery->where('id_kel', $user->id_branch);
+            } else {
+                $baseQuery->whereRaw('1 = 0');
+            }
+        } elseif ($user->isOperatorKecamatan()) {
+            if ($user->id_company > 0) {
+                $baseQuery->where('id_kec', $user->id_company);
+            } else {
+                $baseQuery->whereRaw('1 = 0');
+            }
+        } elseif (! $user->isSuperAdmin()) {
+            $baseQuery->whereRaw('1 = 0');
         }
 
         // Allow Superadmin to filter scope if selected via dropdown
-        if ($filterKec = $request->get('filter_kec')) {
+        if ($user->isSuperAdmin() && $filterKec = $request->get('filter_kec')) {
             $baseQuery->where('id_kec', $filterKec);
         }
 
         // Aggregated statistics for Informasi Koperasi (GovTech KOP)
         $totalKoperasi = (clone $baseQuery)->count();
-        $totalAnggota = 0; // Data verifikasi tahap konsolidasi (sesuai referensi UI)
+        $totalAnggota = (clone $baseQuery)->sum('jum_anggota');
 
         $opsSudah = (clone $baseQuery)->where('st_ops', 'SUDAH')->count();
         $opsBelum = (clone $baseQuery)->where('st_ops', 'BELUM')->count();
@@ -82,19 +92,22 @@ class AdminController extends Controller
         $koperasis = $query->orderBy('id_koperasi', 'asc')->paginate(15)->withQueryString();
 
         // Database Pengurus query
-        $pengurusQuery = Kopsdm::with('koperasi');
-        if ($user && $user->isOperatorDesa() && $user->id_branch > 0) {
-            $kopId = Koperasi::where('id_kel', $user->id_branch)->value('id_koperasi');
-            $pengurusQuery->where('id_koperasi', $kopId ?: 0);
-        } elseif ($user && $user->isOperatorKecamatan() && $user->id_company > 0) {
-            $kopIds = Koperasi::where('id_kec', $user->id_company)->pluck('id_koperasi');
-            $pengurusQuery->whereIn('id_koperasi', $kopIds);
-        }
+        $pengurusQuery = Kopsdm::with('koperasi')
+            ->where('flag_del', 0)
+            ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'));
         if ($searchPengurus = $request->get('search_pengurus')) {
-            $pengurusQuery->where('name_kopsdm', 'like', "%{$searchPengurus}%")
-                ->orWhere('jab_kopsdm', 'like', "%{$searchPengurus}%");
+            $pengurusQuery->where(function ($query) use ($searchPengurus) {
+                $query->where('name_kopsdm', 'like', "%{$searchPengurus}%")
+                    ->orWhere('jab_kopsdm', 'like', "%{$searchPengurus}%");
+            });
         }
         $penguruses = $pengurusQuery->orderBy('id_kopsdm', 'asc')->paginate(20)->withQueryString();
+
+        $anggotaKoperasis = (clone $baseQuery)
+            ->with(['kecamatan', 'kelurahan'])
+            ->orderBy('id_koperasi', 'asc')
+            ->paginate(15, ['*'], 'anggota_page')
+            ->withQueryString();
 
         $kecamatans = Kecamatan::orderBy('id_kopkec')->get();
 
@@ -120,6 +133,7 @@ class AdminController extends Controller
             'klasifikasiAnggota',
             'koperasis',
             'penguruses',
+            'anggotaKoperasis',
             'kecamatans'
         ));
     }
