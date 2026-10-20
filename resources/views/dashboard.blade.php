@@ -33,15 +33,15 @@
                     </div>
                 </div>
 
-                <!-- Nav Menu Links -->
-                <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
-                    <a href="#beranda" class="px-3.5 py-1.5 rounded-full bg-white/15 text-white shadow-sm hover:bg-white/20 transition-all duration-200">
+                <!-- Nav Menu Links (Scrollspy enabled) -->
+                <nav id="publicNav" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
+                    <a href="#beranda" id="nav-beranda" class="nav-link px-3.5 py-1.5 rounded-full bg-white/20 text-white shadow-sm font-bold transition-all duration-200">
                         Beranda
                     </a>
-                    <a href="#informasi" class="px-3.5 py-1.5 rounded-full text-red-100 hover:text-white hover:bg-white/10 transition-all duration-200">
+                    <a href="#informasi" id="nav-informasi" class="nav-link px-3.5 py-1.5 rounded-full text-red-100 hover:text-white hover:bg-white/10 font-medium transition-all duration-200">
                         Informasi
                     </a>
-                    <a href="#sebaran" class="px-3.5 py-1.5 rounded-full text-red-100 hover:text-white hover:bg-white/10 transition-all duration-200">
+                    <a href="#sebaran" id="nav-sebaran" class="nav-link px-3.5 py-1.5 rounded-full text-red-100 hover:text-white hover:bg-white/10 font-medium transition-all duration-200">
                         Sebaran
                     </a>
                 </nav>
@@ -214,20 +214,99 @@
                 </div>
             </div>
 
-            <!-- Section 2: Informasi Koperasi Merah Putih (Potensi, Jenis Usaha, SDM Koperasi) -->
-            <section id="informasi" class="space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <!-- Section 2: Informasi Koperasi Merah Putih (Potensi, Jenis Usaha, SDM Koperasi & Dokumen Progres) -->
+            <section id="informasi" class="space-y-5 scroll-mt-20">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-slate-200/70">
                     <div>
-                        <h3 class="text-xl font-bold text-slate-800 tracking-tight">
+                        <h3 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
                             Informasi Koperasi Merah Putih
                         </h3>
-                        <p class="text-xs sm:text-sm text-slate-500">
-                            Data agregat potensi, diversifikasi unit usaha, dan demografi sumber daya manusia
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">
+                            Kabupaten Bogor &bull; Data Progres Pembangunan, Agregat Potensi & Sumber Daya
                         </p>
                     </div>
-                    <span class="self-start sm:self-auto px-3 py-1 rounded-full bg-slate-200/80 text-slate-700 font-bold text-xs border border-slate-300/60 uppercase tracking-wider">
-                        DATA PROGRES PEMBANGUNAN 2025
-                    </span>
+
+                    <!-- Rounded Buttons Trigger Open File (Sesuai Desain Referensi) -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        @if(!empty($informasiFiles))
+                            @foreach($informasiFiles as $index => $file)
+                                <button
+                                    type="button"
+                                    onclick="toggleProgresDocCard('{{ $file['url'] }}', '{{ $file['title'] }}', '{{ $file['subtitle'] }}', this)"
+                                    class="btn-trigger-doc group inline-flex items-center space-x-2.5 px-4 py-2 rounded-full bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-sm hover:shadow-md transition-all duration-300 transform active:scale-95 cursor-pointer text-xs font-bold"
+                                    title="Klik untuk membuka/menutup isi file laporan"
+                                >
+                                    <span class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs group-hover:bg-blue-100 group-hover:text-blue-600 transition shrink-0">
+                                        <i class="fa-solid fa-file-pdf"></i>
+                                    </span>
+                                    <span class="tracking-tight">{{ $file['title'] }}</span>
+                                    <span class="px-2.5 py-0.5 rounded-full bg-slate-100 group-hover:bg-blue-100 text-[10px] font-extrabold text-slate-600 group-hover:text-blue-800 flex items-center space-x-1.5 shrink-0 transition">
+                                        <span class="doc-label-text">Lihat Detail</span>
+                                        <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-300 doc-chevron-icon"></i>
+                                    </span>
+                                </button>
+                            @endforeach
+                        @else
+                            <button
+                                type="button"
+                                onclick="toggleProgresDocCard('{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}', 'DATA PROGRES PEMBANGUNAN KDKMP', 'LAPJUSIK DIM 0621 &bull; 24 MARET 2026', this)"
+                                class="btn-trigger-doc group inline-flex items-center space-x-2.5 px-4 py-2 rounded-full bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-sm hover:shadow-md transition-all duration-300 transform active:scale-95 cursor-pointer text-xs font-bold"
+                                title="Klik untuk membuka/menutup isi file laporan"
+                            >
+                                <span class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs group-hover:bg-blue-100 group-hover:text-blue-600 transition shrink-0">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </span>
+                                <span class="tracking-tight">DATA PROGRES PEMBANGUNAN KDKMP (Maret 2026)</span>
+                                <span class="px-2.5 py-0.5 rounded-full bg-slate-100 group-hover:bg-blue-100 text-[10px] font-extrabold text-slate-600 group-hover:text-blue-800 flex items-center space-x-1.5 shrink-0 transition">
+                                    <span class="doc-label-text">Lihat Detail</span>
+                                    <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-300 doc-chevron-icon"></i>
+                                </span>
+                            </button>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Collapsible Expanding Card File (Dropdown turun kebawah & melebar kebawah sesuai gambar referensi) -->
+                <div id="progresDocCard" class="hidden transition-all duration-500 ease-in-out border border-slate-200/90 rounded-2xl shadow-xl bg-white overflow-hidden">
+                    <!-- Bar Biru Sesuai Screenshot Lampiran Pengguna -->
+                    <div class="bg-[#0284c7] text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center text-white shrink-0">
+                                <i class="fa-solid fa-file-lines text-base"></i>
+                            </div>
+                            <div>
+                                <h4 id="docCardTitle" class="text-xs sm:text-sm font-extrabold tracking-wider uppercase leading-none">
+                                    DATA PROGRES PEMBANGUNAN KDKMP
+                                </h4>
+                                <p id="docCardSubtitle" class="text-[10px] sm:text-[11px] text-blue-100 font-medium leading-none mt-1">
+                                    LAPJUSIK DIM 0621 &bull; 24 MARET 2026
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 text-xs">
+                            <a id="btnDocDownload" href="{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}" download class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold transition shadow-sm">
+                                <i class="fa-solid fa-download text-xs"></i>
+                                <span class="hidden sm:inline">Unduh PDF</span>
+                            </a>
+                            <a id="btnDocExternal" href="{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}" target="_blank" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold transition shadow-sm">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                <span class="hidden sm:inline">Layar Penuh</span>
+                            </a>
+                            <button type="button" onclick="closeProgresDocCard()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer" title="Tutup / Ciutkan File">
+                                <i class="fa-solid fa-xmark text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Viewer Container yang responsive dan melebar kebawah -->
+                    <div class="relative bg-slate-800 w-full" style="min-height: 650px; height: 80vh;">
+                        <iframe
+                            id="docViewerIframe"
+                            src="{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}#toolbar=1&navpanes=0&scrollbar=1&view=FitH"
+                            class="w-full h-full border-0"
+                            title="Viewer Laporan Perkembangan KDKMP"
+                        ></iframe>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -396,7 +475,7 @@
             </section>
 
             <!-- Section 3: PEMETAAN GEOSPASIAL WILAYAH (Khusus Kabupaten Bogor) -->
-            <section id="sebaran" class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
+            <section id="sebaran" class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4 scroll-mt-20">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pb-3 border-b border-slate-100">
                     <div>
                         <span class="text-[11px] font-bold text-red-600 tracking-wider uppercase block">
@@ -1181,6 +1260,111 @@
         const modal = document.getElementById('loginModal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+    }
+
+    // Scrollspy Handler untuk Navbar Indikator Status ON
+    const navItems = {
+        beranda: document.getElementById('nav-beranda'),
+        informasi: document.getElementById('nav-informasi'),
+        sebaran: document.getElementById('nav-sebaran'),
+    };
+
+    function updateScrollspy() {
+        const scrollY = window.scrollY || window.pageYOffset;
+        const offset = 140; // Offset untuk navbar sticky
+
+        const berandaSec = document.getElementById('beranda');
+        const infoSec = document.getElementById('informasi');
+        const sebaranSec = document.getElementById('sebaran');
+
+        const infoTop = infoSec ? infoSec.offsetTop - offset : 999999;
+        const sebaranTop = sebaranSec ? sebaranSec.offsetTop - offset : 999999;
+
+        let active = 'beranda';
+        if (scrollY >= sebaranTop) {
+            active = 'sebaran';
+        } else if (scrollY >= infoTop) {
+            active = 'informasi';
+        } else {
+            active = 'beranda';
+        }
+
+        Object.keys(navItems).forEach(key => {
+            const el = navItems[key];
+            if (!el) return;
+            if (key === active) {
+                el.className = 'nav-link px-3.5 py-1.5 rounded-full bg-white/20 text-white shadow-sm font-bold transition-all duration-200';
+            } else {
+                el.className = 'nav-link px-3.5 py-1.5 rounded-full text-red-100 hover:text-white hover:bg-white/10 font-medium transition-all duration-200';
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateScrollspy, { passive: true });
+    window.addEventListener('load', updateScrollspy);
+
+    // Document Card Handler (Dropdown turun kebawah & melebar kebawah sesuai gambar referensi)
+    let activeDocBtn = null;
+    function toggleProgresDocCard(url, title, subtitle, btnElement) {
+        const card = document.getElementById('progresDocCard');
+        const iframe = document.getElementById('docViewerIframe');
+        const titleEl = document.getElementById('docCardTitle');
+        const subtitleEl = document.getElementById('docCardSubtitle');
+        const dlBtn = document.getElementById('btnDocDownload');
+        const extBtn = document.getElementById('btnDocExternal');
+
+        if (!card.classList.contains('hidden') && activeDocBtn === btnElement) {
+            closeProgresDocCard();
+            return;
+        }
+
+        // Set card data
+        if (title && titleEl) titleEl.innerText = title;
+        if (subtitle && subtitleEl) subtitleEl.innerHTML = subtitle;
+        if (url && dlBtn) dlBtn.href = url;
+        if (url && extBtn) extBtn.href = url;
+        if (url && iframe) {
+            const viewerUrl = url.includes('#') ? url : `${url}#toolbar=1&navpanes=0&scrollbar=1&view=FitH`;
+            if (iframe.src !== viewerUrl) {
+                iframe.src = viewerUrl;
+            }
+        }
+
+        // Reset previous button styling if any
+        resetDocButtons();
+
+        // Mark current button as active
+        if (btnElement) {
+            activeDocBtn = btnElement;
+            btnElement.classList.add('border-blue-600', 'bg-blue-50', 'text-blue-700');
+            btnElement.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
+            const label = btnElement.querySelector('.doc-label-text');
+            const icon = btnElement.querySelector('.doc-chevron-icon');
+            if (label) label.innerText = 'Tutup Detail';
+            if (icon) icon.classList.add('rotate-180');
+        }
+
+        // Reveal card with smooth slide down
+        card.classList.remove('hidden');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function closeProgresDocCard() {
+        const card = document.getElementById('progresDocCard');
+        if (card) card.classList.add('hidden');
+        resetDocButtons();
+        activeDocBtn = null;
+    }
+
+    function resetDocButtons() {
+        document.querySelectorAll('.btn-trigger-doc').forEach(btn => {
+            btn.classList.remove('border-blue-600', 'bg-blue-50', 'text-blue-700');
+            btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+            const label = btn.querySelector('.doc-label-text');
+            const icon = btn.querySelector('.doc-chevron-icon');
+            if (label) label.innerText = 'Lihat Detail';
+            if (icon) icon.classList.remove('rotate-180');
+        });
     }
 
     @if(session('open_login') || $errors->any())

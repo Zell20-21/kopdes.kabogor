@@ -70,6 +70,25 @@ class DashboardController extends Controller
         ];
         $totalSdm = 23428;
 
+        // Dokumen Progres & Laporan dari folder informasi
+        $informasiDir = base_path('informasi');
+        $informasiFiles = [];
+        if (is_dir($informasiDir)) {
+            $files = glob($informasiDir.'/*.*');
+            foreach ($files as $file) {
+                $filename = basename($file);
+                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                $informasiFiles[] = [
+                    'filename' => $filename,
+                    'title' => 'DATA PROGRES PEMBANGUNAN KDKMP',
+                    'subtitle' => 'LAPJUSIK DIM 0621 &bull; 24 MARET 2026',
+                    'size' => round(filesize($file) / 1024 / 1024, 2).' MB',
+                    'ext' => $ext,
+                    'url' => route('informasi.file', $filename),
+                ];
+            }
+        }
+
         return view('dashboard', compact(
             'kecamatans',
             'totalDesa',
@@ -78,7 +97,8 @@ class DashboardController extends Controller
             'fasilitas',
             'jenisUsaha',
             'sdmKoperasi',
-            'totalSdm'
+            'totalSdm',
+            'informasiFiles'
         ));
     }
 

@@ -264,4 +264,26 @@ class DashboardTest extends TestCase
             'flag_del' => 0,
         ]);
     }
+
+    public function test_dashboard_displays_informasi_files_and_scrollspy_navigation(): void
+    {
+        $response = $this->get(route('dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('id="publicNav"', false);
+        $response->assertSee('id="nav-beranda"', false);
+        $response->assertSee('id="nav-informasi"', false);
+        $response->assertSee('id="nav-sebaran"', false);
+        $response->assertSee('DATA PROGRES PEMBANGUNAN KDKMP');
+        $response->assertSee('id="progresDocCard"', false);
+        $response->assertSee('btn-trigger-doc');
+    }
+
+    public function test_informasi_file_route_can_stream_pdf(): void
+    {
+        $response = $this->get(route('informasi.file', 'kdkp_maret_2026.pdf'));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/pdf');
+    }
 }

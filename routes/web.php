@@ -12,6 +12,26 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/kecamatan/{kecamatan}', [DashboardController::class, 'show'])->name('kecamatan.show');
 Route::get('/export/rekapitulasi', [DashboardController::class, 'export'])->name('export.rekapitulasi');
+Route::get('/informasi/file/{filename}', function (string $filename) {
+    $path = base_path('informasi/'.basename($filename));
+    if (! file_exists($path)) {
+        abort(404);
+    }
+
+    $mimeType = match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+        'pdf' => 'application/pdf',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'xls' => 'application/vnd.ms-excel',
+        'png' => 'image/png',
+        'jpg', 'jpeg' => 'image/jpeg',
+        default => 'application/octet-stream',
+    };
+
+    return response()->file($path, [
+        'Content-Type' => $mimeType,
+        'Content-Disposition' => 'inline; filename="'.basename($filename).'"',
+    ]);
+})->name('informasi.file');
 
 // Authentication routes
 Route::get('/login', function () {
