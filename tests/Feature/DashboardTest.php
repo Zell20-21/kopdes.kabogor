@@ -143,6 +143,7 @@ class DashboardTest extends TestCase
         $response->assertSee('DESK KOP');
         $response->assertSee('KABUPATEN BOGOR');
         $response->assertSee('INFORMASI KOPERASI');
+        $response->assertSee('<select onchange="window.location.href=this.value"', false);
         $response->assertSee('435');
         $response->assertSee('Anggota Koperasi');
         $response->assertSee('OPERASIONAL');
@@ -164,6 +165,7 @@ class DashboardTest extends TestCase
         $response->assertViewHas('totalAnggota', 11);
         $response->assertSee('KOPERASI DESA PONDOK RAJEG');
         $response->assertDontSee('KOPERASI DESA LAIN');
+        $response->assertDontSee('<select onchange="window.location.href=this.value"', false);
     }
 
     public function test_operator_desa_sees_only_its_own_cooperative_managers_and_member_count(): void

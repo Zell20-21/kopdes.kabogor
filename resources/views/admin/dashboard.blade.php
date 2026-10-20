@@ -172,16 +172,18 @@
                             </p>
                         </div>
 
-                        <!-- Dropdown Select Header -->
-                        <div class="relative">
-                            <select onchange="window.location.href=this.value"
-                                    class="bg-white border border-slate-300 rounded-xl px-4 py-2 text-xs font-extrabold text-slate-700 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm cursor-pointer pr-9">
-                                <option value="{{ route('admin.dashboard', ['tab' => 'informasi']) }}" selected>INFORMASI KOPERASI</option>
-                                <option value="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}">DATABASE KOPERASI</option>
-                                <option value="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}">DATABASE PENGURUS</option>
-                                <option value="{{ route('admin.dashboard', ['tab' => 'anggota']) }}">DATABASE ANGGOTA</option>
-                            </select>
-                        </div>
+                        @if(! $user->isOperatorDesa() && ! $user->isOperatorKecamatan())
+                            <!-- Dropdown Select Header -->
+                            <div class="relative">
+                                <select onchange="window.location.href=this.value"
+                                        class="bg-white border border-slate-300 rounded-xl px-4 py-2 text-xs font-extrabold text-slate-700 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm cursor-pointer pr-9">
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'informasi']) }}" selected>INFORMASI KOPERASI</option>
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}">DATABASE KOPERASI</option>
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}">DATABASE PENGURUS</option>
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'anggota']) }}">DATABASE ANGGOTA</option>
+                                </select>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Top Row: 2 Big Highlight Stat Cards (435 Koperasi & 0 Anggota) -->
