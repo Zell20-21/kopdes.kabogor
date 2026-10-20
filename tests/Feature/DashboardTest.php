@@ -56,10 +56,12 @@ class DashboardTest extends TestCase
 
     public function test_portal_login_validation_and_captcha(): void
     {
+        $this->get(route('captcha'));
+
         $response = $this->post(route('portal.login'), [
             'username' => 'admin',
             'password' => 'password',
-            'captcha' => '2842',
+            'captcha' => session('login_captcha'),
         ]);
 
         $response->assertRedirect(route('admin.dashboard'));
@@ -78,15 +80,47 @@ class DashboardTest extends TestCase
             'id_company' => 1,
             'id_branch' => 1,
         ]);
+        $this->get(route('captcha'));
 
         $response = $this->post(route('portal.login'), [
             'username' => 'kop.pond2108',
             'password' => 'password',
-            'captcha' => '2842',
+            'captcha' => session('login_captcha'),
         ]);
 
         $response->assertRedirect(route('admin.dashboard'));
         $this->assertAuthenticatedAs($operator);
+    }
+
+    public function test_captcha_endpoint_returns_a_fresh_uncached_image(): void
+    {
+        $response = $this->get(route('captcha'));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'image/svg+xml');
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
+        $this->assertStringContainsString('no-cache', $response->headers->get('Cache-Control'));
+        $this->assertMatchesRegularExpression('/^\d{4}$/', session('login_captcha'));
+        $this->assertStringContainsString('<svg', $response->getContent());
+        $this->assertStringNotContainsString('<text', $response->getContent());
+    }
+
+    public function test_login_rejects_the_fixed_captcha_code_and_consumes_the_session_code(): void
+    {
+        $this->get(route('captcha'));
+        $this->session(['login_captcha' => '1234']);
+
+        $response = $this->post(route('portal.login'), [
+            'username' => 'admin',
+            'password' => 'password',
+            'captcha' => '2842',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error', 'Kode Captcha tidak sesuai. Silakan coba lagi.');
+        $response->assertSessionHas('open_login', true);
+        $this->assertFalse(session()->has('login_captcha'));
+        $this->assertGuest();
     }
 
     public function test_unauthenticated_user_cannot_access_admin_dashboard(): void

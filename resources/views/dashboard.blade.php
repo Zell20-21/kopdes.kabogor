@@ -797,6 +797,7 @@
                     type="text"
                     name="username"
                     required
+                    value="{{ old('username') }}"
                     placeholder="cth: kop.pond2108 / kopmp.cibinong / admin..."
                     class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-slate-50 focus:bg-white text-xs"
                 >
@@ -827,10 +828,8 @@
             <div class="flex items-center justify-between pt-1">
                 <div class="flex items-center space-x-2">
                     <span class="text-[11px] text-slate-500">Captcha:</span>
-                    <div class="px-2.5 py-1 bg-slate-900 text-white font-mono font-bold tracking-widest text-sm rounded shadow-inner">
-                        2842
-                    </div>
-                    <button type="button" title="Muat ulang kode" class="text-slate-400 hover:text-slate-600 text-xs">
+                    <img id="loginCaptchaImage" alt="Kode captcha" class="h-10 w-[120px] rounded-lg border border-slate-200 bg-slate-900">
+                    <button type="button" onclick="refreshLoginCaptcha()" title="Muat ulang kode" aria-label="Muat ulang kode captcha" class="text-slate-400 hover:text-slate-600 text-xs">
                         <i class="fa-solid fa-rotate-right"></i>
                     </button>
                 </div>
@@ -1156,6 +1155,14 @@
         const modal = document.getElementById('loginModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+        refreshLoginCaptcha();
+    }
+
+    function refreshLoginCaptcha() {
+        const captchaImage = document.getElementById('loginCaptchaImage');
+        const captchaInput = document.querySelector('#loginModal input[name="captcha"]');
+        captchaImage.src = `{{ route('captcha') }}?refresh=${Date.now()}`;
+        captchaInput.value = '';
     }
 
     function closeLoginModal() {
@@ -1163,5 +1170,9 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
+
+    @if(session('open_login') || $errors->any())
+        openLoginModal();
+    @endif
 </script>
 @endpush
