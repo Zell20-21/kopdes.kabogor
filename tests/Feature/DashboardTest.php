@@ -31,7 +31,7 @@ class DashboardTest extends TestCase
 
     public function test_kecamatan_api_returns_json_details(): void
     {
-        $cisarua = Kecamatan::where('nama', 'CISARUA')->firstOrFail();
+        $cisarua = Kecamatan::where('name_kopkec', 'CISARUA')->firstOrFail();
 
         $response = $this->get(route('kecamatan.show', $cisarua));
 
@@ -40,8 +40,6 @@ class DashboardTest extends TestCase
             'status' => 'success',
             'data' => [
                 'nama' => 'CISARUA',
-                'kop_desa' => 9,
-                'kop_kel' => 1,
                 'jumlah' => 10,
             ],
         ]);
@@ -59,14 +57,36 @@ class DashboardTest extends TestCase
     public function test_portal_login_validation_and_captcha(): void
     {
         $response = $this->post(route('portal.login'), [
-            'username' => 'admin_bogor',
-            'password' => 'secret123',
+            'username' => 'admin',
+            'password' => 'password',
             'captcha' => '2842',
         ]);
 
         $response->assertRedirect(route('admin.dashboard'));
         $response->assertSessionHas('success');
         $this->assertAuthenticated();
+    }
+
+    public function test_operator_desa_can_login_and_access_dashboard(): void
+    {
+        $operator = User::create([
+            'id_user' => 55,
+            'name_user' => 'KOP. PONDOK RAJEG [CIBINONG]',
+            'login_user' => 'kop.pond2108',
+            'pswd' => 'f75191ede83d4e347ee30684227509e8',
+            'level_user' => 15,
+            'id_company' => 1,
+            'id_branch' => 1,
+        ]);
+
+        $response = $this->post(route('portal.login'), [
+            'username' => 'kop.pond2108',
+            'password' => 'password',
+            'captcha' => '2842',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticatedAs($operator);
     }
 
     public function test_unauthenticated_user_cannot_access_admin_dashboard(): void

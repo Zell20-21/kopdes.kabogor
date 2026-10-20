@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Kecamatan;
+use App\Models\Kelurahan;
 use Illuminate\Database\Seeder;
 
 class KecamatanSeeder extends Seeder
@@ -548,11 +549,33 @@ class KecamatanSeeder extends Seeder
             ],
         ];
 
+        $kelId = 1;
         foreach ($kecamatanList as $item) {
             Kecamatan::updateOrCreate(
-                ['nomor_urut' => $item['nomor_urut']],
-                $item
+                ['id_kopkec' => $item['nomor_urut']],
+                [
+                    'name_kopkec' => $item['nama'],
+                    'jum_desa' => $item['kop_desa'] + $item['kop_kel'],
+                    'jum_koperasi' => $item['jumlah'],
+                    'code_kopkec' => '3201'.str_pad($item['nomor_urut'], 3, '0', STR_PAD_LEFT),
+                ]
             );
+
+            if (! empty($item['daftar_desa'])) {
+                foreach ($item['daftar_desa'] as $desaName) {
+                    Kelurahan::updateOrCreate(
+                        ['id_kopkel' => $kelId],
+                        [
+                            'id_kopkec' => $item['nomor_urut'],
+                            'name_kopkel' => strtoupper($desaName),
+                            'code_kopkec' => '3201'.str_pad($item['nomor_urut'], 3, '0', STR_PAD_LEFT),
+                            'code_kopkel' => '3201'.str_pad($kelId, 6, '0', STR_PAD_LEFT),
+                            'jum_koperasi' => 1,
+                        ]
+                    );
+                    $kelId++;
+                }
+            }
         }
     }
 }

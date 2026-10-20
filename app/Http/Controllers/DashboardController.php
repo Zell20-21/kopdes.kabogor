@@ -14,7 +14,7 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        $kecamatans = Kecamatan::orderBy('nomor_urut')->get();
+        $kecamatans = Kecamatan::orderBy('id_kopkec')->get();
 
         $totalDesa = $kecamatans->sum('kop_desa');
         $totalKelurahan = $kecamatans->sum('kop_kel');
@@ -98,7 +98,7 @@ class DashboardController extends Controller
      */
     public function export(): StreamedResponse
     {
-        $kecamatans = Kecamatan::orderBy('nomor_urut')->get();
+        $kecamatans = Kecamatan::orderBy('id_kopkec')->get();
 
         $headers = [
             'Content-Type' => 'text/csv; charset=utf-8',

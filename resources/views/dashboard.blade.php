@@ -9,12 +9,9 @@
     <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Logo & Brand -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/20 p-1 flex items-center justify-center shadow-inner">
-                        <div class="w-full h-full rounded bg-red-600 flex items-center justify-center border border-white/30 text-white font-black text-sm tracking-tighter">
-                            KMP
-                        </div>
+                    <div class="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-md shrink-0">
+                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="h-full w-auto object-contain">
                     </div>
                     <div>
                         <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
@@ -578,8 +575,8 @@
                 <!-- Col 1: Brand & Narasi RAPID / KMP -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-3">
-                        <div class="w-11 h-11 rounded-lg bg-white/15 border border-white/30 p-1 flex items-center justify-center shadow-lg">
-                            <span class="text-white font-black text-sm tracking-tighter">KMP</span>
+                        <div class="h-11 w-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-lg shrink-0">
+                            <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="h-full w-auto object-contain">
                         </div>
                         <div>
                             <h4 class="text-base font-extrabold text-white tracking-wide uppercase">
@@ -778,9 +775,14 @@
 <div id="loginModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div class="flex items-center space-x-2 text-slate-800 font-bold text-base">
-                <i class="fa-solid fa-shield-halved text-red-600"></i>
-                <h4 class="text-base font-bold text-slate-800">Login Portal Petugas & Admin</h4>
+            <div class="flex items-center space-x-3">
+                <div class="h-10 w-10 rounded-xl bg-red-50 p-1 flex items-center justify-center border border-red-100 shadow-sm shrink-0">
+                    <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="h-full w-auto object-contain">
+                </div>
+                <div>
+                    <h4 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">Login Operator Desa & Admin</h4>
+                    <span class="text-[10px] text-slate-400 font-medium">SIMKOP &bull; KDKMP Kabupaten Bogor</span>
+                </div>
             </div>
             <button type="button" onclick="closeLoginModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
@@ -790,12 +792,12 @@
         <form action="{{ route('portal.login') }}" method="POST" class="mt-4 space-y-3.5 text-xs">
             @csrf
             <div>
-                <label class="block font-semibold text-slate-700 mb-1">Nama Pengguna / NIK:</label>
+                <label class="block font-semibold text-slate-700 mb-1">Username Operator / Akun:</label>
                 <input
                     type="text"
                     name="username"
                     required
-                    placeholder="Masukkan username / NIK..."
+                    placeholder="cth: kop.pond2108 / kopmp.cibinong / admin..."
                     class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-slate-50 focus:bg-white text-xs"
                 >
             </div>
