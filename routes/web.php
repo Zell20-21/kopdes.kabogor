@@ -180,4 +180,6 @@ Route::post('/logout', function (Request $request) {
 // Admin protected routes
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::post('/koperasi', [AdminController::class, 'storeKoperasi'])->name('admin.koperasi.store');
+    Route::get('/koperasi/export', [AdminController::class, 'exportKoperasi'])->name('admin.koperasi.export');
 });

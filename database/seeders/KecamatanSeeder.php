@@ -84,14 +84,15 @@ class KecamatanSeeder extends Seeder
             [
                 'nomor_urut' => 6,
                 'nama' => 'CIAWI',
-                'kop_desa' => 11,
+                'kop_desa' => 13,
                 'kop_kel' => 0,
-                'jumlah' => 11,
+                'jumlah' => 13,
                 'latitude' => -6.6575000,
                 'longitude' => 106.8525000,
                 'daftar_desa' => [
                     'Banjar Sari', 'Banjar Wangi', 'Banjar Waru', 'Bendungan', 'Bitung Sari',
                     'Bojong Murni', 'Ciawi', 'Cibedug', 'Cileungsi', 'Citapen', 'Pandansari',
+                    'Teluk Pinang', 'Jambu Luwuk',
                 ],
             ],
             [

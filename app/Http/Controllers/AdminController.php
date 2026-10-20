@@ -73,6 +73,13 @@ class AdminController extends Controller
 
         // Database Koperasi query with search & filter
         $query = (clone $baseQuery)->with(['kecamatan', 'kelurahan']);
+
+        if ($filterKec = ($request->get('id_kec') ?: $request->get('filter_kec'))) {
+            $query->where('id_kec', $filterKec);
+        }
+        if ($filterKel = $request->get('id_kel')) {
+            $query->where('id_kel', $filterKel);
+        }
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name_koperasi', 'like', "%{$search}%")
@@ -89,7 +96,29 @@ class AdminController extends Controller
         if ($statusOps = $request->get('status_ops')) {
             $query->where('st_ops', $statusOps);
         }
-        $koperasis = $query->orderBy('id_koperasi', 'asc')->paginate(15)->withQueryString();
+
+        $perPage = max(5, min(100, (int) $request->get('per_page', 25)));
+        $koperasis = $query->orderBy('id_koperasi', 'asc')->paginate($perPage)->withQueryString();
+
+        // GIS map points for all active cooperatives
+        $gisKoperasis = (clone $baseQuery)
+            ->with(['kecamatan:id_kopkec,name_kopkec', 'kelurahan:id_kopkel,name_kopkel'])
+            ->select([
+                'id_koperasi',
+                'name_koperasi',
+                'id_kec',
+                'id_kel',
+                'no_ahu',
+                'no_inkop',
+                'tgl_ahu',
+                'st_ops',
+                'st_latih',
+                'st_sertifikat',
+                'gps_lat',
+                'gps_long',
+                'cat_koperasi',
+            ])
+            ->get();
 
         // Database Pengurus query
         $pengurusQuery = Kopsdm::with('koperasi')
@@ -109,7 +138,9 @@ class AdminController extends Controller
             ->paginate(15, ['*'], 'anggota_page')
             ->withQueryString();
 
-        $kecamatans = Kecamatan::orderBy('id_kopkec')->get();
+        $kecamatans = Kecamatan::with(['kelurahans' => fn ($q) => $q->orderBy('name_kopkel', 'asc')])
+            ->orderBy('id_kopkec', 'asc')
+            ->get();
 
         return view('admin.dashboard', compact(
             'user',
@@ -134,7 +165,108 @@ class AdminController extends Controller
             'koperasis',
             'penguruses',
             'anggotaKoperasis',
-            'kecamatans'
+            'kecamatans',
+            'gisKoperasis',
+            'perPage'
         ));
+    }
+
+    /**
+     * Store a newly created Koperasi.
+     */
+    public function storeKoperasi(Request $request)
+    {
+        $validated = $request->validate([
+            'name_koperasi' => 'required|string|max:255',
+            'id_kec' => 'required|integer',
+            'id_kel' => 'required|integer',
+            'no_inkop' => 'nullable|string|max:100',
+            'no_ahu' => 'nullable|string|max:100',
+            'tgl_ahu' => 'nullable|date',
+            'st_ops' => 'required|string',
+            'st_latih' => 'required|string',
+            'st_sertifikat' => 'required|string',
+            'cat_koperasi' => 'nullable|string',
+        ]);
+
+        $maxId = (int) Koperasi::max('id_koperasi');
+        $validated['id_koperasi'] = $maxId + 1;
+        $validated['kop_addr'] = 'Kabupaten Bogor, Jawa Barat';
+        $validated['kop_telp'] = '08123456789';
+        $validated['kop_mail'] = 'kmp.info@bogorkab.go.id';
+        $validated['jum_pengurus'] = 5;
+        $validated['jum_pengawas'] = 3;
+        $validated['jum_anggota'] = 0;
+
+        // Auto coordinate fallback from subdistrict
+        $kec = Kecamatan::find($validated['id_kec']);
+        $validated['gps_lat'] = $kec?->latitude ? (string) $kec->latitude : '-6.5950';
+        $validated['gps_long'] = $kec?->longitude ? (string) $kec->longitude : '106.7900';
+
+        Koperasi::create($validated);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'koperasi'])
+            ->with('success', 'Data Koperasi berhasil ditambahkan ke database.');
+    }
+
+    /**
+     * Export Koperasi table data to CSV/Excel.
+     */
+    public function exportKoperasi(Request $request)
+    {
+        $query = Koperasi::with(['kecamatan', 'kelurahan'])->where('flag_del', 0);
+
+        if ($idKec = $request->get('id_kec')) {
+            $query->where('id_kec', $idKec);
+        }
+        if ($idKel = $request->get('id_kel')) {
+            $query->where('id_kel', $idKel);
+        }
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name_koperasi', 'like', "%{$search}%")
+                    ->orWhere('no_ahu', 'like', "%{$search}%")
+                    ->orWhere('no_inkop', 'like', "%{$search}%");
+            });
+        }
+
+        $items = $query->orderBy('id_koperasi', 'asc')->get();
+
+        $filename = 'Database_Koperasi_Kabupaten_Bogor_'.date('Ymd_His').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($items) {
+            $handle = fopen('php://output', 'w');
+            // UTF-8 BOM for Excel compatibility
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($handle, ['No', 'NI-KOP', 'Nama Koperasi', 'Nomor AHU', 'Tanggal AHU', 'Kecamatan', 'Desa/Kelurahan', 'Status Operasional', 'Status Pelatihan', 'Status Sertifikat']);
+
+            foreach ($items as $idx => $kop) {
+                fputcsv($handle, [
+                    $idx + 1,
+                    $kop->no_inkop ?? '-',
+                    $kop->name_koperasi,
+                    $kop->no_ahu ?? '-',
+                    $kop->tgl_ahu ? date('d/m/Y', strtotime($kop->tgl_ahu)) : '-',
+                    $kop->kecamatan?->name_kopkec ?? '-',
+                    $kop->kelurahan?->name_kopkel ?? '-',
+                    $kop->st_ops,
+                    $kop->st_latih,
+                    $kop->st_sertifikat,
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
