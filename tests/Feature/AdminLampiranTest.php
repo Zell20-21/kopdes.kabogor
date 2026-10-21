@@ -34,7 +34,7 @@ class AdminLampiranTest extends TestCase
         );
     }
 
-    public function test_admin_can_view_lampiran_tab(): void
+    public function test_admin_can_view_the_existing_dashboard_and_lampiran_page(): void
     {
         $admin = $this->createAdminUser();
 
@@ -45,6 +45,7 @@ class AdminLampiranTest extends TestCase
         $response->assertSee('LAMPIRAN INFORMASI');
         $response->assertSee('Upload File Lampiran Baru');
         $response->assertSee('modalPreviewUpload');
+        $response->assertSee('<aside', false);
     }
 
     public function test_admin_can_upload_and_manage_lampiran(): void
