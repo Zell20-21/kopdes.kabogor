@@ -34,6 +34,32 @@ Route::get('/informasi/file/{filename}', function (string $filename) {
     ]);
 })->name('informasi.file');
 
+Route::get('/asset/{filename}', function (string $filename) {
+    $filename = basename($filename);
+    $path = file_exists(base_path('asset/'.$filename))
+        ? base_path('asset/'.$filename)
+        : public_path('asset/'.$filename);
+
+    if (! file_exists($path)) {
+        abort(404);
+    }
+
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $mimeType = match ($ext) {
+        'png' => 'image/png',
+        'jpg', 'jpeg' => 'image/jpeg',
+        'webp' => 'image/webp',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml',
+        default => 'application/octet-stream',
+    };
+
+    return response()->file($path, [
+        'Content-Type' => $mimeType,
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->where('filename', '[A-Za-z0-9_\-\.]+')->name('asset.file');
+
 // Authentication routes
 Route::get('/login', function () {
     if (Auth::check()) {

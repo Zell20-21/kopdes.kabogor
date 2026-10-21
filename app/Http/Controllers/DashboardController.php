@@ -326,12 +326,12 @@ class DashboardController extends Controller
         $sekretaris = $koperasi->sdms->first(fn ($s) => stripos($s->jab_kopsdm, 'SEKRETARIS') !== false && stripos($s->jab_kopsdm, 'WAKIL') === false);
         $bendahara = $koperasi->sdms->first(fn ($s) => stripos($s->jab_kopsdm, 'BENDAHARA') !== false && stripos($s->jab_kopsdm, 'WAKIL') === false);
 
-        // Helper to find photo from public/asset with fallback
+        // Helper to find photo from root asset or public/asset with fallback
         $getPhoto = function (string $prefix, int $id, string $fallback): string {
             $extensions = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG'];
             foreach ($extensions as $ext) {
                 $file = "asset/{$prefix}_{$id}.{$ext}";
-                if (file_exists(public_path($file))) {
+                if (file_exists(base_path($file)) || file_exists(public_path($file))) {
                     return asset($file);
                 }
             }
@@ -349,7 +349,7 @@ class DashboardController extends Controller
         foreach (['dtkop1', 'dtkop2', 'dtkop3'] as $dt) {
             foreach (['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG'] as $ext) {
                 $file = "asset/{$dt}_{$koperasi->id_koperasi}.{$ext}";
-                if (file_exists(public_path($file))) {
+                if (file_exists(base_path($file)) || file_exists(public_path($file))) {
                     $additionalGallery[] = asset($file);
                     break;
                 }

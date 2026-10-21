@@ -285,8 +285,8 @@
                     
                     <!-- Card Ketua -->
                     <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-5 flex flex-col items-center text-center group hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                        <div class="relative w-full max-w-[210px] aspect-[3/4] rounded-xl overflow-hidden shadow-lg border-2 border-red-500 bg-red-600 cursor-pointer" onclick="openLightbox('{{ $fotoKetua }}', '{{ $ketua?->name_kopsdm ?? 'IDRUS FIRDAUS' }}', 'Ketua Koperasi')">
-                            <img src="{{ $fotoKetua }}" alt="Ketua Koperasi" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <div class="relative w-full max-w-[210px] aspect-[3/4] rounded-xl overflow-hidden shadow-md border-2 border-slate-200 bg-slate-100 cursor-pointer" onclick="openLightbox('{{ $fotoKetua }}', '{{ $ketua?->name_kopsdm ?? 'IDRUS FIRDAUS' }}', 'Ketua Koperasi')">
+                            <img src="{{ $fotoKetua }}" alt="Ketua Koperasi" onerror="this.onerror=null; this.src='{{ asset('asset/kakop_0.png') }}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
                                 <span class="text-[10px] font-black text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-sm flex items-center space-x-1">
                                     <i class="fa-solid fa-magnifying-glass-plus"></i>
@@ -302,8 +302,8 @@
 
                     <!-- Card Sekretaris -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-5 flex flex-col items-center text-center group hover:shadow-md transition-all duration-200">
-                        <div class="relative w-full max-w-[210px] aspect-[3/4] rounded-xl overflow-hidden shadow-sm border border-slate-200 bg-red-600 cursor-pointer" onclick="openLightbox('{{ $fotoSekretaris }}', '{{ $sekretaris?->name_kopsdm ?? 'HJ. NENENG ASRIAH, S.PD.I' }}', 'Sekretaris')">
-                            <img src="{{ $fotoSekretaris }}" alt="Sekretaris" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="relative w-full max-w-[210px] aspect-[3/4] rounded-xl overflow-hidden shadow-sm border border-slate-200 bg-slate-100 cursor-pointer" onclick="openLightbox('{{ $fotoSekretaris }}', '{{ $sekretaris?->name_kopsdm ?? 'HJ. NENENG ASRIAH, S.PD.I' }}', 'Sekretaris')">
+                            <img src="{{ $fotoSekretaris }}" alt="Sekretaris" onerror="this.onerror=null; this.src='{{ asset('asset/sekkop_0.png') }}';" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
                                 <span class="text-[10px] font-black text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-sm">
                                     <i class="fa-solid fa-magnifying-glass-plus mr-1"></i>Perbesar Foto
@@ -324,7 +324,7 @@
                     <!-- Card Bendahara -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-5 flex flex-col items-center text-center group hover:shadow-md transition-all duration-200">
                         <div class="relative w-full max-w-[210px] aspect-[3/4] rounded-xl overflow-hidden shadow-sm border border-slate-200 bg-slate-100 cursor-pointer" onclick="openLightbox('{{ $fotoBendahara }}', '{{ $bendahara?->name_kopsdm ?? 'FAHRIZI' }}', 'Bendahara')">
-                            <img src="{{ $fotoBendahara }}" alt="Bendahara" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                            <img src="{{ $fotoBendahara }}" alt="Bendahara" onerror="this.onerror=null; this.src='{{ asset('asset/benkop_0.png') }}';" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
                                 <span class="text-[10px] font-black text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-sm">
                                     <i class="fa-solid fa-magnifying-glass-plus mr-1"></i>Perbesar Foto
@@ -436,7 +436,7 @@
 
                 <!-- Main Foto Gedung / Landmark with Lightbox Click -->
                 <div class="relative w-full bg-slate-50 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center min-h-[350px] sm:min-h-[420px] p-2 shadow-inner group cursor-pointer" onclick="openLightbox('{{ $fotoGedung }}', 'Foto Gedung / Kantor {{ $koperasi->name_koperasi }}', 'Gallery Dokumentasi')">
-                    <img id="mainGalleryImg" src="{{ $fotoGedung }}" alt="Foto Gedung Koperasi" class="max-h-[420px] w-auto max-w-full object-contain rounded-lg transition-transform duration-300 group-hover:scale-[1.01]">
+                    <img id="mainGalleryImg" src="{{ $fotoGedung }}" alt="Foto Gedung Koperasi" onerror="this.onerror=null; this.src='{{ asset('asset/kop_0.png') }}';" class="max-h-[420px] w-auto max-w-full object-contain rounded-lg transition-transform duration-300 group-hover:scale-[1.01]">
                     
                     <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <span class="px-3.5 py-1.5 rounded-lg bg-white/95 text-slate-900 font-black text-xs shadow flex items-center space-x-1.5">
