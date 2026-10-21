@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Kecamatan;
+use App\Models\Kelurahan;
 use App\Models\Koperasi;
 use App\Models\Kopsdm;
 use App\Models\User;
@@ -168,6 +169,99 @@ class DashboardTest extends TestCase
         $response->assertDontSee('<select onchange="window.location.href=this.value"', false);
     }
 
+    public function test_each_operator_desa_sees_only_its_assigned_cooperative_and_village_filter(): void
+    {
+        $this->createKecamatan(9001, 'KECAMATAN PERTAMA');
+        $this->createKecamatan(9002, 'KECAMATAN KEDUA');
+        $this->createKelurahan(9101, 9001, 'DESA OPERATOR PERTAMA');
+        $this->createKelurahan(9201, 9002, 'DESA OPERATOR KEDUA');
+        $this->createCooperative(9301, 9101, 'KOPERASI DESA PERTAMA', 10, 9001);
+        $this->createCooperative(9302, 9201, 'KOPERASI DESA KEDUA', 20, 9002);
+        $firstOperator = $this->createOperatorDesa(9101, 9001);
+        $secondOperator = $this->createOperatorDesa(9201, 9002, 9002);
+
+        $firstResponse = $this->actingAs($firstOperator)->get(route('admin.dashboard', ['tab' => 'koperasi']));
+        $secondResponse = $this->actingAs($secondOperator)->get(route('admin.dashboard', ['tab' => 'koperasi']));
+
+        $firstResponse->assertOk();
+        $firstResponse->assertViewHas('gisKoperasis', fn ($koperasis): bool => $koperasis->pluck('id_koperasi')->all() === [9301]);
+        $firstResponse->assertSee('name="id_kec" id="filter_id_kec"', false);
+        $firstResponse->assertSee('value="9001" selected', false);
+        $firstResponse->assertSee('KECAMATAN PERTAMA');
+        $firstResponse->assertSee('<option value="9101" selected>DESA OPERATOR PERTAMA</option>', false);
+        $firstResponse->assertDontSee('KECAMATAN KEDUA');
+        $firstResponse->assertDontSee('DESA OPERATOR KEDUA');
+        $firstResponse->assertDontSee('KOPERASI DESA KEDUA');
+        $firstResponse->assertDontSee('Ciawi & Megamendung (19, 45)');
+
+        $secondResponse->assertOk();
+        $secondResponse->assertViewHas('gisKoperasis', fn ($koperasis): bool => $koperasis->pluck('id_koperasi')->all() === [9302]);
+        $secondResponse->assertSee('value="9002" selected', false);
+        $secondResponse->assertSee('KECAMATAN KEDUA');
+        $secondResponse->assertSee('<option value="9201" selected>DESA OPERATOR KEDUA</option>', false);
+        $secondResponse->assertDontSee('KECAMATAN PERTAMA');
+        $secondResponse->assertDontSee('DESA OPERATOR PERTAMA');
+        $secondResponse->assertDontSee('KOPERASI DESA PERTAMA');
+    }
+
+    public function test_operator_kecamatan_sees_only_cooperatives_and_filters_in_its_assigned_kecamatan(): void
+    {
+        $this->createKecamatan(9001, 'KLAPANUNGGAL');
+        $this->createKecamatan(9002, 'KECAMATAN LAIN');
+        $this->createKelurahan(9101, 9001, 'NAMBO');
+        $this->createKelurahan(9102, 9001, 'DESA KLAPANUNGGAL LAIN');
+        $this->createKelurahan(9201, 9002, 'DESA LUAR WILAYAH');
+        $this->createCooperative(9301, 9101, 'KOPERASI NAMBO', 10, 9001);
+        $this->createCooperative(9302, 9201, 'KOPERASI LUAR WILAYAH', 20, 9002);
+        $operator = $this->createOperatorKecamatan(9001);
+
+        $response = $this->actingAs($operator)->get(route('admin.dashboard', ['tab' => 'koperasi']));
+
+        $response->assertOk();
+        $response->assertViewHas('totalKoperasi', 1);
+        $response->assertViewHas('gisKoperasis', fn ($koperasis): bool => $koperasis->pluck('id_koperasi')->all() === [9301]);
+        $response->assertViewHas('kecamatans', function ($kecamatans): bool {
+            return $kecamatans->pluck('id_kopkec')->all() === [9001]
+                && $kecamatans->first()->kelurahans->pluck('id_kopkel')->all() === [9102, 9101];
+        });
+        $response->assertViewHas('kecamatansData', fn (array $data): bool => count($data) === 1
+            && $data[0]['id_kopkec'] === 9001
+            && array_column($data[0]['kelurahans'], 'id_kopkel') === [9102, 9101]);
+        $response->assertSee('KOPERASI NAMBO');
+        $response->assertSee('KLAPANUNGGAL');
+        $response->assertSee('1 Koperasi Terdata');
+        $response->assertDontSee('KOPERASI LUAR WILAYAH');
+        $response->assertDontSee('KECAMATAN LAIN');
+        $response->assertDontSee('DESA LUAR WILAYAH');
+        $response->assertDontSee('-- SEMUA KECAMATAN (40) --');
+        $response->assertDontSee('Ciawi & Megamendung (19, 45)');
+    }
+
+    public function test_operator_kecamatan_cannot_expand_dashboard_data_with_other_region_filters(): void
+    {
+        $this->createKecamatan(9001, 'KLAPANUNGGAL');
+        $this->createKecamatan(9002, 'KECAMATAN LAIN');
+        $this->createKelurahan(9101, 9001, 'NAMBO');
+        $this->createKelurahan(9201, 9002, 'DESA LUAR WILAYAH');
+        $this->createCooperative(9301, 9101, 'KOPERASI NAMBO', 10, 9001);
+        $this->createCooperative(9302, 9201, 'KOPERASI LUAR WILAYAH', 20, 9002);
+        $operator = $this->createOperatorKecamatan(9001);
+
+        $response = $this->actingAs($operator)->get(route('admin.dashboard', [
+            'tab' => 'koperasi',
+            'id_kec' => 9002,
+            'id_kel' => 9201,
+        ]));
+
+        $response->assertOk();
+        $response->assertViewHas('koperasis', fn ($koperasis): bool => $koperasis->total() === 0);
+        $response->assertViewHas('gisKoperasis', fn ($koperasis): bool => $koperasis->pluck('id_koperasi')->all() === [9301]);
+        $response->assertViewHas('kecamatans', fn ($kecamatans): bool => $kecamatans->pluck('id_kopkec')->all() === [9001]);
+        $response->assertDontSee('KOPERASI LUAR WILAYAH');
+        $response->assertDontSee('KECAMATAN LAIN');
+        $response->assertDontSee('DESA LUAR WILAYAH');
+    }
+
     public function test_operator_desa_sees_only_its_own_cooperative_managers_and_member_count(): void
     {
         $this->createCooperative(9001, 9001, 'KOPERASI DESA PONDOK RAJEG', 11);
@@ -224,15 +318,32 @@ class DashboardTest extends TestCase
         $response->assertSee('Data anggota tidak ditemukan.');
     }
 
-    private function createCooperative(int $id, int $villageId, string $name, int $memberCount): void
+    private function createCooperative(int $id, int $villageId, string $name, int $memberCount, int $districtId = 1): void
     {
         Koperasi::create([
             'id_koperasi' => $id,
             'name_koperasi' => $name,
-            'id_kec' => 1,
+            'id_kec' => $districtId,
             'id_kel' => $villageId,
             'jum_anggota' => $memberCount,
             'flag_del' => 0,
+        ]);
+    }
+
+    private function createKecamatan(int $id, string $name): void
+    {
+        Kecamatan::create([
+            'id_kopkec' => $id,
+            'name_kopkec' => $name,
+        ]);
+    }
+
+    private function createKelurahan(int $id, int $districtId, string $name): void
+    {
+        Kelurahan::create([
+            'id_kopkel' => $id,
+            'id_kopkec' => $districtId,
+            'name_kopkel' => $name,
         ]);
     }
 
@@ -251,16 +362,30 @@ class DashboardTest extends TestCase
         ]);
     }
 
-    private function createOperatorDesa(int $villageId): User
+    private function createOperatorDesa(int $villageId, int $districtId = 1, int $userId = 9001): User
     {
         return User::create([
-            'id_user' => 9001,
+            'id_user' => $userId,
             'name_user' => 'Operator Desa',
-            'login_user' => 'operator_desa_9001',
+            'login_user' => 'operator_desa_'.$userId,
             'pswd' => 'password',
             'level_user' => 15,
-            'id_company' => 1,
+            'id_company' => $districtId,
             'id_branch' => $villageId,
+            'flag_del' => 0,
+        ]);
+    }
+
+    private function createOperatorKecamatan(int $districtId): User
+    {
+        return User::create([
+            'id_user' => 9002,
+            'name_user' => 'Operator Kecamatan',
+            'login_user' => 'operator_kecamatan_9002',
+            'pswd' => 'password',
+            'level_user' => 14,
+            'id_company' => $districtId,
+            'id_branch' => 0,
             'flag_del' => 0,
         ]);
     }

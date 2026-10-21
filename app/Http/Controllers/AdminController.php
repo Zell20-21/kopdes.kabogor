@@ -16,6 +16,7 @@ class AdminController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
+        $isOperator = $user->isOperatorDesa() || $user->isOperatorKecamatan();
         $activeTab = $request->get('tab', 'informasi');
 
         // Scoping based on user role
@@ -138,12 +139,46 @@ class AdminController extends Controller
             ->paginate(15, ['*'], 'anggota_page')
             ->withQueryString();
 
-        $kecamatans = Kecamatan::with(['kelurahans' => fn ($q) => $q->orderBy('name_kopkel', 'asc')])
+        $kecamatansQuery = Kecamatan::with(['kelurahans' => function ($query) use ($user) {
+            if ($user->isOperatorDesa()) {
+                $query->where('id_kopkel', $user->id_branch);
+            }
+
+            $query->orderBy('name_kopkel', 'asc');
+        }]);
+
+        if ($user->isOperatorKecamatan()) {
+            if ($user->id_company > 0) {
+                $kecamatansQuery->where('id_kopkec', $user->id_company);
+            } else {
+                $kecamatansQuery->whereRaw('1 = 0');
+            }
+        } elseif ($user->isOperatorDesa()) {
+            if ($user->id_branch > 0) {
+                $kecamatansQuery->whereHas('kelurahans', fn ($query) => $query->where('id_kopkel', $user->id_branch));
+            } else {
+                $kecamatansQuery->whereRaw('1 = 0');
+            }
+        }
+
+        $kecamatans = $kecamatansQuery
             ->orderBy('id_kopkec', 'asc')
             ->get();
+        $kecamatansData = $kecamatans->map(fn (Kecamatan $kecamatan): array => [
+            'id_kopkec' => $kecamatan->id_kopkec,
+            'kelurahans' => $kecamatan->kelurahans->map(fn ($kelurahan): array => [
+                'id_kopkel' => $kelurahan->id_kopkel,
+                'name_kopkel' => $kelurahan->name_kopkel,
+            ])->all(),
+        ])->all();
+        $assignedKecamatanId = $user->isOperatorDesa()
+            ? ($kecamatans->first()?->id_kopkec ?? '')
+            : $user->id_company;
 
         return view('admin.dashboard', compact(
             'user',
+            'isOperator',
+            'assignedKecamatanId',
             'activeTab',
             'totalKoperasi',
             'totalAnggota',
@@ -166,6 +201,7 @@ class AdminController extends Controller
             'penguruses',
             'anggotaKoperasis',
             'kecamatans',
+            'kecamatansData',
             'gisKoperasis',
             'perPage'
         ));

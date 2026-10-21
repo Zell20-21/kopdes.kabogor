@@ -552,7 +552,11 @@
                                         PEMETAAN GIS KOPERASIDESA MERAH PUTIH
                                     </h3>
                                     <p class="text-xs text-slate-500 mt-0.5">
-                                        Sebaran 435 titik koperasi di seluruh desa/kelurahan Kabupaten Bogor
+                                        @if($isOperator)
+                                            Pemetaan koperasi sesuai wilayah akun operator
+                                        @else
+                                            Sebaran koperasi di seluruh desa/kelurahan Kabupaten Bogor
+                                        @endif
                                     </p>
                                 </div>
                             </div>
@@ -560,7 +564,7 @@
                             <div class="flex items-center space-x-2">
                                 <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-[11px] font-bold text-slate-700 shadow-xs">
                                     <i class="fa-solid fa-location-dot text-sky-600 text-xs"></i>
-                                    <span>435 Titik Koordinat Aktif</span>
+                                    <span>{{ $gisKoperasis->count() }} Koperasi Terdata</span>
                                 </span>
                             </div>
                         </div>
@@ -601,9 +605,11 @@
                                     <div class="relative">
                                         <select name="id_kec" id="filter_id_kec" onchange="updateDesaDropdown(this.value)"
                                                 class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs cursor-pointer">
-                                            <option value="">-- SEMUA KECAMATAN (40) --</option>
+                                            @unless($isOperator)
+                                                <option value="">-- SEMUA KECAMATAN (40) --</option>
+                                            @endunless
                                             @foreach($kecamatans as $kec)
-                                                <option value="{{ $kec->id_kopkec }}" {{ (string) request('id_kec') === (string) $kec->id_kopkec ? 'selected' : '' }}>
+                                                <option value="{{ $kec->id_kopkec }}" {{ (string) ($isOperator ? $assignedKecamatanId : request('id_kec')) === (string) $kec->id_kopkec ? 'selected' : '' }}>
                                                     {{ $kec->name_kopkec }}
                                                 </option>
                                             @endforeach
@@ -619,7 +625,16 @@
                                     <div class="relative">
                                         <select name="id_kel" id="filter_id_kel"
                                                 class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs cursor-pointer">
-                                            <option value="">-- SEMUA DESA / KELURAHAN --</option>
+                                            @unless($user->isOperatorDesa())
+                                                <option value="">-- SEMUA DESA / KELURAHAN --</option>
+                                            @endunless
+                                            @if($user->isOperatorDesa())
+                                                @foreach($kecamatans as $kec)
+                                                    @foreach($kec->kelurahans as $kelurahan)
+                                                        <option value="{{ $kelurahan->id_kopkel }}" selected>{{ $kelurahan->name_kopkel }}</option>
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
@@ -1086,16 +1101,19 @@
 
 <!-- Pass Kecamatans and Koperasis JSON to JavaScript -->
 <script>
-    const kecamatansData = @json($kecamatans);
+    const kecamatansData = @json($kecamatansData);
     const gisKoperasisData = @json($gisKoperasis ?? []);
-    const selectedKecId = "{{ request('id_kec', '') }}";
-    const selectedKelId = "{{ request('id_kel', '') }}";
+    const selectedKecId = @json($isOperator ? $assignedKecamatanId : request('id_kec', ''));
+    const selectedKelId = @json($user->isOperatorDesa() ? $user->id_branch : request('id_kel', ''));
+    const isOperatorDesa = @json($user->isOperatorDesa());
 
     function updateDesaDropdown(kecId, targetSelectId = 'filter_id_kel', selectedVal = selectedKelId) {
         const select = document.getElementById(targetSelectId);
         if (!select) return;
 
-        select.innerHTML = '<option value="">-- SEMUA DESA / KELURAHAN --</option>';
+        select.innerHTML = isOperatorDesa
+            ? ''
+            : '<option value="">-- SEMUA DESA / KELURAHAN --</option>';
 
         if (!kecId) return;
 
@@ -1162,6 +1180,7 @@
             attribution: 'Tiles &copy; Esri'
         });
 
+        @if($user->isSuperAdmin())
         // Add Cluster Visual Highlights like in the screenshot (Babakan Madang, Bojong Gede, Ciawi & Megamendung, Caringin)
         const clusterCenters = [
             { name: 'Babakan Madang', count: 14, lat: -6.5516, lng: 106.8797, color: '#0284c7' },
@@ -1196,8 +1215,9 @@
             });
             L.marker([c.lat, c.lng], { icon }).addTo(mapInstance);
         });
+        @endif
 
-        // Add 435 Active Coordinate Markers
+        // Add active cooperative coordinate markers for this user's data scope.
         const markersGroup = L.featureGroup();
 
         gisKoperasisData.forEach(kop => {
@@ -1230,6 +1250,13 @@
         });
 
         markersGroup.addTo(mapInstance);
+
+        @if($isOperator)
+        const operatorBounds = markersGroup.getBounds();
+        if (operatorBounds.isValid()) {
+            mapInstance.fitBounds(operatorBounds, { padding: [40, 40], maxZoom: 13 });
+        }
+        @endif
     }
 
     function setMapLayer(type) {
