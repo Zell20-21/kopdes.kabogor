@@ -69,22 +69,22 @@
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-6 lg:p-7">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
                 
-                <!-- Left Column: Interactive Leaflet Map -->
-                <div class="lg:col-span-5 flex flex-col">
+                <!-- Left Column: Interactive Leaflet Map Card -->
+                <div class="lg:col-span-5 flex flex-col bg-slate-50/70 border-2 border-slate-200/90 rounded-2xl p-4 shadow-sm">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-base sm:text-lg font-black text-slate-950 flex items-center space-x-2">
-                            <i class="fa-solid fa-location-dot text-red-600"></i>
+                            <i class="fa-solid fa-map-location-dot text-red-600"></i>
                             <span>Sebaran Koperasi Merah Putih</span>
                         </h3>
                         <!-- Reset Map Button -->
-                        <button type="button" id="btnResetMap" class="text-xs font-black text-slate-800 hover:text-red-700 bg-slate-100 hover:bg-red-50 border border-slate-300 px-3 py-1 rounded-lg transition-colors flex items-center space-x-1 shadow-sm" title="Kembalikan posisi peta ke batas kecamatan">
+                        <button type="button" id="btnResetMap" class="text-xs font-black text-slate-800 hover:text-red-700 bg-white hover:bg-red-50 border border-slate-300 px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1 shadow-sm active:scale-95" title="Kembalikan posisi peta ke batas kecamatan">
                             <i class="fa-solid fa-arrows-rotate text-[11px]"></i>
                             <span>Reset Peta</span>
                         </button>
                     </div>
 
                     <!-- Map Container with Layer Control & Loading Indicator -->
-                    <div class="relative w-full rounded-2xl border-2 border-slate-200 overflow-hidden shadow-inner bg-slate-100 h-[460px] sm:h-[520px] lg:h-[560px] group">
+                    <div class="relative w-full rounded-xl border-2 border-slate-300 overflow-hidden shadow-inner bg-slate-100 h-[460px] sm:h-[500px] lg:h-[540px] group">
                         <div id="kecamatanMap" class="w-full h-full z-10"></div>
                         
                         <!-- Floating Map Legend -->
@@ -104,9 +104,9 @@
                         </div>
                     </div>
 
-                    <p class="text-xs text-slate-700 mt-2.5 text-center flex items-center justify-center space-x-1 font-bold">
+                    <p class="text-xs text-slate-600 mt-3 text-center flex items-center justify-center space-x-1.5 font-bold">
                         <i class="fa-solid fa-hand-pointer text-blue-600 text-xs"></i>
-                        <span>Arahkan kursor atau klik pin di peta untuk melihat detail koperasi</span>
+                        <span>Klik & tahan untuk menggeser peta &bull; Gunakan tombol + / - untuk zoom</span>
                     </p>
                 </div>
 
@@ -290,7 +290,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const map = L.map('kecamatanMap', {
         zoomControl: true,
-        scrollWheelZoom: true
+        scrollWheelZoom: false,
+        dragging: true
     }).setView([defaultLat, defaultLng], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -319,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 const popupHtml = `
-                    <div class="p-1 min-w-[190px]">
+                    <div class="p-1 min-w-[200px]">
                         <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold rounded-full mb-1">
                             ${p.desa ? 'Desa ' + p.desa : 'Koperasi Merah Putih'}
                         </span>
@@ -327,9 +328,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             ${p.nama}
                         </h4>
                         ${p.alamat ? `<p class="text-[11px] text-slate-600 line-clamp-2 mb-2.5"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i>${p.alamat}</p>` : ''}
-                        <a href="/koperasi/${p.id}" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow">
-                            <span>Buka Profil Koperasi</span>
-                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        <a href="/koperasi/${p.id}" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                            <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                         </a>
                     </div>
                 `;

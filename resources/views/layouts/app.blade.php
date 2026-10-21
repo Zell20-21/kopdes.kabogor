@@ -68,6 +68,14 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
+        /* Ensure popup action buttons have crisp white text */
+        .leaflet-popup-content a,
+        .leaflet-popup-content a span,
+        .leaflet-popup-content a i {
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }
+
         .custom-kmp-pin {
             display: flex;
             align-items: center;

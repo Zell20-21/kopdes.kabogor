@@ -1359,6 +1359,8 @@
             zoom: 11,
             minZoom: 10,
             maxZoom: 18,
+            scrollWheelZoom: false,
+            dragging: true,
             maxBounds: [
                 [-7.1000, 106.2000],
                 [-6.1000, 107.4500]
@@ -1474,9 +1476,9 @@
                             <strong class="font-black text-red-600">${item.jumlah} Kop</strong>
                         </div>
                     </div>
-                    <a href="/kecamatan/${item.id}" class="w-full text-center py-1.5 px-3 bg-red-700 hover:bg-red-800 text-white rounded-lg font-bold text-xs transition shadow-sm flex items-center justify-center space-x-1 cursor-pointer">
-                        <span>Lihat Profil Kecamatan</span>
-                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    <a href="/kecamatan/${item.id}" style="color: #ffffff !important;" class="w-full text-center py-2 px-3 bg-red-700 hover:bg-red-800 !text-white rounded-lg font-black text-xs transition shadow-sm flex items-center justify-center space-x-1.5 cursor-pointer">
+                        <span style="color: #ffffff !important;" class="!text-white font-black">Lihat Profil Kecamatan</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                     </a>
                 </div>
             `;
