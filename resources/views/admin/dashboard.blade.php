@@ -24,7 +24,7 @@
 <div class="min-h-screen bg-[#f8fafc] flex flex-col justify-between text-slate-800">
 
     <!-- Top Navigation Header GovTech KOP -->
-    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-50">
+    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-[100]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Desain Referensi) -->
@@ -68,7 +68,7 @@
     </header>
 
     <!-- Main Content Container with Sidebar -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-0 isolate">
 
         <!-- Flash Notice if any -->
         @if(session('success'))
@@ -590,11 +590,11 @@
                         </div>
 
                         <!-- Map Area with Switcher Controls (Matching Public Dashboard) -->
-                        <div class="relative w-full h-[460px] bg-slate-100 overflow-hidden">
+                        <div class="relative w-full h-[460px] bg-slate-100 overflow-hidden isolate z-0">
                             <div id="gis-koperasi-map" class="w-full h-full z-10"></div>
 
                             <!-- Map Layer Switches (Top Right on Map) -->
-                            <div class="absolute top-3 right-3 z-[400] flex items-center space-x-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl shadow-md border border-slate-200/80 text-xs font-semibold">
+                            <div class="absolute top-3 right-3 z-20 flex items-center space-x-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl shadow-md border border-slate-200/80 text-xs font-semibold">
                                 <div class="relative flex items-center p-0.5 bg-slate-100/80 rounded-lg border border-slate-200/60" id="adminKoperasiLayerWrapper">
                                     <div id="adminKoperasiLayerGlider" class="absolute rounded-md bg-red-600 shadow-xs transition-all duration-300 ease-in-out pointer-events-none" style="left: 2px; top: 2px; width: 44px; height: 26px;"></div>
                                     <button type="button" onclick="setMapLayer('osm')" id="btn-layer-osm" class="relative z-10 px-3 py-1 rounded-md text-white font-semibold transition-colors duration-200 cursor-pointer">
@@ -615,7 +615,7 @@
                             </div>
 
                             <!-- Custom Floating Legend (Bottom Left on Map) -->
-                            <div class="absolute bottom-3 left-3 z-[400] pointer-events-none bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-slate-200 shadow-md text-[11px] text-slate-700 space-y-1">
+                            <div class="absolute bottom-3 left-3 z-20 pointer-events-none bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-slate-200 shadow-md text-[11px] text-slate-700 space-y-1">
                                 <div class="font-bold text-slate-800 flex items-center space-x-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
                                     <span>Wilayah: Kabupaten Bogor</span>
@@ -974,7 +974,7 @@
                     </div>
 
                     <!-- MODAL: TAMBAH DATA KOPERASI -->
-                    <div id="modalTambahData" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div id="modalTambahData" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
                         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <!-- Modal Header -->
                             <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between">
@@ -1080,7 +1080,7 @@
                     </div>
 
                     <!-- MODAL: EDIT / UPDATE DATA KOPERASI -->
-                    <div id="modalEditKoperasi" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div id="modalEditKoperasi" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
                         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <!-- Modal Header -->
                             <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between shrink-0">
@@ -1246,7 +1246,7 @@
                     </div>
 
                     <!-- MODAL: UPDATE USAHA KOPERASI -->
-                    <div id="modalUpdateUsaha" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div id="modalUpdateUsaha" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
                         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <div class="px-6 py-4 bg-gradient-to-r from-cyan-600 to-sky-700 text-white flex items-center justify-between">
                                 <div class="flex items-center space-x-2">
@@ -1291,7 +1291,7 @@
                     </div>
 
                     <!-- MODAL: UPLOAD FOTO KOPERASI -->
-                    <div id="modalUploadFoto" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div id="modalUploadFoto" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
                         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <div class="px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white flex items-center justify-between">
                                 <div class="flex items-center space-x-2">
@@ -1329,7 +1329,7 @@
                     </div>
 
                     <!-- MODAL: KONFIRMASI HAPUS KOPERASI -->
-                    <div id="modalDeleteKoperasi" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div id="modalDeleteKoperasi" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
                         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <div class="px-6 py-4 bg-gradient-to-r from-rose-600 to-red-700 text-white flex items-center justify-between">
                                 <div class="flex items-center space-x-2">
@@ -1693,11 +1693,11 @@
                                 </div>
                                 <span class="text-slate-400 text-[11px] font-medium">Batas Wilayah Geospasial Kabupaten Bogor</span>
                             </div>
-                            <div class="relative w-full h-[460px] bg-slate-100 overflow-hidden">
+                            <div class="relative w-full h-[460px] bg-slate-100 overflow-hidden isolate z-0">
                                 <div id="map-anggota" class="w-full h-full z-10"></div>
 
                                 <!-- Map Layer Switches (Top Right on Map - Matching Database Koperasi) -->
-                                <div class="absolute top-3 right-3 z-[400] flex items-center space-x-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl shadow-md border border-slate-200/80 text-xs font-semibold">
+                                <div class="absolute top-3 right-3 z-20 flex items-center space-x-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl shadow-md border border-slate-200/80 text-xs font-semibold">
                                     <div class="relative flex items-center p-0.5 bg-slate-100/80 rounded-lg border border-slate-200/60" id="adminAnggotaLayerWrapper">
                                         <div id="adminAnggotaLayerGlider" class="absolute rounded-md bg-red-600 shadow-xs transition-all duration-300 ease-in-out pointer-events-none" style="left: 2px; top: 2px; width: 44px; height: 26px;"></div>
                                         <button type="button" onclick="setAnggotaMapLayer('osm')" id="btn-layer-anggota-osm" class="relative z-10 px-3 py-1 rounded-md text-white font-semibold transition-colors duration-200 cursor-pointer">
@@ -1718,7 +1718,7 @@
                                 </div>
 
                                 <!-- Custom Floating Legend (Bottom Left on Map) -->
-                                <div class="absolute bottom-3 left-3 z-[400] pointer-events-none bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-slate-200 shadow-md text-[11px] text-slate-700 space-y-1">
+                                <div class="absolute bottom-3 left-3 z-20 pointer-events-none bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-slate-200 shadow-md text-[11px] text-slate-700 space-y-1">
                                     <div class="font-bold text-slate-800 flex items-center space-x-1.5">
                                         <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
                                         <span>Wilayah: Kabupaten Bogor</span>
@@ -2065,7 +2065,7 @@
     </main>
 
     <!-- Modal Tambah Pengurus -->
-    <div id="modalTambahPengurus" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div id="modalTambahPengurus" class="fixed inset-0 z-[1050] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center space-x-2.5">
@@ -2146,7 +2146,7 @@
     </div>
 
     <!-- Modal Tambah Anggota -->
-    <div id="modalTambahAnggota" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div id="modalTambahAnggota" class="fixed inset-0 z-[1050] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center space-x-2.5">
@@ -2233,7 +2233,7 @@
     </div>
 
     <!-- Modal Import SIMKOP -->
-    <div id="modalImportSimkop" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div id="modalImportSimkop" class="fixed inset-0 z-[1050] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-6 space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center space-x-2.5">
