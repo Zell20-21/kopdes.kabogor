@@ -166,7 +166,9 @@ class DashboardTest extends TestCase
         $response->assertViewHas('totalAnggota', 11);
         $response->assertSee('KOPERASI DESA PONDOK RAJEG');
         $response->assertDontSee('KOPERASI DESA LAIN');
-        $response->assertDontSee('<select onchange="window.location.href=this.value"', false);
+        $response->assertSee('Portal Koperasi Desa');
+        $response->assertDontSee('id="map-members"', false);
+        $response->assertDontSee('<aside', false);
     }
 
     public function test_each_operator_desa_sees_only_its_assigned_cooperative_and_village_filter(): void
@@ -185,20 +187,17 @@ class DashboardTest extends TestCase
 
         $firstResponse->assertOk();
         $firstResponse->assertViewHas('gisKoperasis', fn ($koperasis): bool => $koperasis->pluck('id_koperasi')->all() === [9301]);
-        $firstResponse->assertSee('name="id_kec" id="filter_id_kec"', false);
-        $firstResponse->assertSee('value="9001" selected', false);
-        $firstResponse->assertSee('KECAMATAN PERTAMA');
-        $firstResponse->assertSee('<option value="9101" selected>DESA OPERATOR PERTAMA</option>', false);
+        $firstResponse->assertViewHas('koperasis', fn ($koperasis): bool => $koperasis->pluck('id_koperasi')->all() === [9301]);
+        $firstResponse->assertDontSee('id="map-members"', false);
+        $firstResponse->assertSee('KOPERASI DESA PERTAMA');
         $firstResponse->assertDontSee('KECAMATAN KEDUA');
         $firstResponse->assertDontSee('DESA OPERATOR KEDUA');
         $firstResponse->assertDontSee('KOPERASI DESA KEDUA');
-        $firstResponse->assertDontSee('Ciawi & Megamendung (19, 45)');
 
         $secondResponse->assertOk();
         $secondResponse->assertViewHas('gisKoperasis', fn ($koperasis): bool => $koperasis->pluck('id_koperasi')->all() === [9302]);
-        $secondResponse->assertSee('value="9002" selected', false);
-        $secondResponse->assertSee('KECAMATAN KEDUA');
-        $secondResponse->assertSee('<option value="9201" selected>DESA OPERATOR KEDUA</option>', false);
+        $secondResponse->assertDontSee('id="map-members"', false);
+        $secondResponse->assertSee('KOPERASI DESA KEDUA');
         $secondResponse->assertDontSee('KECAMATAN PERTAMA');
         $secondResponse->assertDontSee('DESA OPERATOR PERTAMA');
         $secondResponse->assertDontSee('KOPERASI DESA PERTAMA');
@@ -229,7 +228,8 @@ class DashboardTest extends TestCase
             && array_column($data[0]['kelurahans'], 'id_kopkel') === [9102, 9101]);
         $response->assertSee('KOPERASI NAMBO');
         $response->assertSee('KLAPANUNGGAL');
-        $response->assertSee('1 Koperasi Terdata');
+        $response->assertSee('KOPERASI MERAH PUTIH');
+        $response->assertDontSee('id="map-members"', false);
         $response->assertDontSee('KOPERASI LUAR WILAYAH');
         $response->assertDontSee('KECAMATAN LAIN');
         $response->assertDontSee('DESA LUAR WILAYAH');
@@ -254,6 +254,8 @@ class DashboardTest extends TestCase
         ]));
 
         $response->assertOk();
+        $response->assertSee('KOPERASI MERAH PUTIH');
+        $response->assertDontSee('id="map-members"', false);
         $response->assertViewHas('koperasis', fn ($koperasis): bool => $koperasis->total() === 0);
         $response->assertViewHas('gisKoperasis', fn ($koperasis): bool => $koperasis->pluck('id_koperasi')->all() === [9301]);
         $response->assertViewHas('kecamatans', fn ($kecamatans): bool => $kecamatans->pluck('id_kopkec')->all() === [9001]);
@@ -278,11 +280,13 @@ class DashboardTest extends TestCase
         $cooperativeResponse->assertOk();
         $managerResponse->assertOk();
         $memberResponse->assertOk();
+        $managerResponse->assertDontSee('id="map-members"', false);
+        $memberResponse->assertDontSee('id="map-members"', false);
         $cooperativeResponse->assertSee('KOPERASI DESA PONDOK RAJEG');
         $cooperativeResponse->assertDontSee('KOPERASI DESA LAIN');
         $managerResponse->assertSee('PENGURUS PONDOK RAJEG');
         $managerResponse->assertDontSee('PENGURUS DESA LAIN');
-        $memberResponse->assertSee('Total 11 anggota tercatat');
+        $memberResponse->assertSee('11 anggota');
         $memberResponse->assertSee('KOPERASI DESA PONDOK RAJEG');
         $memberResponse->assertDontSee('KOPERASI DESA LAIN');
     }
@@ -301,7 +305,7 @@ class DashboardTest extends TestCase
 
         $response->assertOk();
         $response->assertViewHas('penguruses', fn ($penguruses): bool => $penguruses->total() === 0);
-        $response->assertSee('Data pengurus tidak ditemukan.');
+        $response->assertDontSee('id="map-members"', false);
     }
 
     public function test_operator_without_a_village_assignment_sees_no_cooperative_data(): void
@@ -315,7 +319,7 @@ class DashboardTest extends TestCase
         $response->assertViewHas('totalKoperasi', 0);
         $response->assertViewHas('totalAnggota', 0);
         $response->assertDontSee('KOPERASI DESA PONDOK RAJEG');
-        $response->assertSee('Data anggota tidak ditemukan.');
+        $response->assertDontSee('id="map-members"', false);
     }
 
     private function createCooperative(int $id, int $villageId, string $name, int $memberCount, int $districtId = 1): void

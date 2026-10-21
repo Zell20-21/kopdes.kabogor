@@ -93,4 +93,9 @@ class Koperasi extends Model
     {
         return $this->hasMany(Kopsdm::class, 'id_koperasi', 'id_koperasi');
     }
+
+    public function anggota(): HasMany
+    {
+        return $this->hasMany(Kopang::class, 'id_koperasi', 'id_koperasi');
+    }
 }

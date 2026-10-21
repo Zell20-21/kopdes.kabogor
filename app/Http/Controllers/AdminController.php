@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kecamatan;
+use App\Models\Kopang;
+use App\Models\KopangType;
 use App\Models\Koperasi;
 use App\Models\Kopsdm;
 use App\Models\LampiranInformasi;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -126,6 +130,16 @@ class AdminController extends Controller
             ])
             ->get();
 
+        $anggotaRecords = Kopang::with(['koperasi.kecamatan', 'type'])
+            ->where('flag_del', 0)
+            ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'))
+            ->orderByDesc('id_kopang')
+            ->paginate(8, ['*'], 'member_page')
+            ->withQueryString();
+        $koperasiTypes = KopangType::where('flag_del', 0)
+            ->orderBy('name_kopangtype')
+            ->get();
+
         // Database Pengurus statistics & query
         $pengurusBaseQuery = Kopsdm::where('flag_del', 0)
             ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'));
@@ -178,6 +192,14 @@ class AdminController extends Controller
             ->orderBy('id_kopsdm', 'asc')
             ->paginate($perPagePengurus)
             ->withQueryString();
+        $pengurusFotoOptions = $user->isOperatorDesa()
+            ? Kopsdm::where('flag_del', 0)
+                ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'))
+                ->orderBy('id_koperasi')
+                ->orderBy('order_kopsdm')
+                ->orderBy('id_kopsdm')
+                ->get()
+            : collect();
 
         $anggotaQuery = (clone $baseQuery)->with(['kecamatan', 'kelurahan']);
 
@@ -265,7 +287,7 @@ class AdminController extends Controller
             $lampirans = new LengthAwarePaginator([], 0, 10);
         }
 
-        return view('admin.dashboard', compact(
+        $viewData = compact(
             'user',
             'isOperator',
             'assignedKecamatanId',
@@ -297,9 +319,109 @@ class AdminController extends Controller
             'kecamatans',
             'kecamatansData',
             'gisKoperasis',
+            'anggotaRecords',
+            'koperasiTypes',
+            'pengurusFotoOptions',
             'perPage',
             'lampirans'
-        ));
+        );
+
+        return $user->isOperatorDesa()
+            ? view('admin.overview', $viewData)
+            : view('admin.dashboard', $viewData);
+    }
+
+    /**
+     * Store a cooperative member and update the cooperative's member total.
+     */
+    public function storeAnggota(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'id_koperasi' => ['required', 'integer', 'exists:app_md_koperasi,id_koperasi'],
+            'id_kopangtype' => ['required', 'integer', 'exists:app_md_kopangtype,id_kopangtype'],
+            'name_kopang' => ['required', 'string', 'max:255'],
+            'nik_kopang' => ['required', 'digits:16'],
+            'kopang_telp' => ['nullable', 'string', 'max:255'],
+            'kopang_usaha' => ['nullable', 'string', 'max:255'],
+            'kopang_addr' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $koperasi = $this->findVisibleKoperasi($request, (int) $validated['id_koperasi']);
+
+        DB::transaction(function () use ($request, $validated, $koperasi): void {
+            $nextId = (int) DB::table('app_md_kopang')
+                ->lockForUpdate()
+                ->max('id_kopang') + 1;
+
+            Kopang::create([
+                ...$validated,
+                'id_kopang' => $nextId,
+                'id_kec' => $koperasi->id_kec,
+                'id_kel' => $koperasi->id_kel,
+                'comt_kopang' => '-',
+                'kopang_usaha' => $validated['kopang_usaha'] ?? '',
+                'kopang_addr' => $validated['kopang_addr'] ?? '',
+                'kopang_telp' => $validated['kopang_telp'] ?? '',
+                'gps_lat' => (string) $koperasi->gps_lat,
+                'gps_long' => (string) $koperasi->gps_long,
+                'id_user' => $request->user()->id_user,
+                'tgl_data' => now(),
+                'flag_del' => 0,
+            ]);
+
+            $koperasi->increment('jum_anggota');
+        });
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'Anggota berhasil ditambahkan dan total anggota koperasi telah diperbarui.');
+    }
+
+    /**
+     * Upload a photo only for a manager who does not have one yet.
+     */
+    public function uploadFotoPengurus(Request $request, Kopsdm $pengurus): RedirectResponse
+    {
+        abort_unless($pengurus->flag_del == 0, 404);
+        $this->findVisibleKoperasi($request, (int) $pengurus->id_koperasi);
+        abort_if(filled($pengurus->foto_kopsdm), 409, 'Pengurus ini sudah memiliki foto.');
+
+        $request->validate([
+            'foto' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $this->saveFotoPengurus($request, $pengurus);
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'Foto pengurus berhasil diunggah.');
+    }
+
+    public function uploadFotoPengurusOperator(Request $request): RedirectResponse
+    {
+        abort_unless($request->user()->isOperatorDesa(), 404);
+
+        $validated = $request->validate([
+            'id_kopsdm' => ['required', 'integer'],
+            'foto' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $pengurus = Kopsdm::where('flag_del', 0)->findOrFail($validated['id_kopsdm']);
+        $this->findVisibleKoperasi($request, (int) $pengurus->id_koperasi);
+
+        $this->saveFotoPengurus($request, $pengurus);
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'Foto pengurus berhasil disimpan.');
+    }
+
+    private function saveFotoPengurus(Request $request, Kopsdm $pengurus): void
+    {
+        $fotoLama = $pengurus->foto_kopsdm;
+        $pengurus->foto_kopsdm = $request->file('foto')->storePublicly('pengurus', 'public');
+        $pengurus->save();
+
+        if (filled($fotoLama)) {
+            Storage::disk('public')->delete($fotoLama);
+        }
     }
 
     /**
@@ -619,6 +741,8 @@ class AdminController extends Controller
             'comt_kopsdm' => 'nullable|string|max:255',
         ]);
 
+        $this->findVisibleKoperasi($request, (int) $validated['id_koperasi']);
+
         $maxId = (int) Kopsdm::max('id_kopsdm');
         $validated['id_kopsdm'] = $maxId + 1;
         $validated['order_kopsdm'] = $validated['order_kopsdm'] ?? '1';
@@ -629,7 +753,11 @@ class AdminController extends Controller
 
         Kopsdm::create($validated);
 
-        return redirect()->route('admin.dashboard', ['tab' => 'pengurus'])
+        $redirect = $request->user()->isOperatorDesa()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('admin.dashboard', ['tab' => 'pengurus']);
+
+        return $redirect
             ->with('success', 'Data Pengurus berhasil ditambahkan ke database.');
     }
 
@@ -769,5 +897,25 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    private function findVisibleKoperasi(Request $request, int $koperasiId): Koperasi
+    {
+        $user = $request->user();
+
+        abort_unless(
+            $user->isSuperAdmin() || $user->isOperatorDesa() || $user->isOperatorKecamatan(),
+            403
+        );
+
+        $query = Koperasi::where('flag_del', 0);
+
+        if ($user->isOperatorDesa()) {
+            $query->where('id_kel', $user->id_branch);
+        } elseif ($user->isOperatorKecamatan()) {
+            $query->where('id_kec', $user->id_company);
+        }
+
+        return $query->findOrFail($koperasiId);
     }
 }

@@ -239,6 +239,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::delete('/lampiran/{lampiran}', [AdminController::class, 'destroyLampiran'])->name('admin.lampiran.destroy');
 
     Route::post('/pengurus', [AdminController::class, 'storePengurus'])->name('admin.pengurus.store');
+    Route::post('/pengurus/{pengurus}/foto', [AdminController::class, 'uploadFotoPengurus'])->name('admin.pengurus.foto');
+    Route::post('/pengurus/foto', [AdminController::class, 'uploadFotoPengurusOperator'])->name('admin.pengurus.foto.operator');
+    Route::post('/anggota', [AdminController::class, 'storeAnggota'])->name('admin.anggota.store');
     Route::get('/pengurus/export', [AdminController::class, 'exportPengurus'])->name('admin.pengurus.export');
     Route::get('/anggota/export', [AdminController::class, 'exportAnggota'])->name('admin.anggota.export');
 });
