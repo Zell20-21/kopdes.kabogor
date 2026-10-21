@@ -231,6 +231,14 @@ class AdminController extends Controller
             ->get();
         $kecamatansData = $kecamatans->map(fn (Kecamatan $kecamatan): array => [
             'id_kopkec' => $kecamatan->id_kopkec,
+            'id' => $kecamatan->id,
+            'name_kopkec' => $kecamatan->name_kopkec,
+            'nama' => $kecamatan->nama,
+            'latitude' => $kecamatan->latitude,
+            'longitude' => $kecamatan->longitude,
+            'jumlah' => $kecamatan->jumlah,
+            'kop_desa' => $kecamatan->kop_desa,
+            'kop_kel' => $kecamatan->kop_kel,
             'kelurahans' => $kecamatan->kelurahans->map(fn ($kelurahan): array => [
                 'id_kopkel' => $kelurahan->id_kopkel,
                 'name_kopkel' => $kelurahan->name_kopkel,
