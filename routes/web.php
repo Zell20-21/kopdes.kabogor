@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/kecamatan/{kecamatan}', [DashboardController::class, 'show'])->name('kecamatan.show');
+Route::get('/koperasi/{koperasi}', [DashboardController::class, 'showKoperasi'])->name('koperasi.show');
 Route::get('/export/rekapitulasi', [DashboardController::class, 'export'])->name('export.rekapitulasi');
 Route::get('/informasi/file/{filename}', function (string $filename) {
     $path = base_path('informasi/'.basename($filename));

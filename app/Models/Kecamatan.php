@@ -16,6 +16,7 @@ class Kecamatan extends Model
     protected $guarded = [];
 
     protected $appends = [
+        'id',
         'nomor_urut',
         'nama',
         'kop_desa',
@@ -26,6 +27,11 @@ class Kecamatan extends Model
         'latitude',
         'longitude',
     ];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->id_kopkec;
+    }
 
     public function getNomorUrutAttribute(): int
     {

@@ -17,6 +17,7 @@ class Koperasi extends Model
     protected $guarded = [];
 
     protected $appends = [
+        'id',
         'nama_koperasi',
         'kecamatan_nama',
         'desa_nama',
@@ -27,6 +28,11 @@ class Koperasi extends Model
         'jenis_koperasi',
         'jumlah_anggota',
     ];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->id_koperasi;
+    }
 
     public function getNamaKoperasiAttribute(): string
     {

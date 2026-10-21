@@ -10,7 +10,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -109,6 +109,58 @@
             padding: 1px 5px;
             line-height: 1.1;
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        /* Facility Pin for Filtered Map Points */
+        .custom-facility-pin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .custom-facility-pin:hover {
+            transform: scale(1.25);
+            z-index: 9999 !important;
+        }
+
+        .pin-facility-core {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #ef4444, #991b1b);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 2px solid #ffffff;
+            box-shadow: 0 6px 14px rgba(220, 38, 38, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+
+        .pin-facility-core i {
+            transform: rotate(45deg);
+            font-size: 14px;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+        }
+
+        .pin-facility-pulse {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            bottom: -6px;
+            left: 10px;
+            background: rgba(239, 68, 68, 0.6);
+            border-radius: 50%;
+            animation: pinPulse 1.8s infinite ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes pinPulse {
+            0% { transform: scale(0.6); opacity: 1; }
+            100% { transform: scale(3.2); opacity: 0; }
         }
 
         /* Custom scrollbars */
