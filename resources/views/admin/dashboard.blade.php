@@ -21,10 +21,10 @@
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-[#f8fafc] flex flex-col justify-between text-slate-800 w-full max-w-full overflow-x-hidden">
+<div class="min-h-screen bg-[#f8fafc] flex flex-col justify-between text-slate-800 w-full max-w-full">
 
-    <!-- Top Navigation Header GovTech KOP -->
-    <header class="w-full bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-[100]">
+    <!-- Top Navigation Header GovTech KOP (Fixed at top when scrolling) -->
+    <header class="fixed top-0 inset-x-0 w-full bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md z-[100]">
         <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Desain Referensi) -->
@@ -68,7 +68,7 @@
     </header>
 
     <!-- Main Content Container with Sidebar -->
-    <main class="flex-grow w-full max-w-full px-4 sm:px-6 lg:px-8 py-6 relative z-0 isolate min-w-0">
+    <main class="flex-grow w-full max-w-full px-4 sm:px-6 lg:px-8 pt-20 pb-6 relative z-0 isolate min-w-0">
 
         <!-- Flash Notice if any -->
         @if(session('success'))
@@ -87,7 +87,7 @@
 
             <!-- Left Sidebar Navigation Card -->
             <aside class="w-full lg:w-64 shrink-0">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 space-y-4 sticky top-22">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 space-y-4 sticky top-20">
                     
                     <!-- Profile Header Box -->
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center space-x-3">
