@@ -5,7 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Kecamatan;
 use App\Models\Koperasi;
 use App\Models\Kopsdm;
+use App\Models\LampiranInformasi;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -175,6 +180,18 @@ class AdminController extends Controller
             ? ($kecamatans->first()?->id_kopkec ?? '')
             : $user->id_company;
 
+        $lampirans = new LengthAwarePaginator([], 0, 10);
+        try {
+            if (Schema::hasTable('app_lampiran_informasi')) {
+                $lampirans = LampiranInformasi::orderBy('urutan', 'asc')
+                    ->orderBy('id', 'desc')
+                    ->paginate(10, ['*'], 'lampiran_page')
+                    ->withQueryString();
+            }
+        } catch (\Throwable $e) {
+            $lampirans = new LengthAwarePaginator([], 0, 10);
+        }
+
         return view('admin.dashboard', compact(
             'user',
             'isOperator',
@@ -203,7 +220,8 @@ class AdminController extends Controller
             'kecamatans',
             'kecamatansData',
             'gisKoperasis',
-            'perPage'
+            'perPage',
+            'lampirans'
         ));
     }
 
@@ -304,5 +322,120 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Store a newly uploaded document attachment.
+     */
+    public function storeLampiran(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'keterangan' => 'nullable|string|max:255',
+            'urutan' => 'nullable|integer',
+            'file' => 'required|file|max:51200',
+        ]);
+
+        $dir = base_path('informasi');
+        if (! file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $file = $request->file('file');
+        $originalName = $file->getClientOriginalName();
+        $ext = strtolower($file->getClientOriginalExtension() ?: 'pdf');
+        $cleanTitle = trim($request->judul);
+        $displayName = str_ends_with(strtolower($cleanTitle), '.'.$ext) ? $cleanTitle : ($cleanTitle.'.'.$ext);
+        $safeBase = Str::slug(pathinfo($cleanTitle, PATHINFO_FILENAME));
+        $filename = time().'_'.($safeBase ?: 'dokumen').'.'.$ext;
+
+        $file->move($dir, $filename);
+        $savedPath = $dir.'/'.$filename;
+        $sizeInMB = file_exists($savedPath) ? round(filesize($savedPath) / 1024 / 1024, 2).' MB' : '0 MB';
+
+        LampiranInformasi::create([
+            'judul' => $cleanTitle,
+            'keterangan' => $request->keterangan,
+            'file_name' => $displayName,
+            'file_path' => $filename,
+            'file_size' => $sizeInMB,
+            'file_type' => $ext,
+            'urutan' => (int) ($request->input('urutan') ?: 1),
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'lampiran'])->with('success', 'File lampiran berhasil diupload dan terhubung ke portal publik.');
+    }
+
+    /**
+     * Update an existing document attachment.
+     */
+    public function updateLampiran(Request $request, LampiranInformasi $lampiran): RedirectResponse
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'keterangan' => 'nullable|string|max:255',
+            'urutan' => 'nullable|integer',
+            'file' => 'nullable|file|max:51200',
+        ]);
+
+        $dir = base_path('informasi');
+        if (! file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $cleanTitle = trim($request->judul);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $originalName = $file->getClientOriginalName();
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'pdf');
+            $safeBase = Str::slug(pathinfo($cleanTitle, PATHINFO_FILENAME));
+            $filename = time().'_'.($safeBase ?: 'dokumen').'.'.$ext;
+
+            $file->move($dir, $filename);
+            $savedPath = $dir.'/'.$filename;
+            $sizeInMB = file_exists($savedPath) ? round(filesize($savedPath) / 1024 / 1024, 2).' MB' : '0 MB';
+
+            // Delete old file if exists and not default
+            if ($lampiran->file_path && $lampiran->file_path !== 'kdkp_maret_2026.pdf') {
+                $oldPath = $dir.'/'.$lampiran->file_path;
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
+            }
+
+            $lampiran->file_path = $filename;
+            $lampiran->file_size = $sizeInMB;
+            $lampiran->file_type = $ext;
+        }
+
+        $lampiran->judul = $cleanTitle;
+        $lampiran->keterangan = $request->keterangan;
+        $lampiran->file_name = str_ends_with(strtolower($cleanTitle), '.'.$lampiran->file_type) ? $cleanTitle : ($cleanTitle.'.'.$lampiran->file_type);
+        if ($request->filled('urutan')) {
+            $lampiran->urutan = (int) $request->urutan;
+        }
+        $lampiran->save();
+
+        return redirect()->route('admin.dashboard', ['tab' => 'lampiran'])->with('success', 'Data lampiran berhasil diperbarui.');
+    }
+
+    /**
+     * Delete an existing document attachment.
+     */
+    public function destroyLampiran(LampiranInformasi $lampiran): RedirectResponse
+    {
+        $dir = base_path('informasi');
+        if ($lampiran->file_path && $lampiran->file_path !== 'kdkp_maret_2026.pdf') {
+            $path = $dir.'/'.$lampiran->file_path;
+            if (file_exists($path)) {
+                @unlink($path);
+            }
+        }
+
+        $lampiran->delete();
+
+        return redirect()->route('admin.dashboard', ['tab' => 'lampiran'])->with('success', 'Lampiran berhasil dihapus.');
     }
 }

@@ -155,6 +155,18 @@
                                 <i class="fa-solid fa-chevron-right text-xs"></i>
                             @endif
                         </a>
+
+                        <!-- 5. LAMPIRAN INFORMASI -->
+                        <a href="{{ route('admin.dashboard', ['tab' => 'lampiran']) }}"
+                           class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'lampiran' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-solid fa-paperclip text-sm"></i>
+                                <span>Lampiran Informasi</span>
+                            </div>
+                            @if($activeTab === 'lampiran')
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
                     </nav>
 
                     <!-- REKAPITULASI WILAYAH Widget -->
@@ -244,10 +256,11 @@
                             <div class="relative">
                                 <select onchange="window.location.href=this.value"
                                         class="bg-white border border-slate-300 rounded-xl px-4 py-2 text-xs font-extrabold text-slate-700 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm cursor-pointer pr-9">
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'informasi']) }}" selected>INFORMASI KOPERASI</option>
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}">DATABASE KOPERASI</option>
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}">DATABASE PENGURUS</option>
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'anggota']) }}">DATABASE ANGGOTA</option>
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'informasi']) }}" {{ $activeTab === 'informasi' ? 'selected' : '' }}>INFORMASI KOPERASI</option>
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}" {{ $activeTab === 'koperasi' ? 'selected' : '' }}>DATABASE KOPERASI</option>
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}" {{ $activeTab === 'pengurus' ? 'selected' : '' }}>DATABASE PENGURUS</option>
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'anggota']) }}" {{ $activeTab === 'anggota' ? 'selected' : '' }}>DATABASE ANGGOTA</option>
+                                    <option value="{{ route('admin.dashboard', ['tab' => 'lampiran']) }}" {{ $activeTab === 'lampiran' ? 'selected' : '' }}>LAMPIRAN INFORMASI</option>
                                 </select>
                             </div>
                         @endif
@@ -1075,6 +1088,352 @@
                         </div>
                     </div>
 
+                @elseif($activeTab === 'lampiran')
+                    <!-- ================= TAB: LAMPIRAN INFORMASI ================= -->
+                    <div class="space-y-6">
+
+                        <!-- Section Header Bar -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div>
+                                <div class="flex items-center space-x-2 text-sky-600 font-extrabold text-[11px] uppercase tracking-wider">
+                                    <i class="fa-solid fa-paperclip text-xs"></i>
+                                    <span>PORTAL INFORMASI TERINTEGRASI</span>
+                                </div>
+                                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight uppercase mt-0.5 leading-tight">
+                                    LAMPIRAN INFORMASI
+                                </h1>
+                                <p class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+                                    Kelola Dokumen Laporan & Informasi Koperasi Merah Putih
+                                </p>
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                <span class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-xs font-bold text-sky-700 shadow-xs">
+                                    <i class="fa-solid fa-file-circle-check text-sky-600"></i>
+                                    <span>{{ $lampirans->total() }} Lampiran Terdaftar</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Tabel Lampiran Informasi -->
+                        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
+
+                            <!-- Info banner connecting to Public UI -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-blue-50/70 border border-blue-100/90 text-xs text-blue-900 gap-3">
+                                <div class="flex items-center space-x-2.5">
+                                    <i class="fa-solid fa-circle-info text-blue-600 text-base shrink-0"></i>
+                                    <span>Dokumen lampiran di bawah ini <strong>terhubung langsung ke portal publik</strong> pada bagian <em>"Informasi Koperasi Merah Putih"</em> dalam bentuk dropdown dokumen.</span>
+                                </div>
+                                <a href="{{ route('dashboard') }}#informasi" target="_blank" class="shrink-0 text-blue-700 hover:text-blue-900 font-bold flex items-center space-x-1 underline decoration-blue-300">
+                                    <span>Lihat di Halaman Publik</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                </a>
+                            </div>
+
+                            <!-- Tabel Data Lampiran -->
+                            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+                                        <tr>
+                                            <th class="py-3 px-3.5 text-center w-12">No</th>
+                                            <th class="py-3 px-4">Nama File / Judul Dokumen</th>
+                                            <th class="py-3 px-4">File Dokumen & Tipe</th>
+                                            <th class="py-3 px-3.5 text-center">Urutan</th>
+                                            <th class="py-3 px-3.5 text-center">Status</th>
+                                            <th class="py-3 px-4 text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 text-slate-700">
+                                        @forelse($lampirans as $lampiran)
+                                            @php
+                                                $admExt = strtolower($lampiran->file_type ?? 'pdf');
+                                                $admIcon = match($admExt) {
+                                                    'xlsx', 'xls', 'csv' => ['icon' => 'fa-file-excel', 'color' => 'text-emerald-600', 'bg' => 'bg-emerald-50 border-emerald-200'],
+                                                    'pdf' => ['icon' => 'fa-file-pdf', 'color' => 'text-red-600', 'bg' => 'bg-red-50 border-red-200'],
+                                                    'doc', 'docx' => ['icon' => 'fa-file-word', 'color' => 'text-blue-600', 'bg' => 'bg-blue-50 border-blue-200'],
+                                                    'png', 'jpg', 'jpeg', 'webp' => ['icon' => 'fa-file-image', 'color' => 'text-purple-600', 'bg' => 'bg-purple-50 border-purple-200'],
+                                                    default => ['icon' => 'fa-file-lines', 'color' => 'text-slate-600', 'bg' => 'bg-slate-50 border-slate-200'],
+                                                };
+                                            @endphp
+                                            <tr class="hover:bg-slate-50/80 transition">
+                                                <td class="py-3 px-3.5 text-center font-semibold text-slate-500">
+                                                    {{ $loop->iteration + ($lampirans->currentPage() - 1) * $lampirans->perPage() }}
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <div class="font-bold text-slate-900 text-sm">
+                                                        {{ $lampiran->judul }}
+                                                    </div>
+                                                    <div class="text-[11px] text-slate-500 mt-0.5">
+                                                        {{ $lampiran->keterangan ?? '-' }}
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="w-7 h-7 rounded-lg {{ $admIcon['bg'] }} {{ $admIcon['color'] }} border flex items-center justify-center shrink-0 text-xs">
+                                                            <i class="fa-solid {{ $admIcon['icon'] }}"></i>
+                                                        </span>
+                                                        <div class="min-w-0">
+                                                            <a href="{{ route('informasi.file', $lampiran->file_path) }}" target="_blank" class="font-semibold text-sky-600 hover:text-sky-800 hover:underline block truncate max-w-xs" title="{{ $lampiran->file_name }}">
+                                                                {{ $lampiran->file_name }}
+                                                            </a>
+                                                            <span class="text-[10px] text-slate-400 font-mono">
+                                                                {{ $lampiran->file_size ?? '-' }} &bull; {{ strtoupper($lampiran->file_type) }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-3.5 text-center font-bold text-slate-700">
+                                                    {{ $lampiran->urutan }}
+                                                </td>
+                                                <td class="py-3 px-3.5 text-center">
+                                                    <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                        <span>Aktif di Publik</span>
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-4 text-right">
+                                                    <div class="flex items-center justify-end space-x-1.5">
+                                                        <!-- Button Lihat / Preview -->
+                                                        <a href="{{ route('informasi.file', $lampiran->file_path) }}" target="_blank"
+                                                           class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition"
+                                                           title="Buka File Dokumen">
+                                                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                                        </a>
+
+                                                        <!-- Button Edit Lampiran -->
+                                                        <button type="button"
+                                                                onclick="openEditLampiranModal({{ json_encode($lampiran) }})"
+                                                                class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold transition cursor-pointer"
+                                                                title="Edit data lampiran">
+                                                            <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                                            <span>Edit</span>
+                                                        </button>
+
+                                                        <!-- Button Hapus Lampiran -->
+                                                        <form action="{{ route('admin.lampiran.destroy', $lampiran->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus lampiran ini? Dokumen tidak akan tampil lagi di portal publik.');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit"
+                                                                    class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition cursor-pointer"
+                                                                    title="Hapus lampiran">
+                                                                <i class="fa-solid fa-trash text-xs"></i>
+                                                                <span>Hapus</span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center py-8 text-slate-400 italic">
+                                                    <div class="flex flex-col items-center justify-center space-y-2">
+                                                        <i class="fa-regular fa-folder-open text-3xl text-slate-300"></i>
+                                                        <span>Belum ada file lampiran informasi yang terdaftar.</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            @if($lampirans->hasPages())
+                                <div class="pt-2">
+                                    {{ $lampirans->links() }}
+                                </div>
+                            @endif
+
+                            <!-- OPSI UPLOAD FILE DI TENGAH BAWAH CARD TABEL -->
+                            <div class="pt-6 border-t border-slate-100 flex flex-col items-center justify-center text-center">
+                                <input type="file" id="lampiranFileInput" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" onchange="handleLampiranFileSelect(this)">
+
+                                <div class="w-full max-w-xl p-6 rounded-2xl border-2 border-dashed border-slate-300 hover:border-sky-500 bg-slate-50/70 hover:bg-sky-50/40 transition group cursor-pointer text-center"
+                                     onclick="document.getElementById('lampiranFileInput').click()">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    </div>
+                                    <h4 class="mt-3 text-sm font-extrabold text-slate-800">
+                                        Upload File Lampiran Baru
+                                    </h4>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        Klik untuk memilih file dokumen (PDF, Gambar, Word, Excel &bull; Maks. 50 MB)
+                                    </p>
+                                    <div class="mt-3">
+                                        <button type="button" class="inline-flex items-center space-x-2 px-5 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-extrabold shadow-sm group-hover:shadow transition pointer-events-none">
+                                            <i class="fa-solid fa-plus text-xs"></i>
+                                            <span>Pilih File Dokumen</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-2">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>
+                                    Popup preview verifikasi akan muncul otomatis sebelum file di-upload.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <!-- MODAL POPUP PREVIEW UPLOAD LAMPIRAN (Sesuai Permintaan Pengguna) -->
+                        <div id="modalPreviewUpload" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+                            <div class="bg-white rounded-2xl max-w-lg w-full border border-slate-200/90 shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200 my-auto">
+                                <!-- Modal Header -->
+                                <div class="bg-[#0284c7] text-white px-5 py-3 flex items-center justify-between">
+                                    <div class="flex items-center space-x-2.5">
+                                        <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-white">
+                                            <i class="fa-solid fa-eye text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xs sm:text-sm font-extrabold tracking-tight leading-tight">
+                                                Preview Dokumen Lampiran Baru
+                                            </h3>
+                                            <p class="text-[10px] text-sky-100">
+                                                Verifikasi isi file sebelum diunggah ke portal publik
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="cancelUploadPreview()" class="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer" title="Tutup">
+                                        <i class="fa-solid fa-xmark text-xs"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Modal Body Form -->
+                                <form id="formUploadLampiran" action="{{ route('admin.lampiran.store') }}" method="POST" enctype="multipart/form-data" class="p-4 sm:p-5 space-y-3">
+                                    @csrf
+                                    <!-- The actual file input moved here dynamically -->
+                                    <input type="file" id="modalActualFileInput" name="file" class="hidden" required>
+
+                                    <!-- Box Preview File -->
+                                    <div class="bg-slate-50 rounded-xl border border-slate-200 p-3 space-y-2">
+                                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/80">
+                                            <div class="flex items-center space-x-2 min-w-0 pr-2">
+                                                <span id="previewFileIcon" class="w-7 h-7 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold shrink-0">
+                                                    <i class="fa-solid fa-file-pdf"></i>
+                                                </span>
+                                                <div class="min-w-0">
+                                                    <h4 id="previewFileName" class="text-xs font-bold text-slate-800 truncate max-w-xs">
+                                                        dokumen.pdf
+                                                    </h4>
+                                                    <p id="previewFileSize" class="text-[10px] text-slate-500 font-mono">
+                                                        0.00 MB
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold shrink-0">
+                                                Siap Diunggah
+                                            </span>
+                                        </div>
+
+                                        <!-- Interactive Preview Area (Compact Height) -->
+                                        <div id="previewInteractiveContainer" class="w-full rounded-lg overflow-hidden border border-slate-200 bg-white" style="height: 120px;">
+                                            <iframe id="previewIframe" class="w-full h-full border-0 hidden" title="Pratinjau Dokumen"></iframe>
+                                            <img id="previewImage" class="w-full h-full object-contain hidden" alt="Pratinjau Gambar">
+                                            <div id="previewFallback" class="w-full h-full flex flex-col items-center justify-center text-slate-400 p-3 space-y-1">
+                                                <i class="fa-solid fa-file-lines text-2xl text-slate-300"></i>
+                                                <span class="text-[11px] font-medium text-slate-500">Format dokumen siap diunggah.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Input Metadatas -->
+                                    <div class="space-y-2.5">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">
+                                                Nama Dokumen / Judul File <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="judul" id="inputJudulLampiran" required placeholder="Contoh: DATA PROGRES PEMBANGUNAN KDKMP"
+                                                   class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 font-semibold text-slate-800">
+                                            <p class="text-[10px] text-slate-400">Nama ini akan menjadi nama file utama di portal publik dan saat diunduh.</p>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                                            <div class="sm:col-span-8 space-y-1">
+                                                <label class="text-xs font-bold text-slate-700">
+                                                    Keterangan / Subtitle (Opsional)
+                                                </label>
+                                                <input type="text" name="keterangan" id="inputKeteranganLampiran" placeholder="Contoh: LAPJUSIK DIM 0621 • 24 MARET 2026"
+                                                       class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-slate-800">
+                                            </div>
+                                            <div class="sm:col-span-4 space-y-1">
+                                                <label class="text-xs font-bold text-slate-700">
+                                                    Urutan
+                                                </label>
+                                                <input type="number" name="urutan" value="1" min="1"
+                                                       class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-slate-800">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Actions (Tombol Upload & Batalkan Sesuai Permintaan) -->
+                                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                                        <button type="button" onclick="cancelUploadPreview()"
+                                                class="px-4 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer">
+                                            <i class="fa-solid fa-xmark"></i>
+                                            <span>Batalkan Lampiran</span>
+                                        </button>
+
+                                        <button type="submit"
+                                                class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-md hover:shadow-lg transition transform active:scale-95 flex items-center space-x-1.5 cursor-pointer">
+                                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                                            <span>Upload Sekarang</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- MODAL EDIT LAMPIRAN -->
+                        <div id="modalEditLampiran" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+                            <div class="bg-white rounded-2xl max-w-md w-full border border-slate-200/90 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+                                <!-- Modal Header -->
+                                <div class="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fa-solid fa-pen-to-square text-amber-400 text-sm"></i>
+                                        <h3 class="text-xs sm:text-sm font-extrabold tracking-tight">Edit Data Lampiran</h3>
+                                    </div>
+                                    <button type="button" onclick="closeEditLampiranModal()" class="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer">
+                                        <i class="fa-solid fa-xmark text-xs"></i>
+                                    </button>
+                                </div>
+
+                                <form id="formEditLampiran" method="POST" enctype="multipart/form-data" class="p-4 sm:p-5 space-y-3">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Judul Dokumen <span class="text-red-500">*</span></label>
+                                        <input type="text" name="judul" id="editJudul" required class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 font-semibold">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Keterangan / Subtitle</label>
+                                        <input type="text" name="keterangan" id="editKeterangan" class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Nomor Urutan</label>
+                                        <input type="number" name="urutan" id="editUrutan" min="1" class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+
+                                    <div class="space-y-1 pt-2 border-t border-slate-100">
+                                        <label class="text-xs font-bold text-slate-700">Ganti File Dokumen (Opsional)</label>
+                                        <input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" class="w-full text-xs text-slate-500 file:mr-2.5 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer">
+                                        <p class="text-[10px] text-slate-400">Biarkan kosong jika tidak ingin mengganti file yang sudah ada.</p>
+                                    </div>
+
+                                    <div class="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+                                        <button type="button" onclick="closeEditLampiranModal()" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                            Batal
+                                        </button>
+                                        <button type="submit" class="px-4 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold shadow-sm transition cursor-pointer">
+                                            Simpan Perubahan
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+
                 @endif
 
             </section>
@@ -1275,6 +1634,105 @@
             btnOsm.className = "px-3 py-1.5 rounded-lg transition bg-[#0284c7] text-white shadow-xs flex items-center space-x-1.5";
             btnSat.className = "px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-slate-100 flex items-center space-x-1.5";
         }
+    }
+
+    // Lampiran Upload Preview & Edit Modal Handlers
+    function handleLampiranFileSelect(input) {
+        if (!input.files || input.files.length === 0) return;
+        const file = input.files[0];
+
+        // Transfer selected file to modalActualFileInput
+        const modalInput = document.getElementById('modalActualFileInput');
+        if (modalInput) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            modalInput.files = dataTransfer.files;
+        }
+
+        // Set file info in modal
+        const nameEl = document.getElementById('previewFileName');
+        const sizeEl = document.getElementById('previewFileSize');
+        const iconSpan = document.getElementById('previewFileIcon');
+        const judulInput = document.getElementById('inputJudulLampiran');
+
+        if (nameEl) nameEl.innerText = file.name;
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        if (sizeEl) sizeEl.innerText = sizeMb + ' • ' + (file.type || 'Dokumen');
+
+        // Suggest a title if empty or default
+        if (judulInput && !judulInput.value) {
+            const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').toUpperCase();
+            judulInput.value = cleanName;
+        }
+
+        // Handle Interactive Preview
+        const iframe = document.getElementById('previewIframe');
+        const img = document.getElementById('previewImage');
+        const fallback = document.getElementById('previewFallback');
+
+        if (iframe) iframe.classList.add('hidden');
+        if (img) img.classList.add('hidden');
+        if (fallback) fallback.classList.add('hidden');
+
+        if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+            const fileUrl = URL.createObjectURL(file);
+            if (iframe) {
+                iframe.src = fileUrl;
+                iframe.classList.remove('hidden');
+            }
+            if (iconSpan) {
+                iconSpan.innerHTML = '<i class="fa-solid fa-file-pdf"></i>';
+                iconSpan.className = 'w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-sm font-bold shrink-0';
+            }
+        } else if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                if (img) {
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+            if (iconSpan) {
+                iconSpan.innerHTML = '<i class="fa-solid fa-file-image"></i>';
+                iconSpan.className = 'w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm font-bold shrink-0';
+            }
+        } else {
+            if (fallback) fallback.classList.remove('hidden');
+            if (iconSpan) {
+                iconSpan.innerHTML = '<i class="fa-solid fa-file-lines"></i>';
+                iconSpan.className = 'w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0';
+            }
+        }
+
+        // Open modal
+        document.getElementById('modalPreviewUpload')?.classList.remove('hidden');
+    }
+
+    function cancelUploadPreview() {
+        document.getElementById('modalPreviewUpload')?.classList.add('hidden');
+        const fileInput = document.getElementById('lampiranFileInput');
+        if (fileInput) fileInput.value = '';
+        const modalInput = document.getElementById('modalActualFileInput');
+        if (modalInput) modalInput.value = '';
+        const iframe = document.getElementById('previewIframe');
+        if (iframe) iframe.src = '';
+    }
+
+    function openEditLampiranModal(lampiran) {
+        const form = document.getElementById('formEditLampiran');
+        if (form) form.action = '/admin/lampiran/' + lampiran.id;
+        const judulEl = document.getElementById('editJudul');
+        if (judulEl) judulEl.value = lampiran.judul || '';
+        const ketEl = document.getElementById('editKeterangan');
+        if (ketEl) ketEl.value = lampiran.keterangan || '';
+        const urutanEl = document.getElementById('editUrutan');
+        if (urutanEl) urutanEl.value = lampiran.urutan || 1;
+        document.getElementById('modalEditLampiran')?.classList.remove('hidden');
+    }
+
+    function closeEditLampiranModal() {
+        document.getElementById('modalEditLampiran')?.classList.add('hidden');
     }
 
     // Auto-init on page load

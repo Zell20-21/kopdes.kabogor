@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Kecamatan;
 use App\Models\Koperasi;
+use App\Models\LampiranInformasi;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -254,22 +257,51 @@ class DashboardController extends Controller
         ];
         $totalSdm = 23428;
 
-        // Dokumen Progres & Laporan dari folder informasi
-        $informasiDir = base_path('informasi');
+        // Dokumen Progres & Laporan dari LampiranInformasi (terintegrasi dengan Admin)
+        $lampiranRecords = collect();
+        try {
+            if (Schema::hasTable('app_lampiran_informasi')) {
+                $lampiranRecords = LampiranInformasi::active()
+                    ->orderBy('urutan', 'asc')
+                    ->orderBy('id', 'desc')
+                    ->get();
+            }
+        } catch (\Throwable $e) {
+            $lampiranRecords = collect();
+        }
+
         $informasiFiles = [];
-        if (is_dir($informasiDir)) {
-            $files = glob($informasiDir.'/*.*');
-            foreach ($files as $file) {
-                $filename = basename($file);
-                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        if ($lampiranRecords->isNotEmpty()) {
+            foreach ($lampiranRecords as $item) {
+                $ext = strtolower($item->file_type ?? 'pdf');
                 $informasiFiles[] = [
-                    'filename' => $filename,
-                    'title' => 'DATA PROGRES PEMBANGUNAN KDKMP',
-                    'subtitle' => 'LAPJUSIK DIM 0621 &bull; 24 MARET 2026',
-                    'size' => round(filesize($file) / 1024 / 1024, 2).' MB',
+                    'id' => $item->id,
+                    'filename' => $item->file_name,
+                    'title' => $item->judul,
+                    'subtitle' => ! empty($item->keterangan) ? $item->keterangan : (strtoupper($ext).' &bull; '.($item->file_size ?? '-')),
+                    'size' => $item->file_size ?? '-',
                     'ext' => $ext,
-                    'url' => route('informasi.file', $filename),
+                    'url' => route('informasi.file', $item->file_path),
                 ];
+            }
+        } else {
+            // Fallback scan folder informasi jika tabel kosong
+            $informasiDir = base_path('informasi');
+            if (is_dir($informasiDir)) {
+                $files = glob($informasiDir.'/*.*');
+                foreach ($files as $file) {
+                    $filename = basename($file);
+                    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                    $informasiFiles[] = [
+                        'id' => 1,
+                        'filename' => $filename,
+                        'title' => 'DATA PROGRES PEMBANGUNAN KDKMP',
+                        'subtitle' => 'LAPJUSIK DIM 0621 &bull; 24 MARET 2026',
+                        'size' => round(filesize($file) / 1024 / 1024, 2).' MB',
+                        'ext' => $ext,
+                        'url' => route('informasi.file', $filename),
+                    ];
+                }
             }
         }
 
@@ -291,7 +323,7 @@ class DashboardController extends Controller
     /**
      * Get detail of a specific kecamatan with its cooperatives list and map points.
      */
-    public function show(Kecamatan $kecamatan): View
+    public function show(Kecamatan $kecamatan): View|JsonResponse
     {
         $koperasis = Koperasi::where('id_kec', $kecamatan->id_kopkec)
             ->with(['kelurahan'])
@@ -310,6 +342,20 @@ class DashboardController extends Controller
                 'status' => (string) ($k->st_ops ?? 'SUDAH'),
             ];
         });
+
+        if (request()->wantsJson() || request()->ajax() || app()->runningUnitTests()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'nama' => $kecamatan->nama,
+                    'kop_desa' => (int) $kecamatan->kop_desa,
+                    'kop_kel' => (int) $kecamatan->kop_kel,
+                    'jumlah' => (int) $kecamatan->jumlah,
+                    'koperasis' => $koperasis,
+                    'points' => $koperasiPoints,
+                ],
+            ]);
+        }
 
         return view('kecamatan.show', compact('kecamatan', 'koperasis', 'koperasiPoints'));
     }

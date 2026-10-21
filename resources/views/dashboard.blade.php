@@ -69,15 +69,11 @@
         <!-- Hero Welcome Banner -->
         <section id="beranda" class="pt-8 pb-6 bg-gradient-to-b from-red-50/80 via-red-50/30 to-slate-50 border-b border-red-100/60">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-100/80 border border-red-200 text-red-700 text-xs font-semibold uppercase tracking-wider mb-3">
-                    <i class="fa-solid fa-location-dot text-red-600"></i>
-                    <span>PROVINSI JAWA BARAT | TERPADU</span>
-                </div>
-                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#991b1b] tracking-tight uppercase">
-                    SELAMAT DATANG
-                </h2>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#991b1b] tracking-tight uppercase">
+                    KOPERASI DESA MERAH PUTIH
+                </h1>
                 <p class="mt-2 text-sm sm:text-base text-slate-600 font-medium max-w-3xl mx-auto">
-                    Dashboard Koperasi Desa / Kelurahan Merah Putih (KDKMP) Kabupaten Bogor
+                    Koperasi Desa Merah Putih Kabupaten Bogor
                 </p>
             </div>
         </section>
@@ -448,43 +444,130 @@
                         </p>
                     </div>
 
-                    <!-- Rounded Buttons Trigger Open File (Sesuai Desain Referensi) -->
-                    <div class="flex flex-wrap items-center gap-2">
-                        @if(!empty($informasiFiles))
-                            @foreach($informasiFiles as $index => $file)
-                                <button
-                                    type="button"
-                                    onclick="toggleProgresDocCard('{{ $file['url'] }}', '{{ $file['title'] }}', '{{ $file['subtitle'] }}', this)"
-                                    class="btn-trigger-doc group inline-flex items-center space-x-2.5 px-4 py-2 rounded-full bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-sm hover:shadow-md transition-all duration-300 transform active:scale-95 cursor-pointer text-xs font-bold"
-                                    title="Klik untuk membuka/menutup isi file laporan"
-                                >
-                                    <span class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs group-hover:bg-blue-100 group-hover:text-blue-600 transition shrink-0">
-                                        <i class="fa-solid fa-file-pdf"></i>
-                                    </span>
-                                    <span class="tracking-tight">{{ $file['title'] }}</span>
-                                    <span class="px-2.5 py-0.5 rounded-full bg-slate-100 group-hover:bg-blue-100 text-[10px] font-extrabold text-slate-600 group-hover:text-blue-800 flex items-center space-x-1.5 shrink-0 transition">
-                                        <span class="doc-label-text">Lihat Detail</span>
-                                        <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-300 doc-chevron-icon"></i>
-                                    </span>
-                                </button>
-                            @endforeach
-                        @else
-                            <button
-                                type="button"
-                                onclick="toggleProgresDocCard('{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}', 'DATA PROGRES PEMBANGUNAN KDKMP', 'LAPJUSIK DIM 0621 &bull; 24 MARET 2026', this)"
-                                class="btn-trigger-doc group inline-flex items-center space-x-2.5 px-4 py-2 rounded-full bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-sm hover:shadow-md transition-all duration-300 transform active:scale-95 cursor-pointer text-xs font-bold"
-                                title="Klik untuk membuka/menutup isi file laporan"
-                            >
-                                <span class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs group-hover:bg-blue-100 group-hover:text-blue-600 transition shrink-0">
-                                    <i class="fa-solid fa-file-pdf"></i>
+                    <!-- Rounded Buttons Trigger Open File / Dropdown (Sesuai Permintaan & Gambar Referensi) -->
+                    <div class="relative inline-block text-left">
+                        @php
+                            $defaultFile = !empty($informasiFiles) ? $informasiFiles[0] : [
+                                'url' => route('informasi.file', 'kdkp_maret_2026.pdf'),
+                                'title' => 'DATA PROGRES PEMBANGUNAN KDKMP',
+                                'subtitle' => 'LAPJUSIK DIM 0621 &bull; 24 MARET 2026',
+                                'size' => '5.47 MB',
+                                'ext' => 'pdf',
+                                'filename' => 'DATA PROGRES PEMBANGUNAN KDKMP.pdf',
+                            ];
+                            $fileCount = !empty($informasiFiles) ? count($informasiFiles) : 1;
+
+                            $getFileIcon = function($ext) {
+                                return match(strtolower($ext)) {
+                                    'xlsx', 'xls', 'csv' => 'fa-solid fa-file-excel text-emerald-600',
+                                    'pdf' => 'fa-solid fa-file-pdf text-red-600',
+                                    'doc', 'docx' => 'fa-solid fa-file-word text-blue-600',
+                                    'png', 'jpg', 'jpeg', 'webp' => 'fa-solid fa-file-image text-purple-600',
+                                    default => 'fa-solid fa-file-lines text-slate-600',
+                                };
+                            };
+
+                            $getFileBadgeBg = function($ext) {
+                                return match(strtolower($ext)) {
+                                    'xlsx', 'xls', 'csv' => 'bg-emerald-100 text-emerald-700',
+                                    'pdf' => 'bg-red-100 text-red-700',
+                                    'doc', 'docx' => 'bg-blue-100 text-blue-700',
+                                    'png', 'jpg', 'jpeg', 'webp' => 'bg-purple-100 text-purple-700',
+                                    default => 'bg-slate-100 text-slate-700',
+                                };
+                            };
+                        @endphp
+
+                        <!-- Tombol Utama Rounded Sesuai Gambar 2 -->
+                        <button
+                            type="button"
+                            id="btnMainTriggerDoc"
+                            onclick="toggleLampiranDropdown()"
+                            class="btn-trigger-doc group inline-flex items-center space-x-2.5 px-4 py-2 rounded-full bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-sm hover:shadow-md transition-all duration-300 transform active:scale-95 cursor-pointer text-xs font-bold"
+                            title="Klik untuk memilih dokumen laporan lampiran"
+                        >
+                            <span id="mainDocIconWrapper" class="w-6 h-6 rounded-full {{ $getFileBadgeBg($defaultFile['ext']) }} flex items-center justify-center text-xs transition shrink-0">
+                                <i id="mainDocIcon" class="{{ $getFileIcon($defaultFile['ext']) }}"></i>
+                            </span>
+                            <span id="labelCurrentDocTitle" class="tracking-tight truncate max-w-[200px] sm:max-w-xs">
+                                {{ $defaultFile['title'] }}
+                            </span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-slate-100 group-hover:bg-blue-100 text-[10px] font-extrabold text-slate-600 group-hover:text-blue-800 flex items-center space-x-1.5 shrink-0 transition">
+                                <span id="labelCurrentDocAction">Lihat Detail</span>
+                                <i id="iconCurrentDocChevron" class="fa-solid fa-chevron-down text-[9px] transition-transform duration-300"></i>
+                            </span>
+                        </button>
+
+                        <!-- Dropdown Menu Pilihan File yang Turun Langsung di Bawah Tombol -->
+                        <div
+                            id="dropdownMenuLampiran"
+                            class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/90 z-40 p-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200"
+                        >
+                            <div class="px-2 py-1.5 border-b border-slate-100 flex items-center justify-between text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                                <span>PILIH DOKUMEN LAMPIRAN</span>
+                                <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold">
+                                    {{ $fileCount }} Dokumen Tersedia
                                 </span>
-                                <span class="tracking-tight">DATA PROGRES PEMBANGUNAN KDKMP (Maret 2026)</span>
-                                <span class="px-2.5 py-0.5 rounded-full bg-slate-100 group-hover:bg-blue-100 text-[10px] font-extrabold text-slate-600 group-hover:text-blue-800 flex items-center space-x-1.5 shrink-0 transition">
-                                    <span class="doc-label-text">Lihat Detail</span>
-                                    <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-300 doc-chevron-icon"></i>
-                                </span>
-                            </button>
-                        @endif
+                            </div>
+
+                            <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                                @if(!empty($informasiFiles))
+                                    @foreach($informasiFiles as $index => $file)
+                                        <!-- Setiap file dibungkus rounded card tersendiri dengan opsi 'Lihat Detail Informasi' di kanan -->
+                                        <div class="group/item flex items-center justify-between p-2.5 rounded-xl border border-slate-200/80 hover:border-blue-400 bg-white hover:bg-blue-50/40 shadow-2xs hover:shadow-xs transition">
+                                            <div class="flex items-center space-x-2.5 min-w-0 pr-2">
+                                                <span class="w-8 h-8 rounded-lg {{ $getFileBadgeBg($file['ext']) }} flex items-center justify-center text-xs shrink-0 group-hover/item:scale-105 transition-transform">
+                                                    <i class="{{ $getFileIcon($file['ext']) }}"></i>
+                                                </span>
+                                                <div class="min-w-0">
+                                                    <div class="text-xs font-bold text-slate-800 truncate group-hover/item:text-blue-700 transition" title="{{ $file['title'] }}">
+                                                        {{ $file['title'] }}
+                                                    </div>
+                                                    <div class="text-[10px] text-slate-400 truncate">
+                                                        {!! $file['subtitle'] !!} &bull; {{ $file['size'] }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                onclick="selectLampiranDoc('{{ $file['url'] }}', '{{ addslashes($file['title']) }}', '{{ addslashes($file['subtitle']) }}', '{{ $file['ext'] }}', '{{ addslashes($file['filename']) }}', {{ $index }})"
+                                                class="shrink-0 px-3 py-1.5 rounded-full bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 hover:border-blue-600 text-[11px] font-extrabold transition shadow-2xs flex items-center space-x-1.5 cursor-pointer"
+                                                title="Lihat detail dokumen ini"
+                                            >
+                                                <span>Lihat Detail Informasi</span>
+                                                <i class="fa-solid fa-arrow-down text-[9px]"></i>
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="group/item flex items-center justify-between p-2.5 rounded-xl border border-slate-200/80 hover:border-blue-400 bg-white hover:bg-blue-50/40 shadow-2xs hover:shadow-xs transition">
+                                        <div class="flex items-center space-x-2.5 min-w-0 pr-2">
+                                            <span class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-xs shrink-0">
+                                                <i class="fa-solid fa-file-pdf"></i>
+                                            </span>
+                                            <div class="min-w-0">
+                                                <div class="text-xs font-bold text-slate-800 truncate">
+                                                    DATA PROGRES PEMBANGUNAN KDKMP
+                                                </div>
+                                                <div class="text-[10px] text-slate-400 truncate">
+                                                    LAPJUSIK DIM 0621 &bull; 5.47 MB
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onclick="selectLampiranDoc('{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}', 'DATA PROGRES PEMBANGUNAN KDKMP', 'LAPJUSIK DIM 0621 &bull; 24 MARET 2026', 'pdf', 'kdkp_maret_2026.pdf', 0)"
+                                            class="shrink-0 px-3 py-1.5 rounded-full bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 hover:border-blue-600 text-[11px] font-extrabold transition shadow-2xs flex items-center space-x-1.5 cursor-pointer"
+                                        >
+                                            <span>Lihat Detail Informasi</span>
+                                            <i class="fa-solid fa-arrow-down text-[9px]"></i>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -493,24 +576,44 @@
                     <!-- Bar Biru Sesuai Screenshot Lampiran Pengguna -->
                     <div class="bg-[#0284c7] text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
                         <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center text-white shrink-0">
-                                <i class="fa-solid fa-file-lines text-base"></i>
+                            <div id="docCardIcon" class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center text-white shrink-0 text-sm">
+                                <i class="{{ $getFileIcon($defaultFile['ext']) }}"></i>
                             </div>
                             <div>
                                 <h4 id="docCardTitle" class="text-xs sm:text-sm font-extrabold tracking-wider uppercase leading-none">
-                                    DATA PROGRES PEMBANGUNAN KDKMP
+                                    {{ $defaultFile['title'] }}
                                 </h4>
                                 <p id="docCardSubtitle" class="text-[10px] sm:text-[11px] text-blue-100 font-medium leading-none mt-1">
-                                    LAPJUSIK DIM 0621 &bull; 24 MARET 2026
+                                    {!! $defaultFile['subtitle'] !!}
                                 </p>
                             </div>
                         </div>
+
+                        <!-- Quick Document Switcher Tabs if Multiple Files Exist -->
+                        @if(!empty($informasiFiles) && count($informasiFiles) > 1)
+                            <div id="docSwitcherTabs" class="flex items-center space-x-1.5 bg-black/20 p-1 rounded-xl">
+                                @foreach($informasiFiles as $idx => $f)
+                                    <button
+                                        type="button"
+                                        id="docSwitcherBtn_{{ $idx }}"
+                                        onclick="selectLampiranDoc('{{ $f['url'] }}', '{{ addslashes($f['title']) }}', '{{ addslashes($f['subtitle']) }}', '{{ $f['ext'] }}', '{{ addslashes($f['filename']) }}', {{ $idx }})"
+                                        class="doc-switcher-btn px-2.5 py-1 rounded-lg text-[11px] font-bold transition {{ $idx === 0 ? 'bg-white text-blue-900 shadow-xs' : 'text-white/80 hover:bg-white/10 hover:text-white' }} cursor-pointer truncate max-w-[120px]"
+                                        title="{{ $f['title'] }}"
+                                    >
+                                        Dokumen {{ $idx + 1 }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
+
                         <div class="flex items-center space-x-2 text-xs">
-                            <a id="btnDocDownload" href="{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}" download class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold transition shadow-sm">
+                            <a id="btnDocDownload" href="{{ $defaultFile['url'] }}" download="{{ $defaultFile['filename'] ?? ($defaultFile['title'].'.'.$defaultFile['ext']) }}" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold transition shadow-sm">
                                 <i class="fa-solid fa-download text-xs"></i>
-                                <span class="hidden sm:inline">Unduh PDF</span>
+                                <span id="btnDocDownloadLabel" class="hidden sm:inline">
+                                    Unduh {{ in_array($defaultFile['ext'], ['xlsx', 'xls']) ? 'Excel' : ($defaultFile['ext'] === 'pdf' ? 'PDF' : 'File') }}
+                                </span>
                             </a>
-                            <a id="btnDocExternal" href="{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}" target="_blank" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold transition shadow-sm">
+                            <a id="btnDocExternal" href="{{ $defaultFile['url'] }}" target="_blank" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold transition shadow-sm">
                                 <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                                 <span class="hidden sm:inline">Layar Penuh</span>
                             </a>
@@ -521,13 +624,72 @@
                     </div>
 
                     <!-- Viewer Container yang responsive dan melebar kebawah -->
-                    <div class="relative bg-slate-800 w-full" style="min-height: 650px; height: 80vh;">
+                    <div class="relative bg-slate-900 w-full overflow-hidden" style="min-height: 650px; height: 80vh;">
+                        <!-- PDF Viewer Iframe -->
                         <iframe
                             id="docViewerIframe"
-                            src="{{ route('informasi.file', 'kdkp_maret_2026.pdf') }}#toolbar=1&navpanes=0&scrollbar=1&view=FitH"
-                            class="w-full h-full border-0"
-                            title="Viewer Laporan Perkembangan KDKMP"
+                            src=""
+                            class="w-full h-full border-0 hidden"
+                            title="Viewer Dokumen Lampiran"
                         ></iframe>
+
+                        <!-- Spreadsheet / Excel Interactive Viewer (SheetJS) -->
+                        <div id="docViewerSpreadsheet" class="w-full h-full flex flex-col bg-slate-50 hidden">
+                            <!-- Top Toolbar Excel -->
+                            <div class="bg-emerald-800 text-white px-4 py-2 flex flex-wrap items-center justify-between gap-2 border-b border-emerald-900 shadow-xs shrink-0">
+                                <div class="flex items-center space-x-2 min-w-0">
+                                    <span class="w-6 h-6 rounded bg-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">
+                                        <i class="fa-solid fa-file-excel"></i>
+                                    </span>
+                                    <span id="sheetDocName" class="text-xs font-bold truncate max-w-xs sm:max-w-md">Lembar Kerja Excel</span>
+                                    <span id="sheetActiveNameBadge" class="px-2 py-0.5 rounded-full bg-emerald-900/80 text-[10px] font-mono text-emerald-200 shrink-0"></span>
+                                </div>
+                                <!-- Sheet Tabs Switcher if multiple sheets -->
+                                <div id="spreadsheetSheetTabs" class="flex items-center space-x-1 overflow-x-auto max-w-md py-0.5">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+                                <div class="text-[11px] text-emerald-200 flex items-center space-x-2 shrink-0">
+                                    <span id="sheetStatsInfo"></span>
+                                </div>
+                            </div>
+
+                            <!-- Spreadsheet Table Body -->
+                            <div id="spreadsheetTableContainer" class="flex-1 overflow-auto p-4 bg-white select-text">
+                                <!-- Table rendered here -->
+                            </div>
+                        </div>
+
+                        <!-- Image Viewer -->
+                        <div id="docViewerImage" class="w-full h-full flex items-center justify-center p-4 bg-slate-950 hidden">
+                            <img id="imgViewerElement" src="" alt="Preview Lampiran" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+                        </div>
+
+                        <!-- Generic Document Fallback -->
+                        <div id="docViewerFallback" class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-900 text-white space-y-4 hidden text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-3xl text-sky-400 shadow-inner">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+                            <div class="max-w-md space-y-1">
+                                <h4 id="fallbackDocTitle" class="text-base font-bold text-white">Nama Dokumen</h4>
+                                <p class="text-xs text-slate-400">File ini siap dilihat atau diunduh untuk dibuka dengan aplikasi terkait.</p>
+                            </div>
+                            <div class="flex items-center space-x-3 pt-2">
+                                <a id="fallbackDownloadBtn" href="#" download class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-md transition flex items-center space-x-2">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>Unduh File Dokumen</span>
+                                </a>
+                                <a id="fallbackOpenBtn" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs transition flex items-center space-x-2">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    <span>Buka di Tab Baru</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Loading State -->
+                        <div id="docViewerLoading" class="absolute inset-0 bg-slate-900/80 backdrop-blur-xs flex flex-col items-center justify-center text-white space-y-3 z-30 hidden">
+                            <div class="w-10 h-10 border-4 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
+                            <span class="text-xs font-semibold tracking-wide text-slate-200">Memuat pratinjau dokumen...</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1224,6 +1386,7 @@
 @endpush
 
 @push('scripts')
+<script src="{{ asset('js/xlsx.full.min.js') }}"></script>
 <script>
     // Data from Laravel Backend
     const kecamatansData = @json($kecamatans);
@@ -1899,46 +2062,192 @@
     window.addEventListener('scroll', updateScrollspy, { passive: true });
     window.addEventListener('load', updateScrollspy);
 
-    // Document Card Handler (Dropdown turun kebawah & melebar kebawah sesuai gambar referensi)
-    let activeDocBtn = null;
-    function toggleProgresDocCard(url, title, subtitle, btnElement) {
-        const card = document.getElementById('progresDocCard');
-        const iframe = document.getElementById('docViewerIframe');
-        const titleEl = document.getElementById('docCardTitle');
-        const subtitleEl = document.getElementById('docCardSubtitle');
-        const dlBtn = document.getElementById('btnDocDownload');
-        const extBtn = document.getElementById('btnDocExternal');
+    // Document Card, Spreadsheet Viewer & Dropdown Handler (Dropdown turun kebawah & melebar kebawah sesuai gambar referensi)
+    let currentSelectedDoc = {
+        url: '{{ $defaultFile['url'] }}',
+        title: '{{ addslashes($defaultFile['title']) }}',
+        subtitle: '{!! addslashes($defaultFile['subtitle']) !!}',
+        ext: '{{ $defaultFile['ext'] }}',
+        filename: '{{ addslashes($defaultFile['filename'] ?? ($defaultFile['title'].'.'.$defaultFile['ext'])) }}',
+        index: 0
+    };
 
-        if (!card.classList.contains('hidden') && activeDocBtn === btnElement) {
+    function getDocTypeInfo(ext) {
+        switch ((ext || '').toLowerCase()) {
+            case 'xlsx':
+            case 'xls':
+            case 'csv':
+                return { icon: 'fa-solid fa-file-excel', color: 'text-emerald-600', badge: 'bg-emerald-100 text-emerald-700', label: 'Excel' };
+            case 'pdf':
+                return { icon: 'fa-solid fa-file-pdf', color: 'text-red-600', badge: 'bg-red-100 text-red-700', label: 'PDF' };
+            case 'doc':
+            case 'docx':
+                return { icon: 'fa-solid fa-file-word', color: 'text-blue-600', badge: 'bg-blue-100 text-blue-700', label: 'Word' };
+            case 'png':
+            case 'jpg':
+            case 'jpeg':
+            case 'webp':
+                return { icon: 'fa-solid fa-file-image', color: 'text-purple-600', badge: 'bg-purple-100 text-purple-700', label: 'Gambar' };
+            default:
+                return { icon: 'fa-solid fa-file-lines', color: 'text-slate-600', badge: 'bg-slate-100 text-slate-700', label: 'Dokumen' };
+        }
+    }
+
+    function toggleLampiranDropdown() {
+        const dropdown = document.getElementById('dropdownMenuLampiran');
+        const card = document.getElementById('progresDocCard');
+        const chevron = document.getElementById('iconCurrentDocChevron');
+        const totalFiles = {{ !empty($informasiFiles) ? count($informasiFiles) : 1 }};
+
+        // Jika dokumen card sedang terbuka, klik tombol utama akan menutupnya
+        if (card && !card.classList.contains('hidden') && dropdown && dropdown.classList.contains('hidden')) {
             closeProgresDocCard();
             return;
         }
 
-        // Set card data
-        if (title && titleEl) titleEl.innerText = title;
-        if (subtitle && subtitleEl) subtitleEl.innerHTML = subtitle;
-        if (url && dlBtn) dlBtn.href = url;
-        if (url && extBtn) extBtn.href = url;
-        if (url && iframe) {
-            const viewerUrl = url.includes('#') ? url : `${url}#toolbar=1&navpanes=0&scrollbar=1&view=FitH`;
-            if (iframe.src !== viewerUrl) {
-                iframe.src = viewerUrl;
+        if (totalFiles > 1) {
+            // Jika ada lebih dari 1 file, buka/tutup menu dropdown opsi file
+            const isHidden = dropdown.classList.contains('hidden');
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+                if (chevron) chevron.classList.add('rotate-180');
+            } else {
+                dropdown.classList.add('hidden');
+                if (chevron) chevron.classList.remove('rotate-180');
+            }
+        } else {
+            // Jika hanya 1 file, langsung toggle buka/tutup viewer dokumen
+            toggleProgresDocCard(currentSelectedDoc.url, currentSelectedDoc.title, currentSelectedDoc.subtitle, currentSelectedDoc.ext, currentSelectedDoc.filename);
+        }
+    }
+
+    function selectLampiranDoc(url, title, subtitle, ext, filename, idx = 0) {
+        currentSelectedDoc = { url, title, subtitle, ext, filename, index: idx };
+
+        // Update teks judul dan icon di tombol utama
+        const titleEl = document.getElementById('labelCurrentDocTitle');
+        if (titleEl) titleEl.innerText = title;
+
+        const typeInfo = getDocTypeInfo(ext);
+        const iconWrapper = document.getElementById('mainDocIconWrapper');
+        const iconEl = document.getElementById('mainDocIcon');
+        if (iconWrapper && iconEl) {
+            iconWrapper.className = `w-6 h-6 rounded-full ${typeInfo.badge} flex items-center justify-center text-xs transition shrink-0`;
+            iconEl.className = `${typeInfo.icon} ${typeInfo.color}`;
+        }
+
+        // Update active style di switcher tabs (Dokumen 1, Dokumen 2, dst)
+        const switcherBtns = document.querySelectorAll('.doc-switcher-btn');
+        switcherBtns.forEach((btn, bIdx) => {
+            if (bIdx === idx) {
+                btn.className = 'doc-switcher-btn px-2.5 py-1 rounded-lg text-[11px] font-bold transition bg-white text-blue-900 shadow-xs cursor-pointer truncate max-w-[120px]';
+            } else {
+                btn.className = 'doc-switcher-btn px-2.5 py-1 rounded-lg text-[11px] font-bold transition text-white/80 hover:bg-white/10 hover:text-white cursor-pointer truncate max-w-[120px]';
+            }
+        });
+
+        // Tutup dropdown menu
+        const dropdown = document.getElementById('dropdownMenuLampiran');
+        if (dropdown) dropdown.classList.add('hidden');
+
+        // Buka kartu viewer dengan file yang dipilih
+        toggleProgresDocCard(url, title, subtitle, ext, filename, true);
+    }
+
+    function toggleProgresDocCard(url, title, subtitle, ext, filename, forceOpen = false) {
+        const card = document.getElementById('progresDocCard');
+        if (!card) return;
+
+        const mainBtn = document.getElementById('btnMainTriggerDoc');
+        const actionLabel = document.getElementById('labelCurrentDocAction');
+        const chevron = document.getElementById('iconCurrentDocChevron');
+
+        if (!forceOpen && !card.classList.contains('hidden')) {
+            closeProgresDocCard();
+            return;
+        }
+
+        const typeInfo = getDocTypeInfo(ext);
+
+        // Header Card Info
+        const titleEl = document.getElementById('docCardTitle');
+        const subtitleEl = document.getElementById('docCardSubtitle');
+        const iconEl = document.getElementById('docCardIcon');
+        if (titleEl) titleEl.innerText = title;
+        if (subtitleEl) subtitleEl.innerHTML = subtitle;
+        if (iconEl) iconEl.innerHTML = `<i class="${typeInfo.icon} text-base"></i>`;
+
+        // Action Buttons
+        const dlBtn = document.getElementById('btnDocDownload');
+        const dlLabel = document.getElementById('btnDocDownloadLabel');
+        const extBtn = document.getElementById('btnDocExternal');
+        if (dlBtn) {
+            dlBtn.href = url;
+            dlBtn.setAttribute('download', filename || (title + '.' + ext));
+        }
+        if (dlLabel) dlLabel.innerText = `Unduh ${typeInfo.label}`;
+        if (extBtn) extBtn.href = url;
+
+        // Container references
+        const iframe = document.getElementById('docViewerIframe');
+        const spreadsheetContainer = document.getElementById('docViewerSpreadsheet');
+        const imgContainer = document.getElementById('docViewerImage');
+        const imgEl = document.getElementById('imgViewerElement');
+        const fallbackContainer = document.getElementById('docViewerFallback');
+
+        // Reset visibility
+        if (iframe) iframe.classList.add('hidden');
+        if (spreadsheetContainer) spreadsheetContainer.classList.add('hidden');
+        if (imgContainer) imgContainer.classList.add('hidden');
+        if (fallbackContainer) fallbackContainer.classList.add('hidden');
+
+        const cleanExt = (ext || '').toLowerCase();
+
+        if (cleanExt === 'xlsx' || cleanExt === 'xls' || cleanExt === 'csv') {
+            // Excel Spreadsheet Mode (Render inside interactive table without auto-download)
+            if (iframe) iframe.src = 'about:blank';
+            if (spreadsheetContainer) spreadsheetContainer.classList.remove('hidden');
+            renderSpreadsheet(url, filename || title);
+        } else if (cleanExt === 'pdf') {
+            // PDF Mode (Native browser PDF reader in iframe)
+            if (iframe) {
+                iframe.classList.remove('hidden');
+                const viewerUrl = url.includes('#') ? url : `${url}#toolbar=1&navpanes=0&scrollbar=1&view=FitH`;
+                if (iframe.src !== viewerUrl) {
+                    iframe.src = viewerUrl;
+                }
+            }
+        } else if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(cleanExt)) {
+            // Image Mode
+            if (iframe) iframe.src = 'about:blank';
+            if (imgContainer && imgEl) {
+                imgEl.src = url;
+                imgContainer.classList.remove('hidden');
+            }
+        } else {
+            // Generic Document Mode
+            if (iframe) iframe.src = 'about:blank';
+            if (fallbackContainer) {
+                fallbackContainer.classList.remove('hidden');
+                const fbTitle = document.getElementById('fallbackDocTitle');
+                if (fbTitle) fbTitle.innerText = title;
+                const fbDl = document.getElementById('fallbackDownloadBtn');
+                if (fbDl) {
+                    fbDl.href = url;
+                    fbDl.setAttribute('download', filename || (title + '.' + ext));
+                }
+                const fbOpen = document.getElementById('fallbackOpenBtn');
+                if (fbOpen) fbOpen.href = url;
             }
         }
 
-        // Reset previous button styling if any
-        resetDocButtons();
-
-        // Mark current button as active
-        if (btnElement) {
-            activeDocBtn = btnElement;
-            btnElement.classList.add('border-blue-600', 'bg-blue-50', 'text-blue-700');
-            btnElement.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
-            const label = btnElement.querySelector('.doc-label-text');
-            const icon = btnElement.querySelector('.doc-chevron-icon');
-            if (label) label.innerText = 'Tutup Detail';
-            if (icon) icon.classList.add('rotate-180');
+        // Active button styling
+        if (mainBtn) {
+            mainBtn.classList.add('border-blue-600', 'bg-blue-50', 'text-blue-700');
+            mainBtn.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
         }
+        if (actionLabel) actionLabel.innerText = 'Tutup Detail';
+        if (chevron) chevron.classList.add('rotate-180');
 
         // Reveal card with smooth slide down
         card.classList.remove('hidden');
@@ -1948,20 +2257,165 @@
     function closeProgresDocCard() {
         const card = document.getElementById('progresDocCard');
         if (card) card.classList.add('hidden');
-        resetDocButtons();
-        activeDocBtn = null;
+
+        // Clear iframe to stop background activity
+        const iframe = document.getElementById('docViewerIframe');
+        if (iframe) iframe.src = 'about:blank';
+
+        const mainBtn = document.getElementById('btnMainTriggerDoc');
+        if (mainBtn) {
+            mainBtn.classList.remove('border-blue-600', 'bg-blue-50', 'text-blue-700');
+            mainBtn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+        }
+        const actionLabel = document.getElementById('labelCurrentDocAction');
+        if (actionLabel) actionLabel.innerText = 'Lihat Detail';
+
+        const chevron = document.getElementById('iconCurrentDocChevron');
+        if (chevron) chevron.classList.remove('rotate-180');
     }
 
-    function resetDocButtons() {
-        document.querySelectorAll('.btn-trigger-doc').forEach(btn => {
-            btn.classList.remove('border-blue-600', 'bg-blue-50', 'text-blue-700');
-            btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
-            const label = btn.querySelector('.doc-label-text');
-            const icon = btn.querySelector('.doc-chevron-icon');
-            if (label) label.innerText = 'Lihat Detail';
-            if (icon) icon.classList.remove('rotate-180');
-        });
+    // Render interactive Excel sheet via SheetJS
+    function renderSpreadsheet(url, filename) {
+        const loading = document.getElementById('docViewerLoading');
+        const container = document.getElementById('spreadsheetTableContainer');
+        const tabsContainer = document.getElementById('spreadsheetSheetTabs');
+        const nameEl = document.getElementById('sheetDocName');
+        const statsEl = document.getElementById('sheetStatsInfo');
+        const activeBadge = document.getElementById('sheetActiveNameBadge');
+
+        if (loading) loading.classList.remove('hidden');
+        if (nameEl) nameEl.innerText = filename;
+        if (container) container.innerHTML = '<div class="p-8 text-center text-slate-400">Membaca file Excel...</div>';
+        if (tabsContainer) tabsContainer.innerHTML = '';
+
+        if (typeof XLSX === 'undefined') {
+            if (loading) loading.classList.add('hidden');
+            if (container) {
+                container.innerHTML = `
+                    <div class="p-8 text-center space-y-3">
+                        <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-file-excel"></i>
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-800">Dokumen Spreadsheet Siap Diunduh</h4>
+                        <p class="text-xs text-slate-500 max-w-md mx-auto">Klik tombol di bawah untuk mengunduh dan membuka file dengan Microsoft Excel atau spreadsheet viewer.</p>
+                        <a href="${url}" download class="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition shadow-sm">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Unduh File Excel</span>
+                        </a>
+                    </div>
+                `;
+            }
+            return;
+        }
+
+        fetch(url)
+            .then(res => {
+                if (!res.ok) throw new Error('Gagal mengunduh file spreadsheet');
+                return res.arrayBuffer();
+            })
+            .then(buffer => {
+                const workbook = XLSX.read(buffer, { type: 'array' });
+                if (!workbook || !workbook.SheetNames || workbook.SheetNames.length === 0) {
+                    throw new Error('Tidak ada lembar kerja pada file ini.');
+                }
+
+                function displaySheet(sheetName) {
+                    const sheet = workbook.Sheets[sheetName];
+                    if (!sheet) return;
+
+                    if (activeBadge) activeBadge.innerText = sheetName;
+
+                    // Update active button tabs
+                    tabsContainer.querySelectorAll('.sheet-tab-btn').forEach(btn => {
+                        if (btn.getAttribute('data-sheet') === sheetName) {
+                            btn.className = 'sheet-tab-btn px-2.5 py-1 rounded bg-white text-emerald-900 text-[11px] font-bold shadow-xs cursor-pointer';
+                        } else {
+                            btn.className = 'sheet-tab-btn px-2.5 py-1 rounded bg-emerald-900/60 hover:bg-emerald-900 text-emerald-100 text-[11px] font-medium cursor-pointer transition';
+                        }
+                    });
+
+                    // Generate HTML Table from Sheet
+                    const html = XLSX.utils.sheet_to_html(sheet, {
+                        id: 'excelRenderedTable',
+                        editable: false
+                    });
+
+                    container.innerHTML = `
+                        <div class="overflow-auto border border-slate-200 rounded-lg shadow-2xs">
+                            ${html}
+                        </div>
+                    `;
+
+                    // Style the rendered table
+                    const table = container.querySelector('table');
+                    if (table) {
+                        table.className = 'min-w-full border-collapse text-xs text-slate-800 text-left bg-white';
+                        table.querySelectorAll('tr').forEach((tr, rIdx) => {
+                            if (rIdx === 0) {
+                                tr.className = 'bg-slate-100 font-bold border-b border-slate-300';
+                            } else {
+                                tr.className = 'hover:bg-blue-50/30 border-b border-slate-200';
+                            }
+                            tr.querySelectorAll('td, th').forEach(cell => {
+                                cell.className += ' px-3 py-2 border-r border-slate-200 whitespace-nowrap text-xs';
+                            });
+                        });
+
+                        const rowCount = table.querySelectorAll('tr').length;
+                        if (statsEl) statsEl.innerText = `${rowCount} Baris Data`;
+                    }
+                }
+
+                // Create sheet tabs
+                workbook.SheetNames.forEach((sName) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'sheet-tab-btn px-2.5 py-1 rounded text-[11px] cursor-pointer';
+                    btn.setAttribute('data-sheet', sName);
+                    btn.innerText = sName;
+                    btn.onclick = () => displaySheet(sName);
+                    tabsContainer.appendChild(btn);
+                });
+
+                // Display first sheet
+                displaySheet(workbook.SheetNames[0]);
+                if (loading) loading.classList.add('hidden');
+            })
+            .catch(err => {
+                console.error('Spreadsheet preview error:', err);
+                if (loading) loading.classList.add('hidden');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="p-8 text-center space-y-3">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-file-excel"></i>
+                            </div>
+                            <h4 class="text-sm font-bold text-slate-800">Dokumen Spreadsheet</h4>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto">File spreadsheet dapat diunduh langsung untuk dibuka di Microsoft Excel atau Google Spreadsheet.</p>
+                            <a href="${url}" download class="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Unduh File Excel</span>
+                            </a>
+                        </div>
+                    `;
+                }
+            });
     }
+
+    // Close dropdown on click outside
+    document.addEventListener('click', function (e) {
+        const dropdown = document.getElementById('dropdownMenuLampiran');
+        const mainBtn = document.getElementById('btnMainTriggerDoc');
+        if (dropdown && !dropdown.classList.contains('hidden')) {
+            if (!dropdown.contains(e.target) && (!mainBtn || !mainBtn.contains(e.target))) {
+                dropdown.classList.add('hidden');
+                const chevron = document.getElementById('iconCurrentDocChevron');
+                if (chevron && document.getElementById('progresDocCard')?.classList.contains('hidden')) {
+                    chevron.classList.remove('rotate-180');
+                }
+            }
+        }
+    });
 
     @if(session('open_login') || $errors->any())
         openLoginModal();

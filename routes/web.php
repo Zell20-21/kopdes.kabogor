@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
+use App\Models\LampiranInformasi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 // Public routes
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -14,23 +16,41 @@ Route::get('/kecamatan/{kecamatan}', [DashboardController::class, 'show'])->name
 Route::get('/koperasi/{koperasi}', [DashboardController::class, 'showKoperasi'])->name('koperasi.show');
 Route::get('/export/rekapitulasi', [DashboardController::class, 'export'])->name('export.rekapitulasi');
 Route::get('/informasi/file/{filename}', function (string $filename) {
-    $path = base_path('informasi/'.basename($filename));
+    $cleanFilename = basename($filename);
+    $path = base_path('informasi/'.$cleanFilename);
     if (! file_exists($path)) {
         abort(404);
     }
 
-    $mimeType = match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $downloadName = $cleanFilename;
+    try {
+        if (Schema::hasTable('app_lampiran_informasi')) {
+            $lampiran = LampiranInformasi::where('file_path', $cleanFilename)->first();
+            if ($lampiran) {
+                $downloadName = $lampiran->file_name ?: ($lampiran->judul.'.'.$ext);
+            }
+        }
+    } catch (Throwable $e) {
+        $downloadName = $cleanFilename;
+    }
+
+    $mimeType = match ($ext) {
         'pdf' => 'application/pdf',
         'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'xls' => 'application/vnd.ms-excel',
+        'csv' => 'text/csv',
+        'doc' => 'application/msword',
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'png' => 'image/png',
         'jpg', 'jpeg' => 'image/jpeg',
+        'webp' => 'image/webp',
         default => 'application/octet-stream',
     };
 
     return response()->file($path, [
         'Content-Type' => $mimeType,
-        'Content-Disposition' => 'inline; filename="'.basename($filename).'"',
+        'Content-Disposition' => 'inline; filename="'.str_replace('"', '', $downloadName).'"',
     ]);
 })->name('informasi.file');
 
@@ -209,4 +229,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::post('/koperasi', [AdminController::class, 'storeKoperasi'])->name('admin.koperasi.store');
     Route::get('/koperasi/export', [AdminController::class, 'exportKoperasi'])->name('admin.koperasi.export');
+
+    // Lampiran Informasi routes
+    Route::post('/lampiran', [AdminController::class, 'storeLampiran'])->name('admin.lampiran.store');
+    Route::put('/lampiran/{lampiran}', [AdminController::class, 'updateLampiran'])->name('admin.lampiran.update');
+    Route::delete('/lampiran/{lampiran}', [AdminController::class, 'destroyLampiran'])->name('admin.lampiran.destroy');
 });
