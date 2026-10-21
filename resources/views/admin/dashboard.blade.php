@@ -21,11 +21,11 @@
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-[#f8fafc] flex flex-col justify-between text-slate-800">
+<div class="min-h-screen bg-[#f8fafc] flex flex-col justify-between text-slate-800 w-full max-w-full overflow-x-hidden">
 
     <!-- Top Navigation Header GovTech KOP -->
-    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-[100]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header class="w-full bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-[100]">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Desain Referensi) -->
                 <div class="flex items-center space-x-2.5 sm:space-x-3.5">
@@ -68,7 +68,7 @@
     </header>
 
     <!-- Main Content Container with Sidebar -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-0 isolate">
+    <main class="flex-grow w-full max-w-full px-4 sm:px-6 lg:px-8 py-6 relative z-0 isolate min-w-0">
 
         <!-- Flash Notice if any -->
         @if(session('success'))
@@ -83,7 +83,7 @@
             </div>
         @endif
 
-        <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col lg:flex-row gap-6 w-full min-w-0">
 
             <!-- Left Sidebar Navigation Card -->
             <aside class="w-full lg:w-64 shrink-0">
@@ -249,7 +249,7 @@
             </aside>
 
             <!-- Right Main Work Area -->
-            <section class="flex-1 space-y-6">
+            <section class="flex-1 min-w-0 space-y-6">
 
                 @if($activeTab === 'informasi')
                     <!-- ================= TAB: INFORMASI KOPERASI ================= -->
@@ -784,7 +784,7 @@
                         </div>
 
                         <!-- Table Container -->
-                        <div class="overflow-x-auto rounded-xl border border-slate-200/90">
+                        <div class="overflow-x-auto w-full max-w-full rounded-xl border border-slate-200/90">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead class="bg-slate-50/90 text-slate-600 font-extrabold border-b border-slate-200 uppercase tracking-wider text-[11px]">
                                     <tr>
@@ -1548,7 +1548,7 @@
                         </form>
 
                         <!-- Data Table Pengurus -->
-                        <div class="overflow-x-auto rounded-xl border border-slate-100">
+                        <div class="overflow-x-auto w-full max-w-full rounded-xl border border-slate-100">
                             <table class="w-full text-left text-xs">
                                 <thead class="bg-slate-50/70 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
                                     <tr>
@@ -1910,7 +1910,7 @@
                         </div>
 
                         <!-- Data Table Anggota -->
-                        <div class="overflow-x-auto rounded-xl border border-slate-100">
+                        <div class="overflow-x-auto w-full max-w-full rounded-xl border border-slate-100">
                             <table class="w-full text-left text-xs">
                                 <thead class="bg-slate-50/70 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
                                     <tr>
@@ -2639,8 +2639,8 @@
     </div>
 
     <!-- Footer Diskominfo Kabupaten Bogor -->
-    <footer class="bg-white border-t border-slate-200/80 text-slate-600 text-xs py-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <footer class="w-full bg-white border-t border-slate-200/80 text-slate-600 text-xs py-4">
+        <div class="w-full px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
                 <strong class="text-slate-800 font-bold">Diskominfo &copy; 2026</strong> &bull; Pemerintah Daerah Kabupaten Bogor
             </div>

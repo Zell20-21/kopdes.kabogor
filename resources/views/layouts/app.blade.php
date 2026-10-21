@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id" class="scroll-smooth overflow-x-hidden w-full max-w-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -49,6 +49,12 @@
     </script>
 
     <style>
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8fafc;
@@ -189,7 +195,7 @@
     </style>
     @stack('styles')
 </head>
-<body class="antialiased selection:bg-red-500 selection:text-white min-h-screen flex flex-col justify-between">
+<body class="antialiased selection:bg-red-500 selection:text-white min-h-screen flex flex-col justify-between overflow-x-hidden w-full max-w-full">
 
     @yield('content')
 
