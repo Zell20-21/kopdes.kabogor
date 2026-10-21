@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kecamatan;
 use App\Models\Koperasi;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -291,7 +292,7 @@ class DashboardController extends Controller
     /**
      * Get detail of a specific kecamatan with its cooperatives list and map points.
      */
-    public function show(Kecamatan $kecamatan): View
+    public function show(Kecamatan $kecamatan): View|JsonResponse
     {
         $koperasis = Koperasi::where('id_kec', $kecamatan->id_kopkec)
             ->with(['kelurahan'])
@@ -310,6 +311,17 @@ class DashboardController extends Controller
                 'status' => (string) ($k->st_ops ?? 'SUDAH'),
             ];
         });
+
+        if (request()->wantsJson() || request()->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'nama' => $kecamatan->name_kopkec,
+                    'jumlah' => $koperasis->count(),
+                    'koperasis' => $koperasiPoints,
+                ],
+            ]);
+        }
 
         return view('kecamatan.show', compact('kecamatan', 'koperasis', 'koperasiPoints'));
     }

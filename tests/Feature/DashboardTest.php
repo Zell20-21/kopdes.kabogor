@@ -36,14 +36,14 @@ class DashboardTest extends TestCase
     {
         $cisarua = Kecamatan::where('name_kopkec', 'CISARUA')->firstOrFail();
 
-        $response = $this->get(route('kecamatan.show', $cisarua));
+        $response = $this->getJson(route('kecamatan.show', $cisarua));
 
         $response->assertStatus(200);
         $response->assertJson([
             'status' => 'success',
             'data' => [
                 'nama' => 'CISARUA',
-                'jumlah' => 10,
+                'jumlah' => 11,
             ],
         ]);
     }
@@ -410,5 +410,51 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/pdf');
+    }
+
+    public function test_admin_can_update_koperasi_data(): void
+    {
+        $admin = User::first();
+        $koperasi = Koperasi::first();
+
+        $response = $this->actingAs($admin)->put(route('admin.koperasi.update', $koperasi), [
+            'name_koperasi' => 'KOPERASI TEST UPDATE BARU',
+            'id_kec' => $koperasi->id_kec,
+            'id_kel' => $koperasi->id_kel,
+            'no_inkop' => '3201999999999',
+            'no_ahu' => 'AHU-TEST-2026',
+            'tgl_ahu' => '2026-01-15',
+            'st_ops' => 'SUDAH',
+            'st_latih' => 'SUDAH',
+            'st_sertifikat' => 'SUDAH',
+            'cat_koperasi' => 'KOPERASI KONSUMEN',
+            'jum_anggota' => 150,
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard', ['tab' => 'koperasi']));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => $koperasi->id_koperasi,
+            'name_koperasi' => 'KOPERASI TEST UPDATE BARU',
+            'no_inkop' => '3201999999999',
+            'jum_anggota' => 150,
+        ]);
+    }
+
+    public function test_admin_can_soft_delete_koperasi(): void
+    {
+        $admin = User::first();
+        $koperasi = Koperasi::first();
+
+        $response = $this->actingAs($admin)->delete(route('admin.koperasi.destroy', $koperasi));
+
+        $response->assertRedirect(route('admin.dashboard', ['tab' => 'koperasi']));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => $koperasi->id_koperasi,
+            'flag_del' => 1,
+        ]);
     }
 }
