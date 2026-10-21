@@ -347,11 +347,11 @@ class DashboardController extends Controller
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'nama' => $kecamatan->nama ?? $kecamatan->name_kopkec,
+                    'nama' => $kecamatan->name_kopkec,
                     'kop_desa' => (int) $kecamatan->kop_desa,
                     'kop_kel' => (int) $kecamatan->kop_kel,
-                    'jumlah' => (int) ($kecamatan->jumlah ?? $koperasis->count()),
-                    'koperasis' => $koperasis,
+                    'jumlah' => $koperasis->count(),
+                    'koperasis' => $koperasiPoints,
                     'points' => $koperasiPoints,
                 ],
             ]);
