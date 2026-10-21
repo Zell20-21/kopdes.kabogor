@@ -126,22 +126,82 @@ class AdminController extends Controller
             ])
             ->get();
 
-        // Database Pengurus query
-        $pengurusQuery = Kopsdm::with('koperasi')
+        // Database Pengurus statistics & query
+        $pengurusBaseQuery = Kopsdm::where('flag_del', 0)
+            ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'));
+
+        $totalPengurusCount = (clone $pengurusBaseQuery)->count();
+        $ketuaCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%KETUA KOPERASI%')->count();
+        $sekretarisCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%SEKRETARIS%')->where('jab_kopsdm', 'not like', '%WAKIL%')->count();
+        $bendaharaCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%BENDAHARA%')->where('jab_kopsdm', 'not like', '%WAKIL%')->count();
+        $pengawasLainnyaCount = max(0, $totalPengurusCount - ($ketuaCount + $sekretarisCount + $bendaharaCount));
+
+        $statsPengurus = [
+            'total' => $totalPengurusCount,
+            'ketua' => $ketuaCount,
+            'sekretaris' => $sekretarisCount,
+            'bendahara' => $bendaharaCount,
+            'pengawas_lainnya' => $pengawasLainnyaCount,
+        ];
+
+        $pengurusQuery = Kopsdm::with(['koperasi.kecamatan', 'koperasi.kelurahan'])
             ->where('flag_del', 0)
             ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'));
+
+        $filterKecPengurus = $request->get('filter_kec_pengurus');
+        $filterKelPengurus = $request->get('filter_kel_pengurus');
+        $perPagePengurus = max(5, min(100, (int) $request->get('per_page_pengurus', 25)));
+
+        if ($filterKecPengurus) {
+            $pengurusQuery->whereHas('koperasi', fn ($q) => $q->where('id_kec', $filterKecPengurus));
+        }
+        if ($filterKelPengurus) {
+            $pengurusQuery->whereHas('koperasi', fn ($q) => $q->where('id_kel', $filterKelPengurus));
+        }
+
         if ($searchPengurus = $request->get('search_pengurus')) {
             $pengurusQuery->where(function ($query) use ($searchPengurus) {
                 $query->where('name_kopsdm', 'like', "%{$searchPengurus}%")
-                    ->orWhere('jab_kopsdm', 'like', "%{$searchPengurus}%");
+                    ->orWhere('jab_kopsdm', 'like', "%{$searchPengurus}%")
+                    ->orWhere('type_kopsdm', 'like', "%{$searchPengurus}%")
+                    ->orWhere('comt_kopsdm', 'like', "%{$searchPengurus}%")
+                    ->orWhereHas('koperasi', function ($kq) use ($searchPengurus) {
+                        $kq->where('name_koperasi', 'like', "%{$searchPengurus}%")
+                            ->orWhereHas('kecamatan', fn ($sub) => $sub->where('name_kopkec', 'like', "%{$searchPengurus}%"))
+                            ->orWhereHas('kelurahan', fn ($sub) => $sub->where('name_kopkel', 'like', "%{$searchPengurus}%"));
+                    });
             });
         }
-        $penguruses = $pengurusQuery->orderBy('id_kopsdm', 'asc')->paginate(20)->withQueryString();
-
-        $anggotaKoperasis = (clone $baseQuery)
-            ->with(['kecamatan', 'kelurahan'])
+        $penguruses = $pengurusQuery
             ->orderBy('id_koperasi', 'asc')
-            ->paginate(15, ['*'], 'anggota_page')
+            ->orderBy('order_kopsdm', 'asc')
+            ->orderBy('id_kopsdm', 'asc')
+            ->paginate($perPagePengurus)
+            ->withQueryString();
+
+        $anggotaQuery = (clone $baseQuery)->with(['kecamatan', 'kelurahan']);
+
+        $filterKecAnggota = $request->get('filter_kec_anggota');
+        $filterKelAnggota = $request->get('filter_kel_anggota');
+        $perPageAnggota = max(5, min(100, (int) $request->get('per_page_anggota', 25)));
+
+        if ($filterKecAnggota) {
+            $anggotaQuery->where('id_kec', $filterKecAnggota);
+        }
+        if ($filterKelAnggota) {
+            $anggotaQuery->where('id_kel', $filterKelAnggota);
+        }
+        if ($searchAnggota = $request->get('search_anggota')) {
+            $anggotaQuery->where(function ($q) use ($searchAnggota) {
+                $q->where('name_koperasi', 'like', "%{$searchAnggota}%")
+                    ->orWhereHas('kecamatan', fn ($sub) => $sub->where('name_kopkec', 'like', "%{$searchAnggota}%"))
+                    ->orWhereHas('kelurahan', fn ($sub) => $sub->where('name_kopkel', 'like', "%{$searchAnggota}%"));
+            });
+        }
+
+        $anggotaKoperasis = $anggotaQuery
+            ->orderBy('id_koperasi', 'asc')
+            ->paginate($perPageAnggota, ['*'], 'anggota_page')
             ->withQueryString();
 
         $kecamatansQuery = Kecamatan::with(['kelurahans' => function ($query) use ($user) {
@@ -180,6 +240,11 @@ class AdminController extends Controller
             ? ($kecamatans->first()?->id_kopkec ?? '')
             : $user->id_company;
 
+        $allKoperasis = (clone $baseQuery)
+            ->select(['id_koperasi', 'name_koperasi'])
+            ->orderBy('name_koperasi', 'asc')
+            ->get();
+
         $lampirans = new LengthAwarePaginator([], 0, 10);
         try {
             if (Schema::hasTable('app_lampiran_informasi')) {
@@ -216,7 +281,11 @@ class AdminController extends Controller
             'klasifikasiAnggota',
             'koperasis',
             'penguruses',
+            'statsPengurus',
+            'perPagePengurus',
+            'allKoperasis',
             'anggotaKoperasis',
+            'perPageAnggota',
             'kecamatans',
             'kecamatansData',
             'gisKoperasis',
@@ -261,6 +330,95 @@ class AdminController extends Controller
 
         return redirect()->route('admin.dashboard', ['tab' => 'koperasi'])
             ->with('success', 'Data Koperasi berhasil ditambahkan ke database.');
+    }
+
+    /**
+     * Update an existing Koperasi.
+     */
+    public function updateKoperasi(Request $request, Koperasi $koperasi)
+    {
+        $user = $request->user();
+        if ($user->isOperatorDesa() && $user->id_branch > 0 && $koperasi->id_kel != $user->id_branch) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah data koperasi desa lain.');
+        } elseif ($user->isOperatorKecamatan() && $user->id_company > 0 && $koperasi->id_kec != $user->id_company) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah data koperasi kecamatan lain.');
+        }
+
+        $validated = $request->validate([
+            'name_koperasi' => 'required|string|max:255',
+            'id_kec' => 'required|integer',
+            'id_kel' => 'required|integer',
+            'no_inkop' => 'nullable|string|max:100',
+            'no_ahu' => 'nullable|string|max:100',
+            'tgl_ahu' => 'nullable|date',
+            'st_ops' => 'required|string',
+            'st_latih' => 'required|string',
+            'st_sertifikat' => 'required|string',
+            'cat_koperasi' => 'nullable|string',
+            'jum_anggota' => 'nullable|integer|min:0',
+            'jum_pengurus' => 'nullable|integer|min:0',
+            'jum_pengawas' => 'nullable|integer|min:0',
+            'kop_addr' => 'nullable|string|max:255',
+            'kop_telp' => 'nullable|string|max:50',
+            'kop_mail' => 'nullable|string|max:100',
+            'gps_lat' => 'nullable|string|max:50',
+            'gps_long' => 'nullable|string|max:50',
+        ]);
+
+        $koperasi->update($validated);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'koperasi'])
+            ->with('success', 'Data Koperasi berhasil diperbarui.');
+    }
+
+    /**
+     * Delete an existing Koperasi (Soft delete).
+     */
+    public function destroyKoperasi(Request $request, Koperasi $koperasi)
+    {
+        $user = $request->user();
+        if ($user->isOperatorDesa() && $user->id_branch > 0 && $koperasi->id_kel != $user->id_branch) {
+            abort(403, 'Anda tidak memiliki hak akses.');
+        } elseif ($user->isOperatorKecamatan() && $user->id_company > 0 && $koperasi->id_kec != $user->id_company) {
+            abort(403, 'Anda tidak memiliki hak akses.');
+        }
+
+        $koperasi->update(['flag_del' => 1]);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'koperasi'])
+            ->with('success', 'Data Koperasi berhasil dihapus.');
+    }
+
+    /**
+     * Update Usaha for a Koperasi.
+     */
+    public function updateUsahaKoperasi(Request $request, Koperasi $koperasi)
+    {
+        $validated = $request->validate([
+            'cat_koperasi' => 'required|string|max:255',
+        ]);
+
+        $koperasi->update($validated);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'koperasi'])
+            ->with('success', 'Data Usaha Koperasi berhasil diperbarui.');
+    }
+
+    /**
+     * Upload Foto for a Koperasi.
+     */
+    public function uploadFotoKoperasi(Request $request, Koperasi $koperasi)
+    {
+        $request->validate([
+            'foto' => 'required|image|max:5120',
+        ]);
+
+        if ($request->hasFile('foto')) {
+            $request->file('foto')->store('koperasi_foto', 'public');
+        }
+
+        return redirect()->route('admin.dashboard', ['tab' => 'koperasi'])
+            ->with('success', 'Foto Koperasi berhasil diunggah.');
     }
 
     /**
@@ -437,5 +595,171 @@ class AdminController extends Controller
         $lampiran->delete();
 
         return redirect()->route('admin.dashboard', ['tab' => 'lampiran'])->with('success', 'Lampiran berhasil dihapus.');
+    }
+
+    /**
+     * Store a newly created Pengurus / SDM.
+     */
+    public function storePengurus(Request $request)
+    {
+        $validated = $request->validate([
+            'id_koperasi' => 'required|integer|exists:app_md_koperasi,id_koperasi',
+            'name_kopsdm' => 'required|string|max:255',
+            'jab_kopsdm' => 'required|string|max:255',
+            'type_kopsdm' => 'required|string|in:PENGURUS,PENGAWAS',
+            'order_kopsdm' => 'nullable|string|max:10',
+            'comt_kopsdm' => 'nullable|string|max:255',
+        ]);
+
+        $maxId = (int) Kopsdm::max('id_kopsdm');
+        $validated['id_kopsdm'] = $maxId + 1;
+        $validated['order_kopsdm'] = $validated['order_kopsdm'] ?? '1';
+        $validated['comt_kopsdm'] = ! empty($validated['comt_kopsdm']) ? $validated['comt_kopsdm'] : '-';
+        $validated['id_user'] = $request->user()->id_user ?? 1;
+        $validated['tgl_data'] = now();
+        $validated['flag_del'] = 0;
+
+        Kopsdm::create($validated);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'pengurus'])
+            ->with('success', 'Data Pengurus berhasil ditambahkan ke database.');
+    }
+
+    /**
+     * Export Pengurus table data to CSV/Excel.
+     */
+    public function exportPengurus(Request $request)
+    {
+        $query = Kopsdm::with(['koperasi.kecamatan', 'koperasi.kelurahan'])
+            ->where('flag_del', 0);
+
+        if ($idKec = $request->get('filter_kec_pengurus')) {
+            $query->whereHas('koperasi', fn ($q) => $q->where('id_kec', $idKec));
+        }
+        if ($idKel = $request->get('filter_kel_pengurus')) {
+            $query->whereHas('koperasi', fn ($q) => $q->where('id_kel', $idKel));
+        }
+        if ($search = $request->get('search_pengurus')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name_kopsdm', 'like', "%{$search}%")
+                    ->orWhere('jab_kopsdm', 'like', "%{$search}%")
+                    ->orWhere('type_kopsdm', 'like', "%{$search}%")
+                    ->orWhere('comt_kopsdm', 'like', "%{$search}%")
+                    ->orWhereHas('koperasi', function ($kq) use ($search) {
+                        $kq->where('name_koperasi', 'like', "%{$search}%")
+                            ->orWhereHas('kecamatan', fn ($sub) => $sub->where('name_kopkec', 'like', "%{$search}%"))
+                            ->orWhereHas('kelurahan', fn ($sub) => $sub->where('name_kopkel', 'like', "%{$search}%"));
+                    });
+            });
+        }
+
+        $items = $query->orderBy('id_koperasi', 'asc')->orderBy('order_kopsdm', 'asc')->get();
+
+        $filename = 'Database_Pengurus_Koperasi_Kabupaten_Bogor_'.date('Ymd_His').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($items) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($handle, ['No', 'Unit Koperasi', 'Kecamatan', 'Nama Pengurus', 'Jabatan', 'Kategori', 'Urutan', 'Keterangan']);
+
+            foreach ($items as $idx => $sdm) {
+                fputcsv($handle, [
+                    $idx + 1,
+                    $sdm->koperasi?->name_koperasi ?? '-',
+                    $sdm->koperasi?->kecamatan?->name_kopkec ?? '-',
+                    $sdm->name_kopsdm,
+                    $sdm->jab_kopsdm,
+                    $sdm->type_kopsdm,
+                    $sdm->order_kopsdm,
+                    $sdm->comt_kopsdm,
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export Anggota table data to CSV/Excel.
+     */
+    public function exportAnggota(Request $request)
+    {
+        $user = $request->user();
+        $baseQuery = Koperasi::query()->where('flag_del', 0);
+        if ($user->isOperatorDesa()) {
+            if ($user->id_branch > 0) {
+                $baseQuery->where('id_kel', $user->id_branch);
+            } else {
+                $baseQuery->whereRaw('1 = 0');
+            }
+        } elseif ($user->isOperatorKecamatan()) {
+            if ($user->id_company > 0) {
+                $baseQuery->where('id_kec', $user->id_company);
+            } else {
+                $baseQuery->whereRaw('1 = 0');
+            }
+        } elseif (! $user->isSuperAdmin()) {
+            $baseQuery->whereRaw('1 = 0');
+        }
+
+        $query = (clone $baseQuery)->with(['kecamatan', 'kelurahan']);
+
+        if ($idKec = $request->get('filter_kec_anggota')) {
+            $query->where('id_kec', $idKec);
+        }
+        if ($idKel = $request->get('filter_kel_anggota')) {
+            $query->where('id_kel', $idKel);
+        }
+        if ($search = $request->get('search_anggota')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name_koperasi', 'like', "%{$search}%")
+                    ->orWhereHas('kecamatan', fn ($sub) => $sub->where('name_kopkec', 'like', "%{$search}%"))
+                    ->orWhereHas('kelurahan', fn ($sub) => $sub->where('name_kopkel', 'like', "%{$search}%"));
+            });
+        }
+
+        $items = $query->orderBy('id_koperasi', 'asc')->get();
+
+        $filename = 'Database_Anggota_Koperasi_Kabupaten_Bogor_'.date('Ymd_His').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($items) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($handle, ['No', 'Nama Koperasi', 'Kecamatan', 'Desa/Kelurahan', 'Jumlah Anggota Terdata']);
+
+            foreach ($items as $idx => $kop) {
+                fputcsv($handle, [
+                    $idx + 1,
+                    $kop->name_koperasi,
+                    $kop->kecamatan?->name_kopkec ?? '-',
+                    $kop->kelurahan?->name_kopkel ?? '-',
+                    $kop->jum_anggota,
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

@@ -343,14 +343,14 @@ class DashboardController extends Controller
             ];
         });
 
-        if (request()->wantsJson() || request()->ajax() || app()->runningUnitTests()) {
+        if (request()->wantsJson() || request()->expectsJson() || app()->runningUnitTests()) {
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'nama' => $kecamatan->nama,
+                    'nama' => $kecamatan->nama ?? $kecamatan->name_kopkec,
                     'kop_desa' => (int) $kecamatan->kop_desa,
                     'kop_kel' => (int) $kecamatan->kop_kel,
-                    'jumlah' => (int) $kecamatan->jumlah,
+                    'jumlah' => (int) ($kecamatan->jumlah ?? $koperasis->count()),
                     'koperasis' => $koperasis,
                     'points' => $koperasiPoints,
                 ],

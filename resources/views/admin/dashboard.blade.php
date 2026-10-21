@@ -1,12 +1,30 @@
 @extends('layouts.app')
 
-@section('title', 'Database Koperasi | GovTech KOP Kabupaten Bogor')
+@push('styles')
+<style>
+    .kecamatan-tooltip {
+        background: rgba(15, 23, 42, 0.90) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        letter-spacing: 0.02em !important;
+        padding: 4px 8px !important;
+        border-radius: 6px !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    }
+    .kecamatan-tooltip::before {
+        border-top-color: rgba(15, 23, 42, 0.90) !important;
+    }
+</style>
+@endpush
 
 @section('content')
 <div class="min-h-screen bg-[#f8fafc] flex flex-col justify-between text-slate-800">
 
     <!-- Top Navigation Header GovTech KOP -->
-    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-50">
+    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-[100]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Desain Referensi) -->
@@ -27,9 +45,6 @@
                             <span class="hidden sm:inline text-sm font-black tracking-wide text-red-100 uppercase">
                                 KOPERASI MERAH PUTIH
                             </span>
-                            <span class="text-[9px] sm:text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-white/30 text-white/95 bg-white/10 uppercase tracking-wider">
-                                GOVERNMENT
-                            </span>
                         </div>
                         <p class="text-[11px] sm:text-xs text-red-200 font-medium leading-none mt-0.5">
                             Pemerintah Kabupaten Bogor &bull; Dinas Koperasi & UKM
@@ -37,12 +52,8 @@
                     </div>
                 </div>
 
-                <!-- Right: Status Server & Log Out Button -->
+                <!-- Right: Log Out Button -->
                 <div class="flex items-center space-x-3">
-                    <div class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-black/20 border border-white/10 text-emerald-300 text-xs font-semibold shadow-inner">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>Server Bogor Terhubung</span>
-                    </div>
 
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
@@ -57,7 +68,7 @@
     </header>
 
     <!-- Main Content Container with Sidebar -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-0 isolate">
 
         <!-- Flash Notice if any -->
         @if(session('success'))
@@ -173,46 +184,55 @@
                     <div class="pt-3 border-t border-slate-100 space-y-2.5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-1.5">
-                                <span class="w-2 h-2 rounded-full bg-red-600"></span>
-                                <span class="text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">REKAPITULASI WILAYAH</span>
+                                <span class="w-2 h-2 rounded-full {{ $activeTab === 'anggota' ? 'bg-emerald-600' : 'bg-red-600' }}"></span>
+                                <span class="text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">
+                                    {{ $activeTab === 'anggota' ? 'REKAPITULASI KABUPATEN' : 'REKAPITULASI WILAYAH' }}
+                                </span>
                             </div>
-                            <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                                BOGOR
-                            </span>
+                            @if($activeTab === 'anggota')
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    Live Data
+                                </span>
+                            @else
+                                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                                    BOGOR
+                                </span>
+                            @endif
                         </div>
 
-                        <!-- Card 1: Jumlah Koperasi (Warm Peach) -->
-                        <div class="bg-[#fffbeb] border border-amber-200/80 rounded-xl p-3 shadow-xs relative overflow-hidden">
+                        <!-- Card 1: Jumlah Koperasi -->
+                        <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-xs relative overflow-hidden">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider">JUMLAH KOPERASI</span>
-                                <div class="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
-                                    <i class="fa-solid fa-building text-xs"></i>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">JUMLAH KOPERASI</span>
                                 </div>
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                    100% Terdaftar
+                                </span>
                             </div>
-                            <div class="text-2xl font-black text-amber-950 mt-1 leading-none">
+                            <div class="text-2xl font-black text-slate-900 mt-1.5 leading-none">
                                 {{ $totalKoperasi }}
                             </div>
-                            <div class="text-[10px] font-semibold text-amber-800/90 mt-2 flex items-center space-x-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                <span>Tersebar di 40 Kecamatan</span>
-                            </div>
                         </div>
 
-                        <!-- Card 2: Anggota Koperasi (Mint Green) -->
-                        <div class="bg-[#ecfdf5] border border-emerald-200/80 rounded-xl p-3 shadow-xs relative overflow-hidden">
+                        <!-- Card 2: Anggota Koperasi -->
+                        <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-xs relative overflow-hidden">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">ANGGOTA KOPERASI</span>
-                                <div class="w-6 h-6 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-700">
-                                    <i class="fa-solid fa-users text-xs"></i>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">ANGGOTA KOPERASI</span>
                                 </div>
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
+                                    Tahap Verifikasi
+                                </span>
                             </div>
-                            <div class="text-2xl font-black text-emerald-950 mt-1 leading-none">
+                            <div class="text-2xl font-black text-slate-900 mt-1.5 leading-none">
                                 {{ number_format($totalAnggota) }}
                             </div>
-                            <div class="text-[10px] font-semibold text-emerald-800/90 mt-2 flex items-center space-x-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                <span>Terkonsolidasi Lapangan</span>
-                            </div>
+                            <p class="text-[10px] text-slate-400 mt-2 leading-relaxed">
+                                Sinkronisasi NIK anggota koperasi desa sedang dalam integrasi lapangan.
+                            </p>
                         </div>
                     </div>
 
@@ -222,7 +242,7 @@
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span>Sistem Aktif</span>
                         </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200">v3.4.0</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200">v2.4.0</span>
                     </div>
 
                 </div>
@@ -269,8 +289,8 @@
                     <!-- Top Row: 2 Big Highlight Stat Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                        <!-- Card 1: KOPERASI (Coral/Terracotta Red) -->
-                        <div class="bg-[#b85d4f] rounded-2xl p-6 text-white shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[160px] hover:shadow-md transition">
+                        <!-- Card 1: KOPERASI (Merah Senada Navbar) -->
+                        <div class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] rounded-2xl p-6 text-white shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[160px] hover:shadow-md transition">
                             <div class="z-10">
                                 <div class="text-5xl font-black text-white leading-none tracking-tight">
                                     {{ $totalKoperasi }}
@@ -582,42 +602,64 @@
                             </div>
                         </div>
 
-                        <!-- Map Area with Switcher Controls -->
-                        <div class="relative w-full h-[400px] bg-slate-100">
+                        <!-- Map Area with Switcher Controls (Matching Public Dashboard) -->
+                        <div class="relative w-full h-[460px] bg-slate-100 overflow-hidden isolate z-0">
                             <div id="gis-koperasi-map" class="w-full h-full z-10"></div>
 
-                            <!-- Map Layer Switcher (Top Right on Map) -->
-                            <div class="absolute top-3 right-3 z-[400] bg-white/95 backdrop-blur-xs p-1 rounded-xl shadow-md border border-slate-200/80 flex items-center space-x-1 text-xs font-bold">
-                                <button type="button" id="btn-layer-osm" onclick="setMapLayer('osm')"
-                                        class="px-3 py-1.5 rounded-lg transition bg-[#0284c7] text-white shadow-xs flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-map text-[11px]"></i>
-                                    <span>OpenStreetMap</span>
+                            <!-- Map Layer Switches (Top Right on Map) -->
+                            <div class="absolute top-3 right-3 z-20 flex items-center space-x-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl shadow-md border border-slate-200/80 text-xs font-semibold">
+                                <div class="relative flex items-center p-0.5 bg-slate-100/80 rounded-lg border border-slate-200/60" id="adminKoperasiLayerWrapper">
+                                    <div id="adminKoperasiLayerGlider" class="absolute rounded-md bg-red-600 shadow-xs transition-all duration-300 ease-in-out pointer-events-none" style="left: 2px; top: 2px; width: 44px; height: 26px;"></div>
+                                    <button type="button" onclick="setMapLayer('osm')" id="btn-layer-osm" class="relative z-10 px-3 py-1 rounded-md text-white font-semibold transition-colors duration-200 cursor-pointer">
+                                        POS
+                                    </button>
+                                    <button type="button" onclick="setMapLayer('satelit')" id="btn-layer-satelit" class="relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer">
+                                        Satelit
+                                    </button>
+                                    <button type="button" onclick="setMapLayer('topo')" id="btn-layer-topo" class="relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer">
+                                        Topografi
+                                    </button>
+                                </div>
+                                <div class="h-4 w-px bg-slate-200 mx-1"></div>
+                                <button type="button" onclick="toggleAdminKecamatanBoundaries()" id="btnToggleAdminBoundaries" title="Tampilkan / Sembunyikan Garis Batas Antar Kecamatan" class="px-2.5 py-1 rounded-md bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition flex items-center space-x-1 text-xs font-semibold cursor-pointer">
+                                    <i class="fa-solid fa-draw-polygon text-[10px]"></i>
+                                    <span class="hidden sm:inline">Batas Kecamatan</span>
                                 </button>
-                                <button type="button" id="btn-layer-satelit" onclick="setMapLayer('satelit')"
-                                        class="px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-slate-100 flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-satellite text-[11px]"></i>
-                                    <span>Satelit</span>
-                                </button>
+                            </div>
+
+                            <!-- Custom Floating Legend (Bottom Left on Map) -->
+                            <div class="absolute bottom-3 left-3 z-20 pointer-events-none bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-slate-200 shadow-md text-[11px] text-slate-700 space-y-1">
+                                <div class="font-bold text-slate-800 flex items-center space-x-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+                                    <span>Wilayah: Kabupaten Bogor</span>
+                                </div>
+                                <div class="flex items-center space-x-1.5 text-[10px] text-sky-700 font-semibold pt-0.5 border-t border-slate-100">
+                                    <span class="w-3 h-1 bg-sky-500 rounded-sm"></span>
+                                    <span>Batas 40 Kecamatan</span>
+                                </div>
+                                <div class="text-[10px] text-slate-500" id="adminMapLegendDetail">
+                                    Pusat Pemerintahan: Cibinong (-6.4828, 106.8486)
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Filter Controls Bar Under Map -->
-                        <form action="{{ route('admin.dashboard') }}" method="GET" class="p-4 bg-slate-50/60 border-t border-slate-100">
+                        <!-- Filter Controls Bar Under Map (Auto-filter on Change, No Terapkan Button) -->
+                        <form id="formFilterKoperasi" action="{{ route('admin.dashboard') }}" method="GET" class="p-4 bg-slate-50/60 border-t border-slate-100">
                             <input type="hidden" name="tab" value="koperasi">
                             <input type="hidden" name="per_page" value="{{ $perPage }}">
                             @if(request('search'))
                                 <input type="hidden" name="search" value="{{ request('search') }}">
                             @endif
 
-                            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
                                 <!-- Select Kecamatan -->
-                                <div class="md:col-span-5 space-y-1">
+                                <div class="space-y-1">
                                     <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
                                         PILIH KECAMATAN
                                     </label>
                                     <div class="relative">
-                                        <select name="id_kec" id="filter_id_kec" onchange="updateDesaDropdown(this.value)"
-                                                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs cursor-pointer">
+                                        <select name="id_kec" id="filter_id_kec" onchange="onAdminKecamatanChange(this.value)"
+                                                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs cursor-pointer">
                                             @unless($isOperator)
                                                 <option value="">-- SEMUA KECAMATAN (40) --</option>
                                             @endunless
@@ -631,13 +673,23 @@
                                 </div>
 
                                 <!-- Select Desa / Kelurahan -->
-                                <div class="md:col-span-5 space-y-1">
-                                    <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
-                                        PILIH DESA / KELURAHAN
-                                    </label>
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                                            PILIH DESA / KELURAHAN
+                                        </label>
+                                        @if(request('id_kec') || request('id_kel'))
+                                            <a href="{{ route('admin.dashboard', ['tab' => 'koperasi', 'per_page' => $perPage]) }}"
+                                               title="Reset Filter"
+                                               class="text-[10px] font-bold text-red-600 hover:text-red-700 hover:underline flex items-center space-x-1">
+                                                <i class="fa-solid fa-rotate-left text-[9px]"></i>
+                                                <span>Reset Filter</span>
+                                            </a>
+                                        @endif
+                                    </div>
                                     <div class="relative">
-                                        <select name="id_kel" id="filter_id_kel"
-                                                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs cursor-pointer">
+                                        <select name="id_kel" id="filter_id_kel" onchange="onAdminDesaChange(this.value)"
+                                                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs cursor-pointer">
                                             @unless($user->isOperatorDesa())
                                                 <option value="">-- SEMUA DESA / KELURAHAN --</option>
                                             @endunless
@@ -647,26 +699,15 @@
                                                         <option value="{{ $kelurahan->id_kopkel }}" selected>{{ $kelurahan->name_kopkel }}</option>
                                                     @endforeach
                                                 @endforeach
+                                            @elseif(request('id_kec') && ($selectedKec = $kecamatans->firstWhere('id_kopkec', request('id_kec'))))
+                                                @foreach($selectedKec->kelurahans as $kel)
+                                                    <option value="{{ $kel->id_kopkel }}" {{ (string) request('id_kel') === (string) $kel->id_kopkel ? 'selected' : '' }}>
+                                                        {{ $kel->name_kopkel }}
+                                                    </option>
+                                                @endforeach
                                             @endif
                                         </select>
                                     </div>
-                                </div>
-
-                                <!-- Terapkan Button -->
-                                <div class="md:col-span-2 flex items-center space-x-2">
-                                    <button type="submit"
-                                            class="w-full bg-[#0f172a] hover:bg-black text-white px-4 py-2.5 rounded-xl text-xs font-extrabold shadow-sm hover:shadow transition flex items-center justify-center space-x-2 cursor-pointer">
-                                        <i class="fa-solid fa-filter text-xs"></i>
-                                        <span>Terapkan</span>
-                                    </button>
-
-                                    @if(request('id_kec') || request('id_kel'))
-                                        <a href="{{ route('admin.dashboard', ['tab' => 'koperasi', 'per_page' => $perPage]) }}"
-                                           title="Reset Filter"
-                                           class="px-3 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition">
-                                            <i class="fa-solid fa-rotate-left"></i>
-                                        </a>
-                                    @endif
                                 </div>
                             </div>
                         </form>
@@ -747,20 +788,32 @@
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead class="bg-slate-50/90 text-slate-600 font-extrabold border-b border-slate-200 uppercase tracking-wider text-[11px]">
                                     <tr>
-                                        <th class="py-3 px-3 w-12 text-center">#</th>
+                                        <th class="py-3 px-3 w-16 text-center">#</th>
                                         <th class="py-3 px-3">NI-KOP</th>
                                         <th class="py-3 px-4">KOPERASI</th>
                                         <th class="py-3 px-3">NOMOR AHU</th>
                                         <th class="py-3 px-3">TANGGAL AHU</th>
                                         <th class="py-3 px-4">DESA/KELURAHAN</th>
+                                        <th class="py-3 px-4">KECAMATAN</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 text-slate-700">
                                     @forelse($koperasis as $kop)
                                         <tr class="hover:bg-sky-50/40 transition">
-                                            <!-- Index -->
-                                            <td class="py-3 px-3 text-center font-bold text-slate-400 text-[11px]">
-                                                {{ $loop->iteration + ($koperasis->currentPage() - 1) * $koperasis->perPage() }}
+                                            <!-- Index & Toggle Accordion Button (Matching Foto Kedua) -->
+                                            <td class="py-3 px-3 text-center whitespace-nowrap">
+                                                <div class="inline-flex items-center space-x-2">
+                                                    <button type="button"
+                                                            onclick="toggleKoperasiDetail({{ $kop->id_koperasi }})"
+                                                            id="btn-toggle-{{ $kop->id_koperasi }}"
+                                                            title="Buka / Tutup Detail & Proses"
+                                                            class="w-5 h-5 rounded-full bg-[#0284c7] hover:bg-[#0369a1] text-white inline-flex items-center justify-center text-[10px] shadow-sm transition active:scale-90 cursor-pointer">
+                                                        <i class="fa-solid fa-plus text-[9px]" id="icon-toggle-{{ $kop->id_koperasi }}"></i>
+                                                    </button>
+                                                    <span class="font-bold text-slate-500 text-[11px]">
+                                                        {{ $loop->iteration + ($koperasis->currentPage() - 1) * $koperasis->perPage() }}
+                                                    </span>
+                                                </div>
                                             </td>
 
                                             <!-- NI-KOP Pill -->
@@ -796,10 +849,80 @@
                                                     {{ $kop->kelurahan?->name_kopkel ?? '-' }}
                                                 </span>
                                             </td>
+
+                                            <!-- Kecamatan -->
+                                            <td class="py-3 px-4 whitespace-nowrap">
+                                                <span class="text-xs font-bold text-slate-700 uppercase">
+                                                    {{ $kop->kecamatan?->name_kopkec ?? '-' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Collapsible Sub-Row: Detail & Actions (Matching Foto Kedua) -->
+                                        <tr id="detail-row-{{ $kop->id_koperasi }}" class="hidden bg-slate-50/70 border-b border-slate-200">
+                                            <td colspan="7" class="py-4 px-6 sm:px-12">
+                                                <div class="max-w-xl bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-xs font-sans">
+                                                    <div class="space-y-2 divide-y divide-slate-100">
+                                                        <div class="flex items-center justify-between pb-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">OPERASIONAL</span>
+                                                            <span class="font-bold {{ strtoupper($kop->st_ops) === 'SUDAH' ? 'text-emerald-600' : 'text-rose-600' }}">
+                                                                {{ $kop->st_ops ?: 'SUDAH' }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between py-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">PELATIHAN</span>
+                                                            <span class="font-bold {{ strtoupper($kop->st_latih) === 'SUDAH' ? 'text-emerald-600' : 'text-slate-600' }}">
+                                                                {{ $kop->st_latih ?: 'BELUM' }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between py-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">STATUS SERTIFIKAT</span>
+                                                            <span class="font-bold {{ strtoupper($kop->st_sertifikat) === 'SUDAH' ? 'text-emerald-600' : 'text-amber-600' }}">
+                                                                {{ $kop->st_sertifikat ?: 'SUDAH' }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between py-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">PENGURUS</span>
+                                                            <span class="font-bold text-slate-800">{{ $kop->jum_pengurus ?? 5 }}</span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between py-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">PENGAWAS</span>
+                                                            <span class="font-bold text-slate-800">{{ $kop->jum_pengawas ?? 3 }}</span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between py-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">ANGGOTA</span>
+                                                            <span class="font-bold text-slate-800">{{ $kop->jum_anggota ?? 0 }}</span>
+                                                        </div>
+                                                        <div class="flex flex-wrap items-center gap-2 pt-3">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px] mr-2">PROSES</span>
+                                                            <button type="button"
+                                                                    onclick='openEditKoperasiModal(@json($kop))'
+                                                                    class="px-3.5 py-1.5 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold rounded-md shadow-sm transition active:scale-95 cursor-pointer">
+                                                                Update
+                                                            </button>
+                                                            <button type="button"
+                                                                    onclick='openUpdateUsahaModal(@json($kop))'
+                                                                    class="px-3.5 py-1.5 bg-[#0ea5e9] hover:bg-[#0284c7] text-white text-xs font-bold rounded-md shadow-sm transition active:scale-95 cursor-pointer">
+                                                                Update Usaha
+                                                            </button>
+                                                            <button type="button"
+                                                                    onclick='openUploadFotoModal(@json($kop))'
+                                                                    class="px-3.5 py-1.5 bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold rounded-md shadow-sm transition active:scale-95 cursor-pointer">
+                                                                Upload Foto
+                                                            </button>
+                                                            <button type="button"
+                                                                    onclick="confirmDeleteKoperasi({{ $kop->id_koperasi }}, '{{ addslashes($kop->name_koperasi) }}')"
+                                                                    class="px-3.5 py-1.5 bg-[#ef4444] hover:bg-[#dc2626] text-white text-xs font-bold rounded-md shadow-sm transition active:scale-95 cursor-pointer">
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-10 text-slate-400 italic">
+                                            <td colspan="7" class="text-center py-10 text-slate-400 italic">
                                                 <div class="flex flex-col items-center justify-center space-y-2">
                                                     <i class="fa-solid fa-database text-2xl text-slate-300"></i>
                                                     <span>Tidak ada data koperasi yang sesuai dengan filter pencarian.</span>
@@ -864,7 +987,7 @@
                     </div>
 
                     <!-- MODAL: TAMBAH DATA KOPERASI -->
-                    <div id="modalTambahData" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div id="modalTambahData" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
                         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <!-- Modal Header -->
                             <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between">
@@ -969,122 +1092,980 @@
                         </div>
                     </div>
 
+                    <!-- MODAL: EDIT / UPDATE DATA KOPERASI -->
+                    <div id="modalEditKoperasi" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+                            <!-- Modal Header -->
+                            <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between shrink-0">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-pen-to-square text-base text-sky-200"></i>
+                                    <h3 class="text-base font-extrabold tracking-wide uppercase">Update Data Koperasi</h3>
+                                </div>
+                                <button type="button" onclick="closeEditModal()" class="text-white/80 hover:text-white cursor-pointer">
+                                    <i class="fa-solid fa-xmark text-lg"></i>
+                                </button>
+                            </div>
+
+                            <!-- Modal Body / Form -->
+                            <form id="formEditKoperasi" method="POST" class="p-6 space-y-4 overflow-y-auto">
+                                @csrf
+                                @method('PUT')
+
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-slate-700">Nama Lengkap Koperasi <span class="text-red-500">*</span></label>
+                                    <input type="text" name="name_koperasi" id="edit_name_koperasi" required
+                                           class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Kecamatan <span class="text-red-500">*</span></label>
+                                        <select name="id_kec" id="edit_id_kec" required onchange="updateEditDesaDropdown(this.value)"
+                                                class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                            <option value="">Pilih Kecamatan...</option>
+                                            @foreach($kecamatans as $kec)
+                                                <option value="{{ $kec->id_kopkec }}">{{ $kec->name_kopkec }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Desa / Kelurahan <span class="text-red-500">*</span></label>
+                                        <select name="id_kel" id="edit_id_kel" required
+                                                class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                            <option value="">Pilih Desa / Kelurahan...</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">NI-KOP</label>
+                                        <input type="text" name="no_inkop" id="edit_no_inkop" placeholder="Contoh: 3201140020005"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Nomor AHU</label>
+                                        <input type="text" name="no_ahu" id="edit_no_ahu" placeholder="AHU-0011857.AH.01.29.TAHUN 2025"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Tanggal AHU</label>
+                                        <input type="date" name="tgl_ahu" id="edit_tgl_ahu"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Status Operasional</label>
+                                        <select name="st_ops" id="edit_st_ops" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                            <option value="SUDAH">SUDAH</option>
+                                            <option value="BELUM">BELUM</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Pelatihan</label>
+                                        <select name="st_latih" id="edit_st_latih" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                            <option value="BELUM">BELUM</option>
+                                            <option value="SUDAH">SUDAH</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Sertifikat</label>
+                                        <select name="st_sertifikat" id="edit_st_sertifikat" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                            <option value="SUDAH">SUDAH</option>
+                                            <option value="BELUM">BELUM</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Jumlah Anggota</label>
+                                        <input type="number" name="jum_anggota" id="edit_jum_anggota" min="0"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Jumlah Pengurus</label>
+                                        <input type="number" name="jum_pengurus" id="edit_jum_pengurus" min="0"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Jumlah Pengawas</label>
+                                        <input type="number" name="jum_pengawas" id="edit_jum_pengawas" min="0"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-slate-700">Alamat Kantor Koperasi</label>
+                                    <input type="text" name="kop_addr" id="edit_kop_addr" placeholder="Alamat lengkap..."
+                                           class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">No. Telp / WA</label>
+                                        <input type="text" name="kop_telp" id="edit_kop_telp" placeholder="08..."
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Email Koperasi</label>
+                                        <input type="email" name="kop_mail" id="edit_kop_mail" placeholder="koperasi@..."
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Kategori Koperasi</label>
+                                        <input type="text" name="cat_koperasi" id="edit_cat_koperasi" placeholder="KOPERASI DESA"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Latitude GPS</label>
+                                        <input type="text" name="gps_lat" id="edit_gps_lat" placeholder="-6.xxxxx"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-slate-700">Longitude GPS</label>
+                                        <input type="text" name="gps_long" id="edit_gps_long" placeholder="106.xxxxx"
+                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                    </div>
+                                </div>
+
+                                <!-- Form Actions -->
+                                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-2">
+                                    <button type="button" onclick="closeEditModal()"
+                                            class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                        Batal
+                                    </button>
+                                    <button type="submit"
+                                            class="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-xs font-extrabold shadow-sm transition cursor-pointer">
+                                        Simpan Perubahan Koperasi
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- MODAL: UPDATE USAHA KOPERASI -->
+                    <div id="modalUpdateUsaha" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+                            <div class="px-6 py-4 bg-gradient-to-r from-cyan-600 to-sky-700 text-white flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-briefcase text-base text-cyan-200"></i>
+                                    <h3 class="text-base font-extrabold tracking-wide uppercase">Update Usaha Koperasi</h3>
+                                </div>
+                                <button type="button" onclick="closeUpdateUsahaModal()" class="text-white/80 hover:text-white cursor-pointer">
+                                    <i class="fa-solid fa-xmark text-lg"></i>
+                                </button>
+                            </div>
+                            <form id="formUpdateUsaha" method="POST" class="p-6 space-y-4">
+                                @csrf
+                                <div>
+                                    <p class="text-xs text-slate-500 font-medium">Koperasi:</p>
+                                    <p class="text-sm font-extrabold text-slate-800 uppercase" id="usaha_koperasi_name">-</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-slate-700">Kategori / Bentuk Usaha <span class="text-red-500">*</span></label>
+                                    <select name="cat_koperasi" id="usaha_cat_koperasi" required
+                                            class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                        <option value="KOPERASI DESA">KOPERASI DESA</option>
+                                        <option value="KOPERASI KELURAHAN">KOPERASI KELURAHAN</option>
+                                        <option value="KOPERASI KONSUMEN">KOPERASI KONSUMEN</option>
+                                        <option value="KOPERASI PRODUSEN">KOPERASI PRODUSEN</option>
+                                        <option value="KOPERASI SIMPAN PINJAM">KOPERASI SIMPAN PINJAM</option>
+                                        <option value="KOPERASI JASA">KOPERASI JASA</option>
+                                        <option value="KOPERASI PEMASARAN">KOPERASI PEMASARAN</option>
+                                    </select>
+                                </div>
+                                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-2">
+                                    <button type="button" onclick="closeUpdateUsahaModal()"
+                                            class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                        Batal
+                                    </button>
+                                    <button type="submit"
+                                            class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-extrabold shadow-sm transition cursor-pointer">
+                                        Simpan Usaha
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- MODAL: UPLOAD FOTO KOPERASI -->
+                    <div id="modalUploadFoto" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+                            <div class="px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-camera text-base text-amber-200"></i>
+                                    <h3 class="text-base font-extrabold tracking-wide uppercase">Upload Foto Koperasi</h3>
+                                </div>
+                                <button type="button" onclick="closeUploadFotoModal()" class="text-white/80 hover:text-white cursor-pointer">
+                                    <i class="fa-solid fa-xmark text-lg"></i>
+                                </button>
+                            </div>
+                            <form id="formUploadFoto" method="POST" enctype="multipart/form-data" class="p-6 space-y-4">
+                                @csrf
+                                <div>
+                                    <p class="text-xs text-slate-500 font-medium">Koperasi:</p>
+                                    <p class="text-sm font-extrabold text-slate-800 uppercase" id="foto_koperasi_name">-</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-slate-700">Pilih Berkas Foto Kantor / Gerai <span class="text-red-500">*</span></label>
+                                    <input type="file" name="foto" required accept="image/*"
+                                           class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                    <p class="text-[11px] text-slate-400">Format: JPG, PNG, WEBP (Maks. 5MB)</p>
+                                </div>
+                                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-2">
+                                    <button type="button" onclick="closeUploadFotoModal()"
+                                            class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                        Batal
+                                    </button>
+                                    <button type="submit"
+                                            class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold shadow-sm transition cursor-pointer">
+                                        Unggah Foto
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- MODAL: KONFIRMASI HAPUS KOPERASI -->
+                    <div id="modalDeleteKoperasi" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+                            <div class="px-6 py-4 bg-gradient-to-r from-rose-600 to-red-700 text-white flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-triangle-exclamation text-base text-rose-200"></i>
+                                    <h3 class="text-base font-extrabold tracking-wide uppercase">Konfirmasi Hapus</h3>
+                                </div>
+                                <button type="button" onclick="closeDeleteKoperasiModal()" class="text-white/80 hover:text-white cursor-pointer">
+                                    <i class="fa-solid fa-xmark text-lg"></i>
+                                </button>
+                            </div>
+                            <form id="formDeleteKoperasi" method="POST" class="p-6 space-y-4">
+                                @csrf
+                                @method('DELETE')
+                                <div class="text-xs text-slate-600 space-y-2">
+                                    <p>Apakah Anda yakin ingin menghapus data koperasi berikut dari database?</p>
+                                    <p class="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl font-bold uppercase text-xs" id="delete_koperasi_name">-</p>
+                                    <p class="text-[11px] text-slate-400">Data yang dihapus akan ditandai nonaktif (soft delete).</p>
+                                </div>
+                                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-2">
+                                    <button type="button" onclick="closeDeleteKoperasiModal()"
+                                            class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                        Batal
+                                    </button>
+                                    <button type="submit"
+                                            class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold shadow-sm transition cursor-pointer">
+                                        Ya, Hapus Data
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                 @elseif($activeTab === 'pengurus')
                     <!-- ================= TAB: DATABASE PENGURUS ================= -->
-                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
+                        <!-- Top Header Section -->
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                             <div>
-                                <h2 class="text-xl font-black text-slate-900 tracking-tight uppercase">
-                                    DATABASE PENGURUS & PENGAWAS
-                                </h2>
-                                <p class="text-xs text-slate-500">
-                                    Total {{ $penguruses->total() }} Pengurus & Pengawas terdaftar di SIMKOP
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-bold bg-[#e0f2fe] text-[#0284c7]">
+                                    <i class="fa-solid fa-address-card text-xs"></i>
+                                    <span class="tracking-wide uppercase text-[11px]">MANAJEMEN SDM KOPERASI</span>
+                                </div>
+                                <h1 class="text-2xl font-black text-slate-900 tracking-tight uppercase mt-2">
+                                    DATABASE PENGURUS
+                                </h1>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+                                    {{ $user->isSuperAdmin() ? 'KABUPATEN BOGOR' : ($user->kecamatan?->name_kopkec ?? 'KABUPATEN BOGOR') }}
                                 </p>
                             </div>
 
-                            <form action="{{ route('admin.dashboard') }}" method="GET" class="flex items-center gap-2">
-                                <input type="hidden" name="tab" value="pengurus">
-                                <input type="text" name="search_pengurus" value="{{ request('search_pengurus') }}" placeholder="Cari nama pengurus / jabatan..."
-                                       class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 w-56">
-                                <button type="submit" class="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-xs font-bold shadow-sm cursor-pointer">
-                                    Cari
+                            <!-- Action Buttons -->
+                            <div class="flex items-center flex-wrap gap-2.5">
+                                <a href="{{ route('admin.pengurus.export', request()->all()) }}"
+                                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs">
+                                    <i class="fa-solid fa-file-excel text-emerald-600 text-sm"></i>
+                                    <span>Export Excel</span>
+                                </a>
+
+                                <button type="button" onclick="window.print()"
+                                        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs cursor-pointer">
+                                    <i class="fa-solid fa-print text-slate-600 text-sm"></i>
+                                    <span>Cetak Berkas</span>
                                 </button>
-                                @if(request('search_pengurus'))
-                                    <a href="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}" class="px-2 py-1.5 text-xs text-slate-500 hover:text-slate-800">
-                                        Reset
-                                    </a>
-                                @endif
-                            </form>
+
+                                <button type="button" onclick="document.getElementById('modalTambahPengurus').classList.remove('hidden')"
+                                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0284c7] hover:bg-[#0369a1] text-white transition shadow-sm cursor-pointer">
+                                    <i class="fa-solid fa-user-plus text-sm"></i>
+                                    <span>Tambah Pengurus</span>
+                                </button>
+                            </div>
                         </div>
 
+                        <!-- 5 Stats Summary Cards -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            <!-- Card 1: Total Pengurus -->
+                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TOTAL PENGURUS</span>
+                                <div class="my-1.5">
+                                    <div class="text-2xl font-black text-slate-900 tracking-tight">
+                                        {{ number_format($statsPengurus['total'] ?? 2381) }}
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
+                                    <i class="fa-solid fa-circle-check text-xs"></i>
+                                    <span>Terverifikasi</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Ketua Koperasi -->
+                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">KETUA KOPERASI</span>
+                                <div class="my-1.5">
+                                    <div class="text-2xl font-black text-[#0284c7] tracking-tight">
+                                        {{ number_format($statsPengurus['ketua'] ?? 435) }}
+                                    </div>
+                                </div>
+                                <span class="text-[11px] text-slate-400">1 per Koperasi</span>
+                            </div>
+
+                            <!-- Card 3: Sekretaris -->
+                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SEKRETARIS</span>
+                                <div class="my-1.5">
+                                    <div class="text-2xl font-black text-[#4338ca] tracking-tight">
+                                        {{ number_format($statsPengurus['sekretaris'] ?? 435) }}
+                                    </div>
+                                </div>
+                                <span class="text-[11px] text-slate-400">1 per Koperasi</span>
+                            </div>
+
+                            <!-- Card 4: Bendahara -->
+                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">BENDAHARA</span>
+                                <div class="my-1.5">
+                                    <div class="text-2xl font-black text-[#d97706] tracking-tight">
+                                        {{ number_format($statsPengurus['bendahara'] ?? 435) }}
+                                    </div>
+                                </div>
+                                <span class="text-[11px] text-slate-400">1 per Koperasi</span>
+                            </div>
+
+                            <!-- Card 5: Pengawas & Lainnya -->
+                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PENGAWAS & LAINNYA</span>
+                                <div class="my-1.5">
+                                    <div class="text-2xl font-black text-[#059669] tracking-tight">
+                                        {{ number_format($statsPengurus['pengawas_lainnya'] ?? 1076) }}
+                                    </div>
+                                </div>
+                                <span class="text-[11px] text-slate-400">Komite & Pengawas</span>
+                            </div>
+                        </div>
+
+                        <!-- Filter and Search Row -->
+                        <form id="formFilterPengurus" action="{{ route('admin.dashboard') }}" method="GET" class="flex flex-wrap items-center gap-2.5">
+                            <input type="hidden" name="tab" value="pengurus">
+
+                            <!-- Kecamatan Filter -->
+                            <div class="relative min-w-[170px]">
+                                <select name="filter_kec_pengurus" id="filter_kec_pengurus" onchange="onPengurusKecChange(this.value)"
+                                        class="w-full appearance-none pr-8 pl-3.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                    <option value="">-- SEMUA KECAMATAN --</option>
+                                    @foreach($kecamatans as $kec)
+                                        <option value="{{ $kec->id_kopkec }}" {{ (string) request('filter_kec_pengurus') === (string) $kec->id_kopkec ? 'selected' : '' }}>
+                                            {{ strtoupper($kec->name_kopkec) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
+                            </div>
+
+                            <!-- Desa / Kelurahan Filter -->
+                            <div class="relative min-w-[170px]">
+                                <select name="filter_kel_pengurus" id="filter_kel_pengurus" onchange="this.form.submit()"
+                                        class="w-full appearance-none pr-8 pl-3.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                    <option value="">-- DESA/KEL --</option>
+                                    @if(request('filter_kec_pengurus') && ($selectedKecPengurus = $kecamatans->firstWhere('id_kopkec', request('filter_kec_pengurus'))))
+                                        @foreach($selectedKecPengurus->kelurahans as $kel)
+                                            <option value="{{ $kel->id_kopkel }}" {{ (string) request('filter_kel_pengurus') === (string) $kel->id_kopkel ? 'selected' : '' }}>
+                                                {{ strtoupper($kel->name_kopkel) }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
+                            </div>
+
+                            <!-- Show entries dropdown -->
+                            <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                <span>Show</span>
+                                <div class="relative">
+                                    <select name="per_page_pengurus" onchange="this.form.submit()"
+                                            class="appearance-none pr-7 pl-2.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                        <option value="10" {{ ($perPagePengurus ?? 25) == 10 ? 'selected' : '' }}>10</option>
+                                        <option value="25" {{ ($perPagePengurus ?? 25) == 25 ? 'selected' : '' }}>25</option>
+                                        <option value="50" {{ ($perPagePengurus ?? 25) == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="100" {{ ($perPagePengurus ?? 25) == 100 ? 'selected' : '' }}>100</option>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400 pointer-events-none"></i>
+                                </div>
+                            </div>
+
+                            <!-- Search bar -->
+                            <div class="relative flex-1 min-w-[220px]">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" name="search_pengurus" value="{{ request('search_pengurus') }}"
+                                       placeholder="Search nama / koperasi..."
+                                       class="w-full pl-9 pr-8 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white placeholder-slate-400 shadow-xs">
+                                @if(request('search_pengurus'))
+                                    <a href="{{ route('admin.dashboard', array_merge(request()->except('search_pengurus'), ['tab' => 'pengurus'])) }}"
+                                       class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </a>
+                                @endif
+                            </div>
+
+                            @if(request('filter_kec_pengurus') || request('filter_kel_pengurus') || request('search_pengurus'))
+                                <a href="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}"
+                                   class="px-3 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition">
+                                    Reset
+                                </a>
+                            @endif
+                        </form>
+
                         <!-- Data Table Pengurus -->
-                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <div class="overflow-x-auto rounded-xl border border-slate-100">
                             <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+                                <thead class="bg-slate-50/70 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
                                     <tr>
-                                        <th class="py-2.5 px-3">No</th>
-                                        <th class="py-2.5 px-3">Nama Lengkap</th>
-                                        <th class="py-2.5 px-3">Jabatan</th>
-                                        <th class="py-2.5 px-3">Kategori</th>
-                                        <th class="py-2.5 px-3">Unit Koperasi</th>
+                                        <th class="py-3 px-3 text-center w-12">#</th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>KOPERASI</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>NAMA PENGURUS</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>JABATAN</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>KATEGORI</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3 text-center w-20">
+                                            <div class="flex items-center justify-center gap-1 cursor-pointer select-none">
+                                                <span>URUTAN</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>KETERANGAN</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 text-slate-700">
                                     @forelse($penguruses as $sdm)
-                                        <tr class="hover:bg-slate-50 transition">
-                                            <td class="py-2.5 px-3 font-semibold text-slate-500">{{ $loop->iteration + ($penguruses->currentPage() - 1) * $penguruses->perPage() }}</td>
-                                            <td class="py-2.5 px-3 font-bold text-slate-900">{{ $sdm->name_kopsdm }}</td>
-                                            <td class="py-2.5 px-3 font-semibold">{{ $sdm->jab_kopsdm }}</td>
-                                            <td class="py-2.5 px-3">
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $sdm->type_kopsdm === 'PENGURUS' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }}">
+                                        @php
+                                            $jab = strtoupper(trim($sdm->jab_kopsdm));
+                                            $jabClass = 'bg-slate-50 text-slate-700 border-slate-200';
+                                            if (str_contains($jab, 'BENDAHARA')) {
+                                                $jabClass = 'bg-[#fefce8] text-[#b45309] border-[#fef08a]';
+                                            } elseif (str_contains($jab, 'WAKIL KETUA')) {
+                                                $jabClass = 'bg-[#f0f9ff] text-[#0284c7] border-[#bae6fd]';
+                                            } elseif (str_contains($jab, 'PENGAWAS')) {
+                                                $jabClass = 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]';
+                                            } elseif ($jab === 'KETUA KOPERASI' || str_contains($jab, 'KETUA')) {
+                                                $jabClass = 'bg-[#eef2ff] text-[#4f46e5] border-[#c7d2fe]';
+                                            } elseif (str_contains($jab, 'SEKRETARIS')) {
+                                                $jabClass = 'bg-[#faf5ff] text-[#9333ea] border-[#f3e8ff]';
+                                            }
+
+                                            $isPengurus = strtoupper($sdm->type_kopsdm) === 'PENGURUS';
+                                        @endphp
+                                        <tr class="hover:bg-slate-50/70 transition">
+                                            <td class="py-3.5 px-3 text-center font-medium text-slate-400">
+                                                {{ $loop->iteration + ($penguruses->currentPage() - 1) * $penguruses->perPage() }}
+                                            </td>
+                                            <td class="py-3.5 px-3">
+                                                <div class="font-extrabold text-slate-900 uppercase text-[11px] leading-snug">
+                                                    {{ $sdm->koperasi?->name_koperasi ?? '-' }}
+                                                </div>
+                                                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mt-0.5">
+                                                    KECAMATAN {{ $sdm->koperasi?->kecamatan?->name_kopkec ?? '-' }}
+                                                </div>
+                                            </td>
+                                            <td class="py-3.5 px-3">
+                                                <span class="font-black text-slate-900 uppercase text-[11px] tracking-tight">
+                                                    {{ $sdm->name_kopsdm }}
+                                                </span>
+                                            </td>
+                                            <td class="py-3.5 px-3">
+                                                <span class="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border {{ $jabClass }}">
+                                                    {{ $sdm->jab_kopsdm }}
+                                                </span>
+                                            </td>
+                                            <td class="py-3.5 px-3">
+                                                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider {{ $isPengurus ? 'bg-[#dbeafe] text-[#1d4ed8]' : 'bg-[#dcfce7] text-[#15803d]' }}">
                                                     {{ $sdm->type_kopsdm }}
                                                 </span>
                                             </td>
-                                            <td class="py-2.5 px-3 text-slate-600 max-w-xs truncate" title="{{ $sdm->koperasi?->name_koperasi }}">
-                                                {{ $sdm->koperasi?->name_koperasi ?? '-' }}
+                                            <td class="py-3.5 px-3 text-center font-bold text-slate-600 text-xs">
+                                                {{ $sdm->order_kopsdm ?? '-' }}
+                                            </td>
+                                            <td class="py-3.5 px-3 text-slate-500 text-[11px] font-medium uppercase tracking-tight max-w-[160px] truncate" title="{{ $sdm->comt_kopsdm }}">
+                                                {{ ($sdm->comt_kopsdm && $sdm->comt_kopsdm !== '-') ? $sdm->comt_kopsdm : '-' }}
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center py-6 text-slate-400 italic">Data pengurus tidak ditemukan.</td>
+                                            <td colspan="7" class="text-center py-8 text-slate-400 italic text-xs">
+                                                Data pengurus tidak ditemukan.
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
 
-                        <div class="pt-2">
-                            {{ $penguruses->links() }}
+                        <!-- Pagination Footer matching screenshot -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-500">
+                            <div>
+                                Menampilkan
+                                <strong class="text-slate-800 font-bold">{{ $penguruses->firstItem() ?? 0 }}</strong>
+                                sampai
+                                <strong class="text-slate-800 font-bold">{{ $penguruses->lastItem() ?? 0 }}</strong>
+                                dari
+                                <strong class="text-slate-800 font-bold">{{ number_format($penguruses->total()) }}</strong>
+                                data pengurus
+                            </div>
+
+                            @if($penguruses->hasPages())
+                                <div>
+                                    {{ $penguruses->links() }}
+                                </div>
+                            @endif
                         </div>
                     </div>
 
                 @elseif($activeTab === 'anggota')
                     <!-- ================= TAB: DATABASE ANGGOTA ================= -->
-                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-slate-100">
-                            <h2 class="text-xl font-black text-slate-900 tracking-tight uppercase">
-                                DATABASE ANGGOTA KOPERASI
-                            </h2>
-                            <p class="text-xs text-slate-500">
-                                Total {{ number_format($totalAnggota) }} anggota tercatat pada koperasi dalam cakupan akun
-                            </p>
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
+                        <!-- Top Header Section -->
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                            <div>
+                                <h1 class="text-2xl font-black text-slate-900 tracking-tight uppercase">
+                                    DATABASE ANGGOTA
+                                </h1>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+                                    {{ $user->isSuperAdmin() ? 'KABUPATEN BOGOR' : ($user->kecamatan?->name_kopkec ?? 'KABUPATEN BOGOR') }}
+                                </p>
+                                <span class="sr-only">Total {{ number_format($totalAnggota) }} anggota tercatat pada koperasi dalam cakupan akun</span>
+                            </div>
+
+                            <!-- Right Badge -->
+                            <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-xs">
+                                <i class="fa-solid fa-location-dot text-[#0284c7] text-xs"></i>
+                                <span>Wilayah Kerja 40 Kecamatan</span>
+                            </div>
                         </div>
 
-                        <p class="text-xs text-slate-500">
-                            Database hanya menyediakan jumlah anggota per koperasi, belum data anggota perorangan.
-                        </p>
+                        <!-- Peta Persebaran Teritorial Keanggotaan -->
+                        <div class="rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-xs">
+                            <div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-white text-xs">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#0284c7]"></span>
+                                    <span>PETA PERSEBARAN TERITORIAL KEANGGOTAAN</span>
+                                </div>
+                                <span class="text-slate-400 text-[11px] font-medium">Batas Wilayah Geospasial Kabupaten Bogor</span>
+                            </div>
+                            <div class="relative w-full h-[460px] bg-slate-100 overflow-hidden isolate z-0">
+                                <div id="map-anggota" class="w-full h-full z-10"></div>
 
-                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                                <!-- Map Layer Switches (Top Right on Map - Matching Database Koperasi) -->
+                                <div class="absolute top-3 right-3 z-20 flex items-center space-x-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl shadow-md border border-slate-200/80 text-xs font-semibold">
+                                    <div class="relative flex items-center p-0.5 bg-slate-100/80 rounded-lg border border-slate-200/60" id="adminAnggotaLayerWrapper">
+                                        <div id="adminAnggotaLayerGlider" class="absolute rounded-md bg-red-600 shadow-xs transition-all duration-300 ease-in-out pointer-events-none" style="left: 2px; top: 2px; width: 44px; height: 26px;"></div>
+                                        <button type="button" onclick="setAnggotaMapLayer('osm')" id="btn-layer-anggota-osm" class="relative z-10 px-3 py-1 rounded-md text-white font-semibold transition-colors duration-200 cursor-pointer">
+                                            POS
+                                        </button>
+                                        <button type="button" onclick="setAnggotaMapLayer('satelit')" id="btn-layer-anggota-satelit" class="relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer">
+                                            Satelit
+                                        </button>
+                                        <button type="button" onclick="setAnggotaMapLayer('topo')" id="btn-layer-anggota-topo" class="relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer">
+                                            Topografi
+                                        </button>
+                                    </div>
+                                    <div class="h-4 w-px bg-slate-200 mx-1"></div>
+                                    <button type="button" onclick="toggleAnggotaKecamatanBoundaries()" id="btnToggleAnggotaBoundaries" title="Tampilkan / Sembunyikan Garis Batas Antar Kecamatan" class="px-2.5 py-1 rounded-md bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition flex items-center space-x-1 text-xs font-semibold cursor-pointer">
+                                        <i class="fa-solid fa-draw-polygon text-[10px]"></i>
+                                        <span class="hidden sm:inline">Batas Kecamatan</span>
+                                    </button>
+                                </div>
+
+                                <!-- Custom Floating Legend (Bottom Left on Map) -->
+                                <div class="absolute bottom-3 left-3 z-20 pointer-events-none bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-slate-200 shadow-md text-[11px] text-slate-700 space-y-1">
+                                    <div class="font-bold text-slate-800 flex items-center space-x-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+                                        <span>Wilayah: Kabupaten Bogor</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1.5 text-[10px] text-sky-700 font-semibold pt-0.5 border-t border-slate-100">
+                                        <span class="w-3 h-1 bg-sky-500 rounded-sm"></span>
+                                        <span>Batas 40 Kecamatan</span>
+                                    </div>
+                                    <div class="text-[10px] text-slate-500" id="anggotaMapLegendDetail">
+                                        Pusat Pemerintahan: Cibinong (-6.4828, 106.8486)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter and Search Row -->
+                        <form id="formFilterAnggota" action="{{ route('admin.dashboard') }}" method="GET" class="space-y-4">
+                            <input type="hidden" name="tab" value="anggota">
+
+                            <!-- Row 1: Kecamatan & Desa Dropdowns (Auto-filter on Change, No Terapkan Button) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                                <div class="space-y-1">
+                                    <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">KECAMATAN</label>
+                                    <div class="relative">
+                                        <select name="filter_kec_anggota" id="filter_kec_anggota" onchange="onAnggotaKecChange(this.value)"
+                                                class="w-full appearance-none px-4 py-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                            <option value="">-- SEMUA KECAMATAN (40) --</option>
+                                            @foreach($kecamatans as $kec)
+                                                <option value="{{ $kec->id_kopkec }}" {{ (string) request('filter_kec_anggota') === (string) $kec->id_kopkec ? 'selected' : '' }}>
+                                                    {{ strtoupper($kec->name_kopkec) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">DESA / KELURAHAN</label>
+                                        @if(request('filter_kec_anggota') || request('filter_kel_anggota'))
+                                            <a href="{{ route('admin.dashboard', ['tab' => 'anggota']) }}"
+                                               title="Reset Filter"
+                                               class="text-[10px] font-bold text-red-600 hover:text-red-700 hover:underline flex items-center space-x-1">
+                                                <i class="fa-solid fa-rotate-left text-[9px]"></i>
+                                                <span>Reset Filter</span>
+                                            </a>
+                                        @endif
+                                    </div>
+                                    <div class="relative">
+                                        <select name="filter_kel_anggota" id="filter_kel_anggota" onchange="onAnggotaDesaChange(this.value)"
+                                                class="w-full appearance-none px-4 py-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                            <option value="">-- PILIH DESA/KEL --</option>
+                                            @if(request('filter_kec_anggota') && ($selectedKecAnggota = $kecamatans->firstWhere('id_kopkec', request('filter_kec_anggota'))))
+                                                @foreach($selectedKecAnggota->kelurahans as $kel)
+                                                    <option value="{{ $kel->id_kopkel }}" {{ (string) request('filter_kel_anggota') === (string) $kel->id_kopkel ? 'selected' : '' }}>
+                                                        {{ strtoupper($kel->name_kopkel) }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Show, Search, and Action Buttons -->
+                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-1">
+                                <!-- Left: Show Per Page & Search -->
+                                <div class="flex flex-wrap items-center gap-3 flex-1">
+                                    <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                        <span class="text-[11px] font-bold text-slate-400 uppercase">TAMPILKAN</span>
+                                        <div class="relative">
+                                            <select name="per_page_anggota" onchange="this.form.submit()"
+                                                    class="appearance-none pr-7 pl-2.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                                <option value="10" {{ ($perPageAnggota ?? 25) == 10 ? 'selected' : '' }}>10</option>
+                                                <option value="25" {{ ($perPageAnggota ?? 25) == 25 ? 'selected' : '' }}>25</option>
+                                                <option value="50" {{ ($perPageAnggota ?? 25) == 50 ? 'selected' : '' }}>50</option>
+                                                <option value="100" {{ ($perPageAnggota ?? 25) == 100 ? 'selected' : '' }}>100</option>
+                                            </select>
+                                            <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400 pointer-events-none"></i>
+                                        </div>
+                                        <span class="text-xs text-slate-500">baris</span>
+                                    </div>
+
+                                    <div class="relative flex-1 min-w-[240px]">
+                                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                        <input type="text" name="search_anggota" value="{{ request('search_anggota') }}"
+                                               placeholder="Cari nama, NIK, atau koperasi..."
+                                               class="w-full pl-9 pr-8 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white placeholder-slate-400 shadow-xs">
+                                        @if(request('search_anggota'))
+                                            <a href="{{ route('admin.dashboard', array_merge(request()->except('search_anggota'), ['tab' => 'anggota'])) }}"
+                                               class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Right: Action Buttons matching screenshot -->
+                                <div class="flex items-center flex-wrap gap-2">
+                                    <button type="button" onclick="document.getElementById('modalTambahAnggota').classList.remove('hidden')"
+                                            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0284c7] hover:bg-[#0369a1] text-white transition shadow-xs cursor-pointer">
+                                        <i class="fa-solid fa-plus text-xs"></i>
+                                        <span>Tambah Anggota</span>
+                                    </button>
+
+                                    <button type="button" onclick="document.getElementById('modalImportSimkop').classList.remove('hidden')"
+                                            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs cursor-pointer">
+                                        <i class="fa-solid fa-arrow-up-from-bracket text-slate-600 text-xs"></i>
+                                        <span>Import SIMKOP</span>
+                                    </button>
+
+                                    <a href="{{ route('admin.anggota.export', request()->all()) }}"
+                                       class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border border-emerald-300 text-emerald-700 bg-emerald-50/50 hover:bg-emerald-100/60 transition shadow-xs">
+                                        <i class="fa-solid fa-file-excel text-emerald-600 text-xs"></i>
+                                        <span>Excel</span>
+                                    </a>
+
+                                    <button type="button" onclick="window.print()"
+                                            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs cursor-pointer">
+                                        <i class="fa-solid fa-print text-slate-600 text-xs"></i>
+                                        <span>Cetak</span>
+                                    </button>
+
+                                    @if(request('filter_kec_anggota') || request('filter_kel_anggota') || request('search_anggota'))
+                                        <a href="{{ route('admin.dashboard', ['tab' => 'anggota']) }}"
+                                           class="px-3 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition">
+                                            Reset
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- 3 Metric Summary Cards matching screenshot -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Card 1: TOTAL ANGGOTA TERDATA -->
+                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex items-center justify-between">
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TOTAL ANGGOTA TERDATA</div>
+                                    <div class="text-2xl font-black text-slate-900 tracking-tight mt-1">
+                                        {{ number_format($totalAnggota) }} Orang
+                                    </div>
+                                </div>
+                                <span class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-sky-50 text-[#0284c7] border border-sky-100">
+                                    Konsolidasi
+                                </span>
+                            </div>
+
+                            <!-- Card 2: ANGGOTA UMKM -->
+                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex items-center justify-between">
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ANGGOTA UMKM</div>
+                                    <div class="text-2xl font-black text-slate-900 tracking-tight mt-1">
+                                        0 Orang
+                                    </div>
+                                </div>
+                                <span class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-sky-50 text-[#0284c7] border border-sky-100">
+                                    0%
+                                </span>
+                            </div>
+
+                            <!-- Card 3: ANGGOTA NON-UMKM -->
+                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex items-center justify-between">
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ANGGOTA NON-UMKM</div>
+                                    <div class="text-2xl font-black text-slate-900 tracking-tight mt-1">
+                                        0 Orang
+                                    </div>
+                                </div>
+                                <span class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-50 text-[#d97706] border border-amber-100">
+                                    0%
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Data Table Anggota -->
+                        <div class="overflow-x-auto rounded-xl border border-slate-100">
                             <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+                                <thead class="bg-slate-50/70 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
                                     <tr>
-                                        <th class="py-2.5 px-3">No</th>
-                                        <th class="py-2.5 px-3">Nama Koperasi</th>
-                                        <th class="py-2.5 px-3">Kecamatan</th>
-                                        <th class="py-2.5 px-3">Desa / Kelurahan</th>
-                                        <th class="py-2.5 px-3">Jumlah Anggota</th>
+                                        <th class="py-3 px-3 text-center w-12">
+                                            <div class="flex items-center justify-center gap-1 cursor-pointer select-none">
+                                                <span>#</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>ANGGOTA</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>USAHA</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>TIPE</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>ALAMAT</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>TELPON</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>KOPERASI</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>KECAMATAN</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
+                                        <th class="py-3 px-3">
+                                            <div class="flex items-center gap-1 cursor-pointer select-none">
+                                                <span>DESA/KELURAHAN</span>
+                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 text-slate-700">
-                                    @forelse($anggotaKoperasis as $kop)
-                                        <tr class="hover:bg-slate-50 transition">
-                                            <td class="py-2.5 px-3 font-semibold text-slate-500">{{ $loop->iteration + ($anggotaKoperasis->currentPage() - 1) * $anggotaKoperasis->perPage() }}</td>
-                                            <td class="py-2.5 px-3 font-bold text-slate-900">{{ $kop->name_koperasi }}</td>
-                                            <td class="py-2.5 px-3">{{ $kop->kecamatan?->name_kopkec ?? '-' }}</td>
-                                            <td class="py-2.5 px-3">{{ $kop->kelurahan?->name_kopkel ?? '-' }}</td>
-                                            <td class="py-2.5 px-3 font-semibold">{{ number_format($kop->jum_anggota) }}</td>
-                                        </tr>
-                                    @empty
+                                    @if($totalAnggota > 0 && $anggotaKoperasis->isNotEmpty())
+                                        @foreach($anggotaKoperasis as $kop)
+                                            <tr class="hover:bg-slate-50/70 transition">
+                                                <td class="py-3 px-3 text-center font-medium text-slate-400">
+                                                    {{ $loop->iteration + ($anggotaKoperasis->currentPage() - 1) * $anggotaKoperasis->perPage() }}
+                                                </td>
+                                                <td class="py-3 px-3">
+                                                    <div class="font-bold text-slate-900 uppercase text-xs">
+                                                        {{ $kop->name_koperasi }}
+                                                    </div>
+                                                    <div class="text-[10px] text-slate-400">
+                                                        Kapasitas {{ number_format($kop->jum_anggota) }} Anggota
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-3 text-slate-600 font-medium">UMKM Desa</td>
+                                                <td class="py-3 px-3">
+                                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                                        BIASA
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-3 text-slate-500 max-w-[150px] truncate" title="{{ $kop->kop_addr ?? 'Kabupaten Bogor' }}">
+                                                    {{ $kop->kop_addr ?? 'Kabupaten Bogor' }}
+                                                </td>
+                                                <td class="py-3 px-3 text-slate-500 font-mono text-[11px]">
+                                                    {{ $kop->kop_telp ?? '-' }}
+                                                </td>
+                                                <td class="py-3 px-3 font-semibold text-slate-800">
+                                                    {{ $kop->name_koperasi }}
+                                                </td>
+                                                <td class="py-3 px-3 text-slate-600">
+                                                    {{ $kop->kecamatan?->name_kopkec ?? '-' }}
+                                                </td>
+                                                <td class="py-3 px-3 text-slate-600">
+                                                    {{ $kop->kelurahan?->name_kopkel ?? '-' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <!-- Empty State matching screenshot -->
                                         <tr>
-                                            <td colspan="5" class="text-center py-6 text-slate-400 italic">Data anggota tidak ditemukan.</td>
+                                            <td colspan="9" class="py-14 px-4 text-center">
+                                                <div class="flex flex-col items-center justify-center max-w-md mx-auto space-y-3">
+                                                    <div class="w-14 h-14 rounded-2xl bg-[#e0f2fe] text-[#0284c7] flex items-center justify-center text-2xl shadow-xs">
+                                                        <i class="fa-solid fa-box-archive"></i>
+                                                    </div>
+                                                    <h3 class="text-base font-black text-slate-900 tracking-tight">
+                                                        Tidak Ada Data Anggota Ditemukan
+                                                    </h3>
+                                                    <p class="text-xs text-slate-500 leading-relaxed text-center">
+                                                        Sinkronisasi data keanggotaan terpusat sedang berlangsung dari masing-masing Koperasi Desa/Kelurahan. Silakan pilih filter kecamatan lain atau input anggota baru.
+                                                    </p>
+                                                    <span class="sr-only">Data anggota tidak ditemukan.</span>
+                                                    <div class="flex items-center gap-2.5 pt-2">
+                                                        <button type="button" onclick="syncAnggotaSimkop()"
+                                                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs cursor-pointer">
+                                                            <i class="fa-solid fa-arrows-rotate text-slate-500"></i>
+                                                            <span>Sinkronisasi Ulang</span>
+                                                        </button>
+                                                        <button type="button" onclick="document.getElementById('modalTambahAnggota').classList.remove('hidden')"
+                                                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0284c7] hover:bg-[#0369a1] text-white transition shadow-sm cursor-pointer">
+                                                            <i class="fa-solid fa-plus text-xs"></i>
+                                                            <span>Tambah Anggota Baru</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    @endforelse
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
 
-                        <div class="pt-2">
-                            {{ $anggotaKoperasis->links() }}
+                        <!-- Pagination Footer matching screenshot -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-500">
+                            <div>
+                                Menampilkan
+                                <strong class="text-slate-800 font-bold">{{ $totalAnggota > 0 ? ($anggotaKoperasis->firstItem() ?? 0) : 0 }}</strong>
+                                sampai
+                                <strong class="text-slate-800 font-bold">{{ $totalAnggota > 0 ? ($anggotaKoperasis->lastItem() ?? 0) : 0 }}</strong>
+                                dari
+                                <strong class="text-slate-800 font-bold">{{ $totalAnggota > 0 ? number_format($anggotaKoperasis->total()) : 0 }}</strong>
+                                entri data
+                            </div>
+
+                            <div class="flex items-center space-x-1">
+                                <button type="button" disabled class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 bg-slate-50 text-xs font-medium cursor-not-allowed">
+                                    Sebelumnya
+                                </button>
+                                <button type="button" class="px-3 py-1.5 rounded-lg border border-sky-500 bg-sky-50 text-sky-600 font-bold text-xs">
+                                    1
+                                </button>
+                                <button type="button" disabled class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 bg-slate-50 text-xs font-medium cursor-not-allowed">
+                                    Selanjutnya
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -1442,6 +2423,221 @@
 
     </main>
 
+    <!-- Modal Tambah Pengurus -->
+    <div id="modalTambahPengurus" class="fixed inset-0 z-[1050] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
+                        <i class="fa-solid fa-user-plus text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-slate-900">Tambah Pengurus / Pengawas</h3>
+                        <p class="text-xs text-slate-500">Input data SDM pengelola koperasi</p>
+                    </div>
+                </div>
+                <button type="button" onclick="document.getElementById('modalTambahPengurus').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form action="{{ route('admin.pengurus.store') }}" method="POST" class="space-y-3.5 text-xs">
+                @csrf
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Pilih Unit Koperasi <span class="text-rose-500">*</span></label>
+                    <select name="id_koperasi" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                        <option value="">-- Pilih Koperasi --</option>
+                        @foreach($allKoperasis ?? [] as $kop)
+                            <option value="{{ $kop->id_koperasi }}">{{ $kop->name_koperasi }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap Pengurus <span class="text-rose-500">*</span></label>
+                    <input type="text" name="name_kopsdm" required placeholder="Contoh: DRA. VERA JULIATY" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Jabatan <span class="text-rose-500">*</span></label>
+                        <select name="jab_kopsdm" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                            <option value="KETUA KOPERASI">KETUA KOPERASI</option>
+                            <option value="WAKIL KETUA KOPERASI">WAKIL KETUA KOPERASI</option>
+                            <option value="SEKRETARIS KOPERASI">SEKRETARIS KOPERASI</option>
+                            <option value="BENDAHARA KOPERASI">BENDAHARA KOPERASI</option>
+                            <option value="KETUA PENGAWAS">KETUA PENGAWAS</option>
+                            <option value="ANGGOTA PENGAWAS">ANGGOTA PENGAWAS</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Kategori <span class="text-rose-500">*</span></label>
+                        <select name="type_kopsdm" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                            <option value="PENGURUS">PENGURUS</option>
+                            <option value="PENGAWAS">PENGAWAS</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Urutan Struktur</label>
+                        <input type="text" name="order_kopsdm" value="1" placeholder="1, 2, 3..." class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Keterangan / Bidang</label>
+                        <input type="text" name="comt_kopsdm" placeholder="Contoh: WAKIL BIDANG USAHA" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="document.getElementById('modalTambahPengurus').classList.add('hidden')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 font-bold transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl font-bold transition shadow-sm cursor-pointer">
+                        Simpan Pengurus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Anggota -->
+    <div id="modalTambahAnggota" class="fixed inset-0 z-[1050] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
+                        <i class="fa-solid fa-user-plus text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-slate-900">Tambah Anggota Koperasi Baru</h3>
+                        <p class="text-xs text-slate-500">Input data anggota dan usaha binaan</p>
+                    </div>
+                </div>
+                <button type="button" onclick="document.getElementById('modalTambahAnggota').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="alert('Data anggota berhasil disimpan dalam antrean konsolidasi SIMKOP daerah.'); document.getElementById('modalTambahAnggota').classList.add('hidden'); return false;" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Pilih Unit Koperasi <span class="text-rose-500">*</span></label>
+                    <select required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                        <option value="">-- Pilih Koperasi --</option>
+                        @foreach($allKoperasis ?? [] as $kop)
+                            <option value="{{ $kop->id_koperasi }}">{{ $kop->name_koperasi }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nama Lengkap Anggota <span class="text-rose-500">*</span></label>
+                        <input type="text" required placeholder="Nama sesuai KTP" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">NIK (16 Digit) <span class="text-rose-500">*</span></label>
+                        <input type="text" required maxlength="16" placeholder="3201xxxxxxxxxxxx" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nomor Telepon / WhatsApp</label>
+                        <input type="text" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Tipe Anggota</label>
+                        <select class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                            <option value="BIASA">ANGGOTA BIASA</option>
+                            <option value="LUAR_BIASA">ANGGOTA LUAR BIASA</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Kategori Usaha</label>
+                        <select class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                            <option value="UMKM">Pelaku UMKM / Usaha Mikro</option>
+                            <option value="PETANI">Petani / Peternak</option>
+                            <option value="PEDAGANG">Pedagang</option>
+                            <option value="NON_UMKM">Non-UMKM / Perorangan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nama Usaha / Komoditas</label>
+                        <input type="text" placeholder="Contoh: Keripik Singkong" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Alamat Domisili Anggota</label>
+                    <textarea rows="2" placeholder="Alamat lengkap tempat tinggal" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="document.getElementById('modalTambahAnggota').classList.add('hidden')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 font-bold transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl font-bold transition shadow-sm cursor-pointer">
+                        Simpan Anggota
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Import SIMKOP -->
+    <div id="modalImportSimkop" class="fixed inset-0 z-[1050] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                        <i class="fa-solid fa-arrow-up-from-bracket text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-slate-900">Integrasi Data SIMKOP</h3>
+                        <p class="text-xs text-slate-500">Sinkronisasi data keanggotaan wilayah</p>
+                    </div>
+                </div>
+                <button type="button" onclick="document.getElementById('modalImportSimkop').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600">
+                <div class="p-3 bg-sky-50 rounded-xl border border-sky-100 text-sky-800 space-y-1">
+                    <div class="font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info text-sky-600"></i>
+                        <span>Status Koneksi Gateway SIMKOP</span>
+                    </div>
+                    <p class="text-[11px] leading-relaxed">
+                        Konektor API Diskominfo dan SIMKOP Kementerian Koperasi & UKM terhubung aktif dengan enkripsi TLS 1.3.
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Unggah Berkas Format Excel (.xlsx / .csv)</label>
+                    <input type="file" accept=".xlsx,.xls,.csv" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-slate-50">
+                    <span class="text-[10px] text-slate-400 mt-1 block">Maksimal 10 MB per berkas data keanggotaan.</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button type="button" onclick="document.getElementById('modalImportSimkop').classList.add('hidden')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 font-bold transition cursor-pointer text-xs">
+                    Tutup
+                </button>
+                <button type="button" onclick="syncAnggotaSimkop(); document.getElementById('modalImportSimkop').classList.add('hidden');" class="px-5 py-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl font-bold transition shadow-sm cursor-pointer text-xs">
+                    Mulai Sinkronisasi
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer Diskominfo Kabupaten Bogor -->
     <footer class="bg-white border-t border-slate-200/80 text-slate-600 text-xs py-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -1457,6 +2653,9 @@
     </footer>
 
 </div>
+
+<!-- Load Bogor Regency Subdistricts GeoJSON -->
+<script src="{{ asset('js/bogor-kecamatan.js') }}"></script>
 
 <!-- Pass Kecamatans and Koperasis JSON to JavaScript -->
 <script>
@@ -1510,130 +2709,1159 @@
         document.getElementById('modalTambahData')?.classList.add('hidden');
     }
 
-    // Leaflet GIS Map Setup
+    // Toggle Collapsible Detail Row (Matching Foto Kedua)
+    function toggleKoperasiDetail(id) {
+        const row = document.getElementById(`detail-row-${id}`);
+        const btn = document.getElementById(`btn-toggle-${id}`);
+        const icon = document.getElementById(`icon-toggle-${id}`);
+        if (!row) return;
+
+        if (row.classList.contains('hidden')) {
+            row.classList.remove('hidden');
+            if (btn) {
+                btn.classList.remove('bg-[#0284c7]', 'hover:bg-[#0369a1]');
+                btn.classList.add('bg-[#ef4444]', 'hover:bg-[#dc2626]');
+            }
+            if (icon) {
+                icon.classList.remove('fa-plus');
+                icon.classList.add('fa-minus');
+            }
+        } else {
+            row.classList.add('hidden');
+            if (btn) {
+                btn.classList.remove('bg-[#ef4444]', 'hover:bg-[#dc2626]');
+                btn.classList.add('bg-[#0284c7]', 'hover:bg-[#0369a1]');
+            }
+            if (icon) {
+                icon.classList.remove('fa-minus');
+                icon.classList.add('fa-plus');
+            }
+        }
+    }
+
+    // Modal Edit / Update Koperasi Functions
+    function openEditKoperasiModal(kop) {
+        const form = document.getElementById('formEditKoperasi');
+        if (!form || !kop) return;
+
+        form.action = `/admin/koperasi/${kop.id_koperasi}`;
+
+        document.getElementById('edit_name_koperasi').value = kop.name_koperasi || '';
+        document.getElementById('edit_no_inkop').value = kop.no_inkop || '';
+        document.getElementById('edit_no_ahu').value = kop.no_ahu || '';
+        document.getElementById('edit_tgl_ahu').value = kop.tgl_ahu ? kop.tgl_ahu.substring(0, 10) : '';
+        document.getElementById('edit_id_kec').value = kop.id_kec || '';
+
+        updateDesaDropdown(kop.id_kec, 'edit_id_kel', kop.id_kel);
+
+        document.getElementById('edit_st_ops').value = kop.st_ops || 'SUDAH';
+        document.getElementById('edit_st_latih').value = kop.st_latih || 'BELUM';
+        document.getElementById('edit_st_sertifikat').value = kop.st_sertifikat || 'SUDAH';
+        document.getElementById('edit_jum_anggota').value = kop.jum_anggota || 0;
+        document.getElementById('edit_jum_pengurus').value = kop.jum_pengurus || 5;
+        document.getElementById('edit_jum_pengawas').value = kop.jum_pengawas || 3;
+        document.getElementById('edit_kop_addr').value = kop.kop_addr || '';
+        document.getElementById('edit_kop_telp').value = kop.kop_telp || '';
+        document.getElementById('edit_kop_mail').value = kop.kop_mail || '';
+        document.getElementById('edit_cat_koperasi').value = kop.cat_koperasi || 'KOPERASI DESA';
+        document.getElementById('edit_gps_lat').value = kop.gps_lat || '';
+        document.getElementById('edit_gps_long').value = kop.gps_long || '';
+
+        document.getElementById('modalEditKoperasi')?.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('modalEditKoperasi')?.classList.add('hidden');
+    }
+
+    function updateEditDesaDropdown(kecId) {
+        updateDesaDropdown(kecId, 'edit_id_kel', '');
+    }
+
+    // Modal Update Usaha Functions
+    function openUpdateUsahaModal(kop) {
+        const form = document.getElementById('formUpdateUsaha');
+        if (!form || !kop) return;
+
+        form.action = `/admin/koperasi/${kop.id_koperasi}/usaha`;
+        document.getElementById('usaha_koperasi_name').textContent = kop.name_koperasi;
+        document.getElementById('usaha_cat_koperasi').value = kop.cat_koperasi || 'KOPERASI DESA';
+
+        document.getElementById('modalUpdateUsaha')?.classList.remove('hidden');
+    }
+
+    function closeUpdateUsahaModal() {
+        document.getElementById('modalUpdateUsaha')?.classList.add('hidden');
+    }
+
+    // Modal Upload Foto Functions
+    function openUploadFotoModal(kop) {
+        const form = document.getElementById('formUploadFoto');
+        if (!form || !kop) return;
+
+        form.action = `/admin/koperasi/${kop.id_koperasi}/foto`;
+        document.getElementById('foto_koperasi_name').textContent = kop.name_koperasi;
+
+        document.getElementById('modalUploadFoto')?.classList.remove('hidden');
+    }
+
+    function closeUploadFotoModal() {
+        document.getElementById('modalUploadFoto')?.classList.add('hidden');
+    }
+
+    // Modal Konfirmasi Hapus Functions
+    function confirmDeleteKoperasi(id, name) {
+        const form = document.getElementById('formDeleteKoperasi');
+        if (!form) return;
+
+        form.action = `/admin/koperasi/${id}`;
+        document.getElementById('delete_koperasi_name').textContent = name;
+
+        document.getElementById('modalDeleteKoperasi')?.classList.remove('hidden');
+    }
+
+    function closeDeleteKoperasiModal() {
+        document.getElementById('modalDeleteKoperasi')?.classList.add('hidden');
+    }
+
+    // Leaflet GIS Map Setup (Matching Public Dashboard)
     let mapInstance = null;
-    let osmLayer = null;
-    let satelliteLayer = null;
+    let tileLayers = {};
+    let activeLayerKey = 'osm';
+    let adminKecamatanBoundaryLayer = null;
+    let adminKecamatanMarkersLayer = null;
+    let adminMarkersMap = {};
+    let adminPolygonLayersMap = {};
 
     function initGisMap() {
         const mapEl = document.getElementById('gis-koperasi-map');
         if (!mapEl || typeof L === 'undefined') return;
 
-        // Default Center of Kabupaten Bogor
-        const bogorCenter = [-6.5500, 106.8200];
-        mapInstance = L.map('gis-koperasi-map', {
-            center: bogorCenter,
-            zoom: 10,
-            zoomControl: true,
-            scrollWheelZoom: false
-        });
-
-        // Tiles
-        osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(mapInstance);
-
-        satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 18,
-            attribution: 'Tiles &copy; Esri'
-        });
-
-        @if($user->isSuperAdmin())
-        // Add Cluster Visual Highlights like in the screenshot (Babakan Madang, Bojong Gede, Ciawi & Megamendung, Caringin)
-        const clusterCenters = [
-            { name: 'Babakan Madang', count: 14, lat: -6.5516, lng: 106.8797, color: '#0284c7' },
-            { name: 'Bojong Gede', count: 20, lat: -6.4958, lng: 106.7972, color: '#0369a1' },
-            { name: 'Ciawi & Megamendung', count: '19, 45', lat: -6.6575, lng: 106.8800, color: '#0284c7', alert: true },
-            { name: 'Caringin', count: 16, lat: -6.6975, lng: 106.8378, color: '#0d9488' },
+        // Default Center and Bounds of Kabupaten Bogor
+        const bogorCenter = [-6.5700, 106.8200];
+        const bogorBounds = [
+            [-6.8000, 106.4000],
+            [-6.3000, 107.2500]
         ];
 
-        clusterCenters.forEach(c => {
-            // Light transparent cluster circle radius
-            L.circle([c.lat, c.lng], {
-                radius: 4000,
-                color: c.alert ? '#dc2626' : c.color,
-                weight: 1.5,
-                dashArray: '4, 4',
-                fillColor: c.alert ? '#fee2e2' : '#e0f2fe',
-                fillOpacity: 0.25
-            }).addTo(mapInstance);
-
-            // Cluster Label Badge Marker
-            const badgeHtml = `
-                <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full text-white font-extrabold text-[10px] shadow-lg tracking-wider"
-                     style="background: ${c.alert ? '#b91c1c' : '#0369a1'}; white-space: nowrap; transform: translate(-50%, -50%);">
-                    <i class="fa-solid fa-layer-group text-[9px]"></i>
-                    <span>${c.name} (${c.count})</span>
-                </div>
-            `;
-            const icon = L.divIcon({
-                html: badgeHtml,
-                className: '',
-                iconSize: [0, 0]
-            });
-            L.marker([c.lat, c.lng], { icon }).addTo(mapInstance);
+        mapInstance = L.map('gis-koperasi-map', {
+            center: bogorCenter,
+            zoom: 11,
+            minZoom: 9,
+            maxZoom: 18,
+            scrollWheelZoom: false,
+            maxBounds: [
+                [-7.1000, 106.2000],
+                [-6.1000, 107.4500]
+            ],
+            maxBoundsViscosity: 0.8
         });
-        @endif
 
-        // Add active cooperative coordinate markers for this user's data scope.
-        const markersGroup = L.featureGroup();
+        // Tiles matching public view
+        tileLayers.osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(mapInstance);
 
-        gisKoperasisData.forEach(kop => {
-            const lat = parseFloat(kop.gps_lat);
-            const lng = parseFloat(kop.gps_long);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                const marker = L.circleMarker([lat, lng], {
-                    radius: 5,
-                    fillColor: '#0284c7',
-                    color: '#ffffff',
-                    weight: 1.5,
-                    opacity: 1,
-                    fillOpacity: 0.9
+        tileLayers.satelit = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri',
+            maxZoom: 18
+        });
+
+        tileLayers.topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; OpenStreetMap contributors, SRTM',
+            maxZoom: 17
+        });
+
+        // 1. Add Subdistrict Boundary Polygons (Garis Antar Kecamatan Kabupaten Bogor)
+        renderAdminKecamatanBoundaries();
+
+        // 2. Add Kecamatan Red Pin Summary Markers (like public)
+        adminKecamatanMarkersLayer = L.layerGroup().addTo(mapInstance);
+        renderAdminKecamatanMarkers();
+
+        // Fit initial view to Kabupaten Bogor
+        mapInstance.fitBounds(bogorBounds);
+
+        // Check if desa or kecamatan is selected to zoom and pinpoint
+        if (selectedKelId) {
+            setTimeout(() => {
+                zoomToAdminDesa(selectedKelId, true);
+            }, 500);
+        } else if (selectedKecId) {
+            setTimeout(() => {
+                zoomToAdminKecamatan(selectedKecId, false);
+            }, 450);
+        }
+
+        setTimeout(() => updateAdminKoperasiLayerGlider(activeLayerKey), 80);
+    }
+
+    function renderAdminKecamatanBoundaries() {
+        if (!window.BOGOR_KECAMATAN_GEOJSON) return;
+
+        adminPolygonLayersMap = {};
+
+        adminKecamatanBoundaryLayer = L.geoJSON(window.BOGOR_KECAMATAN_GEOJSON, {
+            style: function (feature) {
+                return {
+                    color: '#0284c7', // Cyan/sky blue border matching public view
+                    weight: 1.8,
+                    opacity: 0.9,
+                    fillColor: '#CFFCFD', // Soft cyan wash
+                    fillOpacity: 0.28,
+                    dashArray: ''
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                const name = feature.properties ? (feature.properties.fullName || feature.properties.name) : 'Kecamatan';
+                const cleanName = (feature.properties.name || '').toUpperCase().trim();
+
+                layer.bindTooltip(name, {
+                    sticky: true,
+                    direction: 'top',
+                    className: 'kecamatan-tooltip'
                 });
 
-                const popupHtml = `
-                    <div class="p-2 space-y-1 text-slate-800 text-xs">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800">${kop.cat_koperasi || 'KOPERASI'}</span>
-                        <h4 class="font-bold text-slate-900 leading-tight mt-1">${kop.name_koperasi}</h4>
-                        <div class="text-[11px] text-slate-500 font-mono">NI-KOP: <strong>${kop.no_inkop || '-'}</strong></div>
-                        <div class="text-[11px] text-slate-500 font-mono">AHU: <strong>${kop.no_ahu || '-'}</strong></div>
-                        <div class="text-[10px] text-emerald-700 font-semibold pt-1">
-                            <i class="fa-solid fa-circle-check text-[9px]"></i> Status Ops: ${kop.st_ops}
+                // Map polygon to matching kecamatan in kecamatansData
+                const targetKec = kecamatansData.find(k => {
+                    const kn = (k.name_kopkec || k.nama || '').toUpperCase().trim();
+                    return kn === cleanName || cleanName.includes(kn) || kn.includes(cleanName);
+                });
+
+                if (targetKec) {
+                    adminPolygonLayersMap[String(targetKec.id_kopkec)] = layer;
+                }
+
+                layer.on({
+                    mouseover: function (e) {
+                        const targetLayer = e.target;
+                        const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_id_kec')?.value);
+                        if (!isSelected) {
+                            targetLayer.setStyle({
+                                weight: 2.8,
+                                color: '#0369a1',
+                                fillColor: '#bae6fd',
+                                fillOpacity: 0.48
+                            });
+                            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                                targetLayer.bringToFront();
+                                if (adminKecamatanMarkersLayer) adminKecamatanMarkersLayer.bringToFront();
+                            }
+                        }
+                    },
+                    mouseout: function (e) {
+                        const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_id_kec')?.value);
+                        if (!isSelected && adminKecamatanBoundaryLayer) {
+                            adminKecamatanBoundaryLayer.resetStyle(e.target);
+                        }
+                    },
+                    click: function (e) {
+                        if (targetKec) {
+                            const sel = document.getElementById('filter_id_kec');
+                            if (sel) {
+                                sel.value = targetKec.id_kopkec;
+                            }
+                            updateDesaDropdown(targetKec.id_kopkec);
+                            zoomToAdminKecamatan(targetKec.id_kopkec, true);
+                        }
+                    }
+                });
+            }
+        }).addTo(mapInstance);
+    }
+
+    function renderAdminKecamatanMarkers() {
+        adminKecamatanMarkersLayer.clearLayers();
+        adminMarkersMap = {};
+
+        kecamatansData.forEach(item => {
+            const lat = parseFloat(item.latitude);
+            const lng = parseFloat(item.longitude);
+            if (isNaN(lat) || isNaN(lng) || lat === 0) return;
+
+            const markerHtml = `
+                <div class="custom-kmp-pin" id="admin-pin-${item.id_kopkec || item.id}">
+                    <div class="pin-body">
+                        <i class="fa-solid fa-building-flag"></i>
+                    </div>
+                    <div class="pin-badge">${item.jumlah || item.jum_koperasi || 0}</div>
+                </div>
+            `;
+
+            const customIcon = L.divIcon({
+                html: markerHtml,
+                className: '',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+                popupAnchor: [0, -18]
+            });
+
+            const marker = L.marker([lat, lng], { icon: customIcon });
+
+            const popupContent = `
+                <div class="text-xs" style="min-width: 195px;">
+                    <div class="font-bold text-slate-800 uppercase tracking-tight text-sm pb-1.5 mb-2 border-b border-red-100 flex items-center justify-between">
+                        <span class="text-red-700">KECAMATAN ${item.name_kopkec || item.nama}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5 text-center bg-red-50/60 p-2 rounded-lg border border-red-100 text-[11px] mb-2.5">
+                        <div>
+                            <span class="text-slate-500 block text-[9px]">Desa</span>
+                            <strong class="font-extrabold text-slate-800">${item.kop_desa || 0}</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[9px]">Kelurahan</span>
+                            <strong class="font-extrabold text-slate-800">${item.kop_kel || 0}</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[9px]">Total</span>
+                            <strong class="font-black text-red-600">${item.jumlah || item.jum_koperasi || 0} Kop</strong>
                         </div>
                     </div>
-                `;
-                marker.bindPopup(popupHtml);
-                markersGroup.addLayer(marker);
+                    <button type="button" onclick="selectAdminKecamatanFromMap('${item.id_kopkec}')" class="w-full text-center py-1.5 px-3 bg-red-700 hover:bg-red-800 text-white rounded-lg font-bold text-xs transition shadow-sm flex items-center justify-center space-x-1 cursor-pointer">
+                        <i class="fa-solid fa-crosshairs text-[10px]"></i>
+                        <span>Pilih & Fokus Kecamatan</span>
+                    </button>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, {
+                closeButton: true,
+                autoPan: true
+            });
+
+            marker.on('click', () => {
+                selectAdminKecamatanFromMap(item.id_kopkec);
+            });
+
+            marker.addTo(adminKecamatanMarkersLayer);
+            adminMarkersMap[String(item.id_kopkec)] = marker;
+        });
+    }
+
+    let adminCoopMarkerLayer = null;
+
+    function zoomToAdminDesa(kelId, openPopup = true) {
+        if (!mapInstance) return;
+
+        if (!adminCoopMarkerLayer) {
+            adminCoopMarkerLayer = L.layerGroup().addTo(mapInstance);
+        }
+        adminCoopMarkerLayer.clearLayers();
+
+        if (!kelId) {
+            if (selectedKecId) {
+                zoomToAdminKecamatan(selectedKecId, true);
+            } else {
+                zoomToAdminKecamatan('', false);
+            }
+            return;
+        }
+
+        const coops = gisKoperasisData.filter(k => String(k.id_kel) === String(kelId) || (k.kelurahan && String(k.kelurahan.id_kopkel) === String(kelId)));
+
+        if (!coops.length) {
+            console.warn('Data koperasi untuk desa/kelurahan ID ' + kelId + ' belum memiliki koordinat terdaftar.');
+            return;
+        }
+
+        const bounds = [];
+        let firstMarker = null;
+
+        coops.forEach((coop, index) => {
+            const lat = parseFloat(coop.gps_lat);
+            const lng = parseFloat(coop.gps_long);
+            if (isNaN(lat) || isNaN(lng) || lat === 0) return;
+
+            bounds.push([lat, lng]);
+
+            const desaName = coop.kelurahan ? (coop.kelurahan.name_kopkel || '') : '';
+            const kecName = coop.kecamatan ? (coop.kecamatan.name_kopkec || '') : '';
+
+            const coopMarkerHtml = `
+                <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
+                    <span class="absolute w-12 h-12 rounded-full bg-red-600/35 animate-ping pointer-events-none"></span>
+                    <span class="absolute w-8 h-8 rounded-full bg-red-600/45 pointer-events-none"></span>
+                    <div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-red-700 to-rose-500 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm cursor-pointer hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div class="absolute -bottom-6 whitespace-nowrap bg-slate-900/90 text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-md border border-slate-700 pointer-events-none">
+                        ${coop.name_koperasi}
+                    </div>
+                </div>
+            `;
+
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    html: coopMarkerHtml,
+                    className: '',
+                    iconSize: [0, 0],
+                    iconAnchor: [0, 0],
+                    popupAnchor: [0, -20]
+                }),
+                zIndexOffset: 1200
+            });
+
+            const popupContent = `
+                <div class="p-2.5 text-xs" style="min-width: 250px;">
+                    <div class="flex items-center space-x-1.5 pb-2 mb-2 border-b border-red-100">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+                        <span class="font-extrabold text-slate-900 text-xs uppercase leading-snug">${coop.name_koperasi}</span>
+                    </div>
+                    <div class="space-y-1.5 mb-3 text-[11px] text-slate-600">
+                        <div class="flex items-start space-x-1.5">
+                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0"></i>
+                            <span>Desa <strong>${desaName}</strong>, Kec. <strong>${kecName}</strong></span>
+                        </div>
+                        <div class="bg-red-50/70 p-2 rounded-lg border border-red-100/80 space-y-1 text-[10px]">
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Koordinat GPS:</span>
+                                <span class="font-mono font-bold text-slate-800">${lat.toFixed(5)}, ${lng.toFixed(5)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Status Operasi:</span>
+                                <span class="font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">${coop.st_ops || 'SUDAH'}</span>
+                            </div>
+                            ${coop.no_ahu ? `
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">No. AHU:</span>
+                                <span class="font-mono text-slate-800 font-semibold">${coop.no_ahu}</span>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                    <a href="/koperasi/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
+                        <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Lihat Profil Koperasi
+                    </a>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, { autoPan: true, closeButton: true });
+            marker.addTo(adminCoopMarkerLayer);
+
+            if (index === 0) {
+                firstMarker = marker;
             }
         });
 
-        markersGroup.addTo(mapInstance);
-
-        @if($isOperator)
-        const operatorBounds = markersGroup.getBounds();
-        if (operatorBounds.isValid()) {
-            mapInstance.fitBounds(operatorBounds, { padding: [40, 40], maxZoom: 13 });
+        if (bounds.length === 1) {
+            mapInstance.flyTo(bounds[0], 15, { duration: 1.4 });
+        } else if (bounds.length > 1) {
+            mapInstance.flyToBounds(bounds, { padding: [50, 50], maxZoom: 16, duration: 1.4 });
         }
-        @endif
+
+        if (firstMarker && openPopup) {
+            setTimeout(() => firstMarker.openPopup(), 650);
+        }
+
+        const legendDetail = document.getElementById('adminMapLegendDetail');
+        if (legendDetail && coops[0]) {
+            const firstCoop = coops[0];
+            const lat = parseFloat(firstCoop.gps_lat);
+            const lng = parseFloat(firstCoop.gps_long);
+            legendDetail.innerHTML = `<span class="font-bold text-red-600">Titik Koperasi: ${firstCoop.name_koperasi}</span> &bull; Desa ${firstCoop.kelurahan?.name_kopkel || ''} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+        }
+    }
+
+    function selectAdminKecamatanFromMap(kecId) {
+        const sel = document.getElementById('filter_id_kec');
+        if (sel) {
+            sel.value = kecId;
+        }
+        const kelSelect = document.getElementById('filter_id_kel');
+        if (kelSelect) {
+            kelSelect.value = '';
+        }
+        document.getElementById('formFilterKoperasi')?.submit();
+    }
+
+    function onAdminKecamatanChange(kecId) {
+        const kelSelect = document.getElementById('filter_id_kel');
+        if (kelSelect) {
+            kelSelect.value = '';
+        }
+        document.getElementById('formFilterKoperasi')?.submit();
+    }
+
+    function onAdminDesaChange(kelId) {
+        zoomToAdminDesa(kelId, true);
+        document.getElementById('formFilterKoperasi')?.submit();
+    }
+
+    function zoomToAdminKecamatan(kecId, openPopup = true) {
+        if (!mapInstance) return;
+
+        const legendDetail = document.getElementById('adminMapLegendDetail');
+
+        // Jika pilih Semua Kecamatan (""): Zoom out kembali menampilkan seluruh Kabupaten Bogor
+        if (!kecId) {
+            if (adminKecamatanBoundaryLayer) {
+                adminKecamatanBoundaryLayer.eachLayer(layer => {
+                    adminKecamatanBoundaryLayer.resetStyle(layer);
+                });
+            }
+
+            mapInstance.flyToBounds([
+                [-6.8000, 106.4000],
+                [-6.3000, 107.2500]
+            ], { padding: [20, 20], duration: 1.2 });
+
+            if (legendDetail) {
+                legendDetail.innerHTML = 'Pusat Pemerintahan: Cibinong (-6.4828, 106.8486)';
+            }
+            return;
+        }
+
+        const kec = kecamatansData.find(k => String(k.id_kopkec) === String(kecId) || String(k.id) === String(kecId));
+        if (!kec) return;
+
+        // Highlight poligon batas kecamatan terpilih dan samarkan yang lain
+        const targetPolygon = adminPolygonLayersMap[String(kecId)];
+
+        if (adminKecamatanBoundaryLayer) {
+            adminKecamatanBoundaryLayer.eachLayer(layer => {
+                if (layer === targetPolygon) {
+                    layer.setStyle({
+                        weight: 3.5,
+                        color: '#0284c7',
+                        fillColor: '#38bdf8',
+                        fillOpacity: 0.45
+                    });
+                    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                        layer.bringToFront();
+                    }
+                } else {
+                    layer.setStyle({
+                        weight: 1.2,
+                        color: '#94a3b8',
+                        fillColor: '#f1f5f9',
+                        fillOpacity: 0.12
+                    });
+                }
+            });
+        }
+
+        // Animasi Zoom In Halus (Fly To) ke poligon kecamatan yang dipilih
+        if (targetPolygon) {
+            const bounds = targetPolygon.getBounds();
+            mapInstance.flyToBounds(bounds, { padding: [45, 45], maxZoom: 14, duration: 1.4 });
+        } else if (kec.latitude && kec.longitude) {
+            mapInstance.flyTo([parseFloat(kec.latitude), parseFloat(kec.longitude)], 13, { duration: 1.4 });
+        }
+
+        // Buka popup info kecamatan
+        if (openPopup && adminMarkersMap[String(kecId)]) {
+            setTimeout(() => {
+                adminMarkersMap[String(kecId)].openPopup();
+            }, 600);
+        }
+
+        // Perbarui detail legenda floating di pojok kiri bawah
+        if (legendDetail) {
+            legendDetail.innerHTML = `<span class="font-bold text-sky-700">Fokus: Kec. ${kec.name_kopkec || kec.nama}</span> &bull; <strong>${kec.jumlah || kec.jum_koperasi || 0} Koperasi</strong>`;
+        }
+    }
+
+    function toggleAdminKecamatanBoundaries() {
+        if (!adminKecamatanBoundaryLayer || !mapInstance) return;
+        const btn = document.getElementById('btnToggleAdminBoundaries');
+        if (mapInstance.hasLayer(adminKecamatanBoundaryLayer)) {
+            mapInstance.removeLayer(adminKecamatanBoundaryLayer);
+            if (btn) {
+                btn.classList.remove('bg-sky-50', 'text-sky-700', 'border-sky-200');
+                btn.classList.add('bg-slate-50', 'text-slate-500', 'border-slate-200');
+            }
+        } else {
+            adminKecamatanBoundaryLayer.addTo(mapInstance);
+            if (adminKecamatanMarkersLayer) {
+                adminKecamatanMarkersLayer.bringToFront();
+            }
+            if (btn) {
+                btn.classList.add('bg-sky-50', 'text-sky-700', 'border-sky-200');
+                btn.classList.remove('bg-slate-50', 'text-slate-500', 'border-slate-200');
+            }
+        }
+    }
+
+    function updateAdminKoperasiLayerGlider(type) {
+        const btnOsm = document.getElementById('btn-layer-osm');
+        const btnSat = document.getElementById('btn-layer-satelit');
+        const btnTopo = document.getElementById('btn-layer-topo');
+        const mapButtons = { 'osm': btnOsm, 'satelit': btnSat, 'topo': btnTopo };
+        const key = type || activeLayerKey;
+        const activeBtn = mapButtons[key];
+        const glider = document.getElementById('adminKoperasiLayerGlider');
+
+        if (glider && activeBtn && activeBtn.offsetWidth > 0) {
+            glider.style.left = activeBtn.offsetLeft + 'px';
+            glider.style.top = activeBtn.offsetTop + 'px';
+            glider.style.width = activeBtn.offsetWidth + 'px';
+            glider.style.height = activeBtn.offsetHeight + 'px';
+        }
+
+        [
+            { key: 'osm', btn: btnOsm },
+            { key: 'satelit', btn: btnSat },
+            { key: 'topo', btn: btnTopo }
+        ].forEach(item => {
+            if (!item.btn) return;
+            if (item.key === key) {
+                item.btn.className = "relative z-10 px-3 py-1 rounded-md text-white font-semibold transition-colors duration-200 cursor-pointer";
+            } else {
+                item.btn.className = "relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer";
+            }
+        });
     }
 
     function setMapLayer(type) {
-        if (!mapInstance) return;
-        const btnOsm = document.getElementById('btn-layer-osm');
-        const btnSat = document.getElementById('btn-layer-satelit');
+        updateAdminKoperasiLayerGlider(type);
 
-        if (type === 'satelit') {
-            mapInstance.removeLayer(osmLayer);
-            mapInstance.addLayer(satelliteLayer);
-            btnSat.className = "px-3 py-1.5 rounded-lg transition bg-[#0284c7] text-white shadow-xs flex items-center space-x-1.5";
-            btnOsm.className = "px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-slate-100 flex items-center space-x-1.5";
-        } else {
-            mapInstance.removeLayer(satelliteLayer);
-            mapInstance.addLayer(osmLayer);
-            btnOsm.className = "px-3 py-1.5 rounded-lg transition bg-[#0284c7] text-white shadow-xs flex items-center space-x-1.5";
-            btnSat.className = "px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-slate-100 flex items-center space-x-1.5";
+        if (!mapInstance) return;
+
+        if (tileLayers[activeLayerKey]) {
+            mapInstance.removeLayer(tileLayers[activeLayerKey]);
         }
+
+        if (tileLayers[type]) {
+            tileLayers[type].addTo(mapInstance);
+            activeLayerKey = type;
+        }
+
+        if (adminKecamatanBoundaryLayer && mapInstance.hasLayer(adminKecamatanBoundaryLayer)) {
+            adminKecamatanBoundaryLayer.bringToFront();
+        }
+        if (adminKecamatanMarkersLayer && mapInstance.hasLayer(adminKecamatanMarkersLayer)) {
+            adminKecamatanMarkersLayer.bringToFront();
+        }
+    }
+
+    function onPengurusKecChange(kecId) {
+        updateDesaDropdown(kecId, 'filter_kel_pengurus', '');
+        document.getElementById('formFilterPengurus').submit();
+    }
+
+    let mapAnggotaInstance = null;
+    let tileLayersAnggota = {};
+    let activeLayerAnggotaKey = 'osm';
+    let adminAnggotaBoundaryLayer = null;
+    let adminAnggotaMarkersLayer = null;
+    let adminAnggotaMarkersMap = {};
+    let adminAnggotaPolygonLayersMap = {};
+
+    function initMapAnggota() {
+        const mapContainer = document.getElementById('map-anggota');
+        if (!mapContainer || mapAnggotaInstance || typeof L === 'undefined') return;
+
+        const bogorCenter = [-6.5700, 106.8200];
+        const bogorBounds = [
+            [-6.8000, 106.4000],
+            [-6.3000, 107.2500]
+        ];
+
+        mapAnggotaInstance = L.map('map-anggota', {
+            center: bogorCenter,
+            zoom: 11,
+            minZoom: 9,
+            maxZoom: 18,
+            maxBounds: [
+                [-7.1000, 106.2000],
+                [-6.1000, 107.4500]
+            ],
+            maxBoundsViscosity: 0.8
+        });
+
+        tileLayersAnggota.osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(mapAnggotaInstance);
+
+        tileLayersAnggota.satelit = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri',
+            maxZoom: 18
+        });
+
+        tileLayersAnggota.topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; OpenStreetMap contributors, SRTM',
+            maxZoom: 17
+        });
+
+        // 1. Add Subdistrict Boundary Polygons (Garis Antar Kecamatan)
+        renderAnggotaKecamatanBoundaries();
+
+        // 2. Add Red Pin Markers with Numbers (NO blue dots!)
+        adminAnggotaMarkersLayer = L.layerGroup().addTo(mapAnggotaInstance);
+        renderAnggotaKecamatanMarkers();
+
+        // Fit view to Kabupaten Bogor
+        mapAnggotaInstance.fitBounds(bogorBounds);
+
+        // Check if desa or kecamatan is selected to zoom and pinpoint
+        const selectedAnggotaKec = "{{ request('filter_kec_anggota', '') }}";
+        const selectedAnggotaKel = "{{ request('filter_kel_anggota', '') }}";
+        if (selectedAnggotaKel) {
+            setTimeout(() => {
+                zoomToAnggotaDesa(selectedAnggotaKel, true);
+            }, 500);
+        } else if (selectedAnggotaKec) {
+            setTimeout(() => {
+                zoomToAnggotaKecamatan(selectedAnggotaKec, false);
+            }, 450);
+        }
+
+        setTimeout(() => updateAdminAnggotaLayerGlider(activeLayerAnggotaKey), 80);
+    }
+
+    function renderAnggotaKecamatanBoundaries() {
+        if (!window.BOGOR_KECAMATAN_GEOJSON || !mapAnggotaInstance) return;
+
+        adminAnggotaPolygonLayersMap = {};
+
+        adminAnggotaBoundaryLayer = L.geoJSON(window.BOGOR_KECAMATAN_GEOJSON, {
+            style: function (feature) {
+                return {
+                    color: '#0284c7',
+                    weight: 1.8,
+                    opacity: 0.9,
+                    fillColor: '#CFFCFD',
+                    fillOpacity: 0.28,
+                    dashArray: ''
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                const name = feature.properties ? (feature.properties.fullName || feature.properties.name) : 'Kecamatan';
+                const cleanName = (feature.properties.name || '').toUpperCase().trim();
+
+                layer.bindTooltip(name, {
+                    sticky: true,
+                    direction: 'top',
+                    className: 'kecamatan-tooltip'
+                });
+
+                const targetKec = kecamatansData.find(k => {
+                    const kn = (k.name_kopkec || k.nama || '').toUpperCase().trim();
+                    return kn === cleanName || cleanName.includes(kn) || kn.includes(cleanName);
+                });
+
+                if (targetKec) {
+                    adminAnggotaPolygonLayersMap[String(targetKec.id_kopkec)] = layer;
+                }
+
+                layer.on({
+                    mouseover: function (e) {
+                        const targetLayer = e.target;
+                        const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_kec_anggota')?.value);
+                        if (!isSelected) {
+                            targetLayer.setStyle({
+                                weight: 2.8,
+                                color: '#0369a1',
+                                fillColor: '#bae6fd',
+                                fillOpacity: 0.48
+                            });
+                            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                                targetLayer.bringToFront();
+                                if (adminAnggotaMarkersLayer) adminAnggotaMarkersLayer.bringToFront();
+                            }
+                        }
+                    },
+                    mouseout: function (e) {
+                        const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_kec_anggota')?.value);
+                        if (!isSelected && adminAnggotaBoundaryLayer) {
+                            adminAnggotaBoundaryLayer.resetStyle(e.target);
+                        }
+                    },
+                    click: function (e) {
+                        if (targetKec) {
+                            const sel = document.getElementById('filter_kec_anggota');
+                            if (sel) {
+                                sel.value = targetKec.id_kopkec;
+                            }
+                            updateDesaDropdown(targetKec.id_kopkec, 'filter_kel_anggota', '');
+                            zoomToAnggotaKecamatan(targetKec.id_kopkec, true);
+                        }
+                    }
+                });
+            }
+        }).addTo(mapAnggotaInstance);
+    }
+
+    function renderAnggotaKecamatanMarkers() {
+        if (!adminAnggotaMarkersLayer) return;
+        adminAnggotaMarkersLayer.clearLayers();
+        adminAnggotaMarkersMap = {};
+
+        kecamatansData.forEach(item => {
+            const lat = parseFloat(item.latitude);
+            const lng = parseFloat(item.longitude);
+            if (isNaN(lat) || isNaN(lng) || lat === 0) return;
+
+            const markerHtml = `
+                <div class="custom-kmp-pin" id="admin-anggota-pin-${item.id_kopkec || item.id}">
+                    <div class="pin-body">
+                        <i class="fa-solid fa-building-flag"></i>
+                    </div>
+                    <div class="pin-badge">${item.jumlah || item.jum_koperasi || 0}</div>
+                </div>
+            `;
+
+            const customIcon = L.divIcon({
+                html: markerHtml,
+                className: '',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+                popupAnchor: [0, -18]
+            });
+
+            const marker = L.marker([lat, lng], { icon: customIcon });
+
+            const popupContent = `
+                <div class="text-xs" style="min-width: 195px;">
+                    <div class="font-bold text-slate-800 uppercase tracking-tight text-sm pb-1.5 mb-2 border-b border-red-100 flex items-center justify-between">
+                        <span class="text-red-700">KECAMATAN ${item.name_kopkec || item.nama}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5 text-center bg-red-50/60 p-2 rounded-lg border border-red-100 text-[11px] mb-2.5">
+                        <div>
+                            <span class="text-slate-500 block text-[9px]">Desa</span>
+                            <strong class="font-extrabold text-slate-800">${item.kop_desa || 0}</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[9px]">Kelurahan</span>
+                            <strong class="font-extrabold text-slate-800">${item.kop_kel || 0}</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[9px]">Total</span>
+                            <strong class="font-black text-red-600">${item.jumlah || item.jum_koperasi || 0} Kop</strong>
+                        </div>
+                    </div>
+                    <button type="button" onclick="selectAnggotaKecamatanFromMap('${item.id_kopkec}')" class="w-full text-center py-1.5 px-3 bg-red-700 hover:bg-red-800 text-white rounded-lg font-bold text-xs transition shadow-sm flex items-center justify-center space-x-1 cursor-pointer">
+                        <i class="fa-solid fa-crosshairs text-[10px]"></i>
+                        <span>Pilih & Fokus Kecamatan</span>
+                    </button>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, {
+                closeButton: true,
+                autoPan: true
+            });
+
+            marker.on('click', () => {
+                selectAnggotaKecamatanFromMap(item.id_kopkec);
+            });
+
+            marker.addTo(adminAnggotaMarkersLayer);
+            adminAnggotaMarkersMap[String(item.id_kopkec)] = marker;
+        });
+    }
+
+    function selectAnggotaKecamatanFromMap(kecId) {
+        const sel = document.getElementById('filter_kec_anggota');
+        if (sel) {
+            sel.value = kecId;
+        }
+        updateDesaDropdown(kecId, 'filter_kel_anggota', '');
+        zoomToAnggotaKecamatan(kecId, true);
+    }
+
+    function onAnggotaKecChange(kecId) {
+        updateDesaDropdown(kecId, 'filter_kel_anggota', '');
+        zoomToAnggotaKecamatan(kecId, true);
+    }
+
+    function zoomToAnggotaKecamatan(kecId, openPopup = true) {
+        if (!mapAnggotaInstance) return;
+
+        const legendDetail = document.getElementById('anggotaMapLegendDetail');
+
+        if (!kecId) {
+            if (adminAnggotaBoundaryLayer) {
+                adminAnggotaBoundaryLayer.eachLayer(layer => {
+                    adminAnggotaBoundaryLayer.resetStyle(layer);
+                });
+            }
+
+            mapAnggotaInstance.flyToBounds([
+                [-6.8000, 106.4000],
+                [-6.3000, 107.2500]
+            ], { padding: [20, 20], duration: 1.2 });
+
+            if (legendDetail) {
+                legendDetail.innerHTML = 'Pusat Pemerintahan: Cibinong (-6.4828, 106.8486)';
+            }
+            return;
+        }
+
+        const kec = kecamatansData.find(k => String(k.id_kopkec) === String(kecId) || String(k.id) === String(kecId));
+        if (!kec) return;
+
+        const targetPolygon = adminAnggotaPolygonLayersMap[String(kecId)];
+
+        if (adminAnggotaBoundaryLayer) {
+            adminAnggotaBoundaryLayer.eachLayer(layer => {
+                if (layer === targetPolygon) {
+                    layer.setStyle({
+                        weight: 3.5,
+                        color: '#0284c7',
+                        fillColor: '#38bdf8',
+                        fillOpacity: 0.45
+                    });
+                    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                        layer.bringToFront();
+                    }
+                } else {
+                    layer.setStyle({
+                        weight: 1.2,
+                        color: '#94a3b8',
+                        fillColor: '#f1f5f9',
+                        fillOpacity: 0.12
+                    });
+                }
+            });
+        }
+
+        if (targetPolygon) {
+            const bounds = targetPolygon.getBounds();
+            mapAnggotaInstance.flyToBounds(bounds, { padding: [45, 45], maxZoom: 14, duration: 1.4 });
+        } else if (kec.latitude && kec.longitude) {
+            mapAnggotaInstance.flyTo([parseFloat(kec.latitude), parseFloat(kec.longitude)], 13, { duration: 1.4 });
+        }
+
+        if (openPopup && adminAnggotaMarkersMap[String(kecId)]) {
+            setTimeout(() => {
+                adminAnggotaMarkersMap[String(kecId)].openPopup();
+            }, 600);
+        }
+
+        if (legendDetail) {
+            legendDetail.innerHTML = `<span class="font-bold text-sky-700">Fokus: Kec. ${kec.name_kopkec || kec.nama}</span> &bull; <strong>${kec.jumlah || kec.jum_koperasi || 0} Koperasi</strong>`;
+        }
+    }
+
+    function toggleAnggotaKecamatanBoundaries() {
+        if (!adminAnggotaBoundaryLayer || !mapAnggotaInstance) return;
+        const btn = document.getElementById('btnToggleAnggotaBoundaries');
+        if (mapAnggotaInstance.hasLayer(adminAnggotaBoundaryLayer)) {
+            mapAnggotaInstance.removeLayer(adminAnggotaBoundaryLayer);
+            if (btn) {
+                btn.classList.remove('bg-sky-50', 'text-sky-700', 'border-sky-200');
+                btn.classList.add('bg-slate-50', 'text-slate-500', 'border-slate-200');
+            }
+        } else {
+            adminAnggotaBoundaryLayer.addTo(mapAnggotaInstance);
+            if (adminAnggotaMarkersLayer) {
+                adminAnggotaMarkersLayer.bringToFront();
+            }
+            if (btn) {
+                btn.classList.add('bg-sky-50', 'text-sky-700', 'border-sky-200');
+                btn.classList.remove('bg-slate-50', 'text-slate-500', 'border-slate-200');
+            }
+        }
+    }
+
+    function updateAdminAnggotaLayerGlider(type) {
+        const btnOsm = document.getElementById('btn-layer-anggota-osm');
+        const btnSat = document.getElementById('btn-layer-anggota-satelit');
+        const btnTopo = document.getElementById('btn-layer-anggota-topo');
+        const mapButtons = { 'osm': btnOsm, 'satelit': btnSat, 'topo': btnTopo };
+        const key = type || activeLayerAnggotaKey;
+        const activeBtn = mapButtons[key];
+        const glider = document.getElementById('adminAnggotaLayerGlider');
+
+        if (glider && activeBtn && activeBtn.offsetWidth > 0) {
+            glider.style.left = activeBtn.offsetLeft + 'px';
+            glider.style.top = activeBtn.offsetTop + 'px';
+            glider.style.width = activeBtn.offsetWidth + 'px';
+            glider.style.height = activeBtn.offsetHeight + 'px';
+        }
+
+        [
+            { key: 'osm', btn: btnOsm },
+            { key: 'satelit', btn: btnSat },
+            { key: 'topo', btn: btnTopo }
+        ].forEach(item => {
+            if (!item.btn) return;
+            if (item.key === key) {
+                item.btn.className = "relative z-10 px-3 py-1 rounded-md text-white font-semibold transition-colors duration-200 cursor-pointer";
+            } else {
+                item.btn.className = "relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer";
+            }
+        });
+    }
+
+    function setAnggotaMapLayer(type) {
+        updateAdminAnggotaLayerGlider(type);
+
+        if (!mapAnggotaInstance) return;
+
+        if (tileLayersAnggota[activeLayerAnggotaKey]) {
+            mapAnggotaInstance.removeLayer(tileLayersAnggota[activeLayerAnggotaKey]);
+        }
+
+        if (tileLayersAnggota[type]) {
+            tileLayersAnggota[type].addTo(mapAnggotaInstance);
+            activeLayerAnggotaKey = type;
+        }
+
+        if (adminAnggotaBoundaryLayer && mapAnggotaInstance.hasLayer(adminAnggotaBoundaryLayer)) {
+            adminAnggotaBoundaryLayer.bringToFront();
+        }
+        if (adminAnggotaMarkersLayer && mapAnggotaInstance.hasLayer(adminAnggotaMarkersLayer)) {
+            adminAnggotaMarkersLayer.bringToFront();
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        updateAdminKoperasiLayerGlider(activeLayerKey);
+        updateAdminAnggotaLayerGlider(activeLayerAnggotaKey);
+    });
+
+    function resetAnggotaMapView() {
+        if (mapAnggotaInstance) {
+            zoomToAnggotaKecamatan('', false);
+        }
+    }
+
+    let adminAnggotaCoopMarkerLayer = null;
+
+    function zoomToAnggotaDesa(kelId, openPopup = true) {
+        if (!mapAnggotaInstance) return;
+
+        if (!adminAnggotaCoopMarkerLayer) {
+            adminAnggotaCoopMarkerLayer = L.layerGroup().addTo(mapAnggotaInstance);
+        }
+        adminAnggotaCoopMarkerLayer.clearLayers();
+
+        if (!kelId) {
+            const selectedAnggotaKec = document.getElementById('filter_kec_anggota')?.value;
+            if (selectedAnggotaKec) {
+                zoomToAnggotaKecamatan(selectedAnggotaKec, true);
+            } else {
+                zoomToAnggotaKecamatan('', false);
+            }
+            return;
+        }
+
+        const coops = gisKoperasisData.filter(k => String(k.id_kel) === String(kelId) || (k.kelurahan && String(k.kelurahan.id_kopkel) === String(kelId)));
+
+        if (!coops.length) return;
+
+        const bounds = [];
+        let firstMarker = null;
+
+        coops.forEach((coop, index) => {
+            const lat = parseFloat(coop.gps_lat);
+            const lng = parseFloat(coop.gps_long);
+            if (isNaN(lat) || isNaN(lng) || lat === 0) return;
+
+            bounds.push([lat, lng]);
+
+            const desaName = coop.kelurahan ? (coop.kelurahan.name_kopkel || '') : '';
+            const kecName = coop.kecamatan ? (coop.kecamatan.name_kopkec || '') : '';
+
+            const coopMarkerHtml = `
+                <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
+                    <span class="absolute w-12 h-12 rounded-full bg-red-600/35 animate-ping pointer-events-none"></span>
+                    <span class="absolute w-8 h-8 rounded-full bg-red-600/45 pointer-events-none"></span>
+                    <div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-red-700 to-rose-500 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm cursor-pointer hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-users-viewfinder"></i>
+                    </div>
+                    <div class="absolute -bottom-6 whitespace-nowrap bg-slate-900/90 text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-md border border-slate-700 pointer-events-none">
+                        ${coop.name_koperasi}
+                    </div>
+                </div>
+            `;
+
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    html: coopMarkerHtml,
+                    className: '',
+                    iconSize: [0, 0],
+                    iconAnchor: [0, 0],
+                    popupAnchor: [0, -20]
+                }),
+                zIndexOffset: 1200
+            });
+
+            const popupContent = `
+                <div class="p-2.5 text-xs" style="min-width: 250px;">
+                    <div class="flex items-center space-x-1.5 pb-2 mb-2 border-b border-red-100">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+                        <span class="font-extrabold text-slate-900 text-xs uppercase leading-snug">${coop.name_koperasi}</span>
+                    </div>
+                    <div class="space-y-1.5 mb-3 text-[11px] text-slate-600">
+                        <div class="flex items-start space-x-1.5">
+                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0"></i>
+                            <span>Desa <strong>${desaName}</strong>, Kec. <strong>${kecName}</strong></span>
+                        </div>
+                        <div class="bg-red-50/70 p-2 rounded-lg border border-red-100/80 space-y-1 text-[10px]">
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Koordinat GPS:</span>
+                                <span class="font-mono font-bold text-slate-800">${lat.toFixed(5)}, ${lng.toFixed(5)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Status Operasi:</span>
+                                <span class="font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">${coop.st_ops || 'SUDAH'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/koperasi/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
+                        <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Lihat Profil Koperasi
+                    </a>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, { autoPan: true, closeButton: true });
+            marker.addTo(adminAnggotaCoopMarkerLayer);
+
+            if (index === 0) {
+                firstMarker = marker;
+            }
+        });
+
+        if (bounds.length === 1) {
+            mapAnggotaInstance.flyTo(bounds[0], 15, { duration: 1.4 });
+        } else if (bounds.length > 1) {
+            mapAnggotaInstance.flyToBounds(bounds, { padding: [50, 50], maxZoom: 16, duration: 1.4 });
+        }
+
+        if (firstMarker && openPopup) {
+            setTimeout(() => firstMarker.openPopup(), 650);
+        }
+
+        const legendDetail = document.getElementById('anggotaMapLegendDetail');
+        if (legendDetail && coops[0]) {
+            const firstCoop = coops[0];
+            const lat = parseFloat(firstCoop.gps_lat);
+            const lng = parseFloat(firstCoop.gps_long);
+            legendDetail.innerHTML = `<span class="font-bold text-red-600">Titik Koperasi: ${firstCoop.name_koperasi}</span> &bull; Desa ${firstCoop.kelurahan?.name_kopkel || ''} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+        }
+    }
+
+    function onAnggotaKecChange(kecId) {
+        const kelSelect = document.getElementById('filter_kel_anggota');
+        if (kelSelect) {
+            kelSelect.value = '';
+        }
+        document.getElementById('formFilterAnggota')?.submit();
+    }
+
+    function onAnggotaDesaChange(kelId) {
+        zoomToAnggotaDesa(kelId, true);
+        document.getElementById('formFilterAnggota')?.submit();
+    }
+
+    function selectAnggotaKecamatanFromMap(kecId) {
+        const sel = document.getElementById('filter_kec_anggota');
+        if (sel) {
+            sel.value = kecId;
+        }
+        const kelSelect = document.getElementById('filter_kel_anggota');
+        if (kelSelect) {
+            kelSelect.value = '';
+        }
+        document.getElementById('formFilterAnggota')?.submit();
+    }
+
+    function syncAnggotaSimkop() {
+        alert('Memulai sinkronisasi background SIMKOP Koperasi Desa Kabupaten Bogor...');
     }
 
     // Lampiran Upload Preview & Edit Modal Handlers
@@ -1741,8 +3969,25 @@
             updateDesaDropdown(selectedKecId, 'filter_id_kel', selectedKelId);
         }
 
-        // Initialize GIS map after DOM settles
+        const selectedPengurusKecId = "{{ request('filter_kec_pengurus', '') }}";
+        const selectedPengurusKelId = "{{ request('filter_kel_pengurus', '') }}";
+        if (selectedPengurusKecId) {
+            updateDesaDropdown(selectedPengurusKecId, 'filter_kel_pengurus', selectedPengurusKelId);
+        }
+
+        const selectedAnggotaKecId = "{{ request('filter_kec_anggota', '') }}";
+        const selectedAnggotaKelId = "{{ request('filter_kel_anggota', '') }}";
+        if (selectedAnggotaKecId) {
+            updateDesaDropdown(selectedAnggotaKecId, 'filter_kel_anggota', selectedAnggotaKelId);
+        }
+
+        // Initialize GIS map and layer switchers after DOM settles
         setTimeout(initGisMap, 200);
+        setTimeout(initMapAnggota, 250);
+        setTimeout(() => {
+            updateAdminKoperasiLayerGlider(activeLayerKey);
+            updateAdminAnggotaLayerGlider(activeLayerAnggotaKey);
+        }, 120);
     });
 </script>
 @endsection

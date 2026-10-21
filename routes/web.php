@@ -228,10 +228,17 @@ Route::post('/logout', function (Request $request) {
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::post('/koperasi', [AdminController::class, 'storeKoperasi'])->name('admin.koperasi.store');
+    Route::put('/koperasi/{koperasi}', [AdminController::class, 'updateKoperasi'])->name('admin.koperasi.update');
+    Route::delete('/koperasi/{koperasi}', [AdminController::class, 'destroyKoperasi'])->name('admin.koperasi.destroy');
+    Route::post('/koperasi/{koperasi}/usaha', [AdminController::class, 'updateUsahaKoperasi'])->name('admin.koperasi.usaha');
+    Route::post('/koperasi/{koperasi}/foto', [AdminController::class, 'uploadFotoKoperasi'])->name('admin.koperasi.foto');
     Route::get('/koperasi/export', [AdminController::class, 'exportKoperasi'])->name('admin.koperasi.export');
-
     // Lampiran Informasi routes
     Route::post('/lampiran', [AdminController::class, 'storeLampiran'])->name('admin.lampiran.store');
     Route::put('/lampiran/{lampiran}', [AdminController::class, 'updateLampiran'])->name('admin.lampiran.update');
     Route::delete('/lampiran/{lampiran}', [AdminController::class, 'destroyLampiran'])->name('admin.lampiran.destroy');
+
+    Route::post('/pengurus', [AdminController::class, 'storePengurus'])->name('admin.pengurus.store');
+    Route::get('/pengurus/export', [AdminController::class, 'exportPengurus'])->name('admin.pengurus.export');
+    Route::get('/anggota/export', [AdminController::class, 'exportAnggota'])->name('admin.anggota.export');
 });

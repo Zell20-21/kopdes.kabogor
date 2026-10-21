@@ -944,14 +944,22 @@
 
                     <!-- Map Layer Switches -->
                     <div class="flex items-center space-x-1 bg-white p-1 rounded-lg border border-slate-200 shadow-sm text-xs font-semibold">
-                        <button type="button" onclick="switchMapLayer('osm')" id="btnLayerOsm" class="px-3 py-1 rounded-md bg-red-600 text-white transition">
-                            POS
-                        </button>
-                        <button type="button" onclick="switchMapLayer('satellite')" id="btnLayerSat" class="px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 transition">
-                            Satelit
-                        </button>
-                        <button type="button" onclick="switchMapLayer('topo')" id="btnLayerTopo" class="px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 transition">
-                            Topografi
+                        <div class="relative flex items-center p-0.5 bg-slate-100/80 rounded-lg border border-slate-200/60" id="publicLayerWrapper">
+                            <div id="publicLayerGlider" class="absolute rounded-md bg-red-600 shadow-xs transition-all duration-300 ease-in-out pointer-events-none" style="left: 2px; top: 2px; width: 44px; height: 26px;"></div>
+                            <button type="button" onclick="switchMapLayer('osm')" id="btnLayerOsm" class="relative z-10 px-3 py-1 rounded-md text-white font-semibold transition-colors duration-200 cursor-pointer">
+                                POS
+                            </button>
+                            <button type="button" onclick="switchMapLayer('satellite')" id="btnLayerSat" class="relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer">
+                                Satelit
+                            </button>
+                            <button type="button" onclick="switchMapLayer('topo')" id="btnLayerTopo" class="relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer">
+                                Topografi
+                            </button>
+                        </div>
+                        <div class="h-4 w-px bg-slate-200 mx-1"></div>
+                        <button type="button" onclick="toggleKecamatanBoundaries()" id="btnToggleBoundaries" title="Tampilkan / Sembunyikan Garis Batas Antar Kecamatan" class="px-2.5 py-1 rounded-md bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition flex items-center space-x-1 text-xs">
+                            <i class="fa-solid fa-draw-polygon text-[10px]"></i>
+                            <span class="hidden sm:inline">Batas Kecamatan</span>
                         </button>
                     </div>
                 </div>
@@ -965,6 +973,10 @@
                         <div class="font-bold text-slate-800 flex items-center space-x-1.5">
                             <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
                             <span>Wilayah: Kabupaten Bogor</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5 text-[10px] text-sky-700 font-semibold pt-0.5 border-t border-slate-100">
+                            <span class="w-3 h-1 bg-sky-500 rounded-sm"></span>
+                            <span>Batas 40 Kecamatan</span>
                         </div>
                         <div class="text-[10px] text-slate-500">
                             Pusat Pemerintahan: Cibinong (-6.4828, 106.8486)
@@ -1382,10 +1394,26 @@
     .animate-slide-down {
         animation: slideDownFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+    .kecamatan-tooltip {
+        background: rgba(15, 23, 42, 0.90) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        letter-spacing: 0.02em !important;
+        padding: 4px 8px !important;
+        border-radius: 6px !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    }
+    .kecamatan-tooltip::before {
+        border-top-color: rgba(15, 23, 42, 0.90) !important;
+    }
 </style>
 @endpush
 
 @push('scripts')
+<script src="{{ asset('js/bogor-kecamatan.js') }}"></script>
 <script src="{{ asset('js/xlsx.full.min.js') }}"></script>
 <script>
     // Data from Laravel Backend
@@ -1395,6 +1423,7 @@
 
     let map;
     let markersLayer;
+    let kecamatanBoundaryLayer;
     let tileLayers = {};
     let activeLayerKey = 'osm';
     let currentFacilityFilter = null;
@@ -1550,36 +1579,25 @@
         // Add default layer (OSM Positron / Voyager)
         tileLayers.osm.addTo(map);
 
-        // Add subtle polygon boundary for Kabupaten Bogor visualization
-        const bogorPolygon = [
-            [-6.350, 106.500],
-            [-6.340, 106.650],
-            [-6.380, 106.850],
-            [-6.380, 107.000],
-            [-6.450, 107.160],
-            [-6.650, 107.220],
-            [-6.750, 107.100],
-            [-6.780, 106.920],
-            [-6.760, 106.800],
-            [-6.730, 106.600],
-            [-6.650, 106.420],
-            [-6.450, 106.420],
-            [-6.350, 106.500]
-        ];
-
-        L.polygon(bogorPolygon, {
-            color: '#dc2626',
-            weight: 2,
-            opacity: 0.5,
-            dashArray: '6, 6',
-            fillColor: '#fee2e2',
-            fillOpacity: 0.08
-        }).addTo(map);
+        // Add Subdistrict Boundary Polygons (Garis Antar Kecamatan Kabupaten Bogor)
+        renderKecamatanBoundaries();
 
         // Markers group
         markersLayer = L.layerGroup().addTo(map);
 
         renderKecamatanMarkers();
+
+        // Layer Control matching kdkmp.bogorkab.go.id screenshot
+        const baseMaps = {
+            "OpenStreetMap": tileLayers.osm,
+            "Satelit": tileLayers.satellite,
+            "Topografi": tileLayers.topo
+        };
+        const overlayMaps = {
+            "Batas Kecamatan": kecamatanBoundaryLayer,
+            "Sebaran Koperasi": markersLayer
+        };
+        L.control.layers(baseMaps, overlayMaps, { position: 'topright' }).addTo(map);
 
         // Fit to Kabupaten Bogor
         map.fitBounds(bogorBounds);
@@ -1590,6 +1608,89 @@
             setTimeout(() => {
                 focusMarker(cisarua.id, false);
             }, 500);
+        }
+
+        setTimeout(() => updatePublicLayerGlider(activeLayerKey), 60);
+    }
+
+    function renderKecamatanBoundaries() {
+        if (!window.BOGOR_KECAMATAN_GEOJSON) {
+            console.warn('Data GeoJSON batas kecamatan belum tersedia.');
+            return;
+        }
+
+        kecamatanBoundaryLayer = L.geoJSON(window.BOGOR_KECAMATAN_GEOJSON, {
+            style: function (feature) {
+                return {
+                    color: '#0284c7', // Cyan/sky blue border matching kdkmp.bogorkab.go.id
+                    weight: 1.8,
+                    opacity: 0.9,
+                    fillColor: '#CFFCFD', // Soft cyan wash
+                    fillOpacity: 0.28,
+                    dashArray: ''
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                const name = feature.properties ? (feature.properties.fullName || feature.properties.name) : 'Kecamatan';
+
+                layer.bindTooltip(name, {
+                    sticky: true,
+                    direction: 'top',
+                    className: 'kecamatan-tooltip'
+                });
+
+                layer.on({
+                    mouseover: function (e) {
+                        const targetLayer = e.target;
+                        targetLayer.setStyle({
+                            weight: 2.8,
+                            color: '#0369a1',
+                            fillColor: '#bae6fd',
+                            fillOpacity: 0.48
+                        });
+                        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                            targetLayer.bringToFront();
+                            if (markersLayer) markersLayer.bringToFront();
+                        }
+                    },
+                    mouseout: function (e) {
+                        if (kecamatanBoundaryLayer) {
+                            kecamatanBoundaryLayer.resetStyle(e.target);
+                        }
+                    },
+                    click: function (e) {
+                        const cleanName = (feature.properties.name || '').toUpperCase().trim();
+                        const targetKec = kecamatansData.find(k => {
+                            const kn = k.nama.toUpperCase().trim();
+                            return kn === cleanName || cleanName.includes(kn) || kn.includes(cleanName);
+                        });
+                        if (targetKec) {
+                            focusMarker(targetKec.id, true);
+                        }
+                    }
+                });
+            }
+        }).addTo(map);
+    }
+
+    function toggleKecamatanBoundaries() {
+        if (!kecamatanBoundaryLayer) return;
+        const btn = document.getElementById('btnToggleBoundaries');
+        if (map.hasLayer(kecamatanBoundaryLayer)) {
+            map.removeLayer(kecamatanBoundaryLayer);
+            if (btn) {
+                btn.classList.remove('bg-sky-50', 'text-sky-700', 'border-sky-200');
+                btn.classList.add('bg-slate-50', 'text-slate-500', 'border-slate-200');
+            }
+        } else {
+            kecamatanBoundaryLayer.addTo(map);
+            if (markersLayer) {
+                markersLayer.bringToFront();
+            }
+            if (btn) {
+                btn.classList.add('bg-sky-50', 'text-sky-700', 'border-sky-200');
+                btn.classList.remove('bg-slate-50', 'text-slate-500', 'border-slate-200');
+            }
         }
     }
 
@@ -1859,23 +1960,48 @@
         }
     }
 
-    function switchMapLayer(layerName) {
-        if (layerName === activeLayerKey) return;
+    function updatePublicLayerGlider(layerName) {
+        const key = layerName || activeLayerKey;
+        const keyMap = {
+            'osm': 'btnLayerOsm',
+            'satellite': 'btnLayerSat',
+            'topo': 'btnLayerTopo'
+        };
+        const activeBtn = document.getElementById(keyMap[key]);
+        const glider = document.getElementById('publicLayerGlider');
+        if (glider && activeBtn && activeBtn.offsetWidth > 0) {
+            glider.style.left = activeBtn.offsetLeft + 'px';
+            glider.style.top = activeBtn.offsetTop + 'px';
+            glider.style.width = activeBtn.offsetWidth + 'px';
+            glider.style.height = activeBtn.offsetHeight + 'px';
+        }
 
-        map.removeLayer(tileLayers[activeLayerKey]);
-        tileLayers[layerName].addTo(map);
-        activeLayerKey = layerName;
-
-        // Update button styles
-        ['Osm', 'Sat', 'Topo'].forEach(key => {
-            const btn = document.getElementById('btnLayer' + key);
-            if (key.toLowerCase() === (layerName === 'satellite' ? 'sat' : layerName)) {
-                btn.className = "px-3 py-1 rounded-md bg-red-600 text-white transition";
+        ['btnLayerOsm', 'btnLayerSat', 'btnLayerTopo'].forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            if (activeBtn && btnId === activeBtn.id) {
+                btn.className = "relative z-10 px-3 py-1 rounded-md text-white font-semibold transition-colors duration-200 cursor-pointer";
             } else {
-                btn.className = "px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 transition";
+                btn.className = "relative z-10 px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200 cursor-pointer";
             }
         });
     }
+
+    function switchMapLayer(layerName) {
+        updatePublicLayerGlider(layerName);
+
+        if (layerName === activeLayerKey) return;
+
+        if (map && tileLayers[activeLayerKey] && tileLayers[layerName]) {
+            map.removeLayer(tileLayers[activeLayerKey]);
+            tileLayers[layerName].addTo(map);
+            activeLayerKey = layerName;
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        updatePublicLayerGlider(activeLayerKey);
+    });
 
     function zoomToKecamatan(kecId) {
         if (kecId === 'all') {
