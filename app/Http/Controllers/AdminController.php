@@ -28,6 +28,9 @@ class AdminController extends Controller
         $user = $request->user();
         $isOperator = $user->isOperatorDesa() || $user->isOperatorKecamatan();
         $activeTab = $request->get('tab', 'informasi');
+        if ($user->isOperatorKecamatan() && $activeTab === 'lampiran') {
+            $activeTab = 'informasi';
+        }
 
         // Scoping based on user role
         $baseQuery = Koperasi::query()->where('flag_del', 0);
@@ -55,6 +58,13 @@ class AdminController extends Controller
         // Aggregated statistics for Informasi Koperasi (GovTech KOP)
         $totalKoperasi = (clone $baseQuery)->count();
         $totalAnggota = (clone $baseQuery)->sum('jum_anggota');
+        $simpananTotals = (clone $baseQuery)
+            ->selectRaw(
+                'COALESCE(SUM(jum_sim_pokok), 0) as total_simpanan_pokok, COALESCE(SUM(jum_sim_wajib), 0) as total_simpanan_wajib'
+            )
+            ->first();
+        $totalSimpananPokok = (int) $simpananTotals->total_simpanan_pokok;
+        $totalSimpananWajib = (int) $simpananTotals->total_simpanan_wajib;
 
         $opsSudah = (clone $baseQuery)->where('st_ops', 'SUDAH')->count();
         $opsBelum = (clone $baseQuery)->where('st_ops', 'BELUM')->count();
@@ -146,6 +156,12 @@ class AdminController extends Controller
             ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'));
 
         $totalPengurusCount = (clone $pengurusBaseQuery)->count();
+        $totalPengawasKoperasi = (clone $pengurusBaseQuery)
+            ->where('type_kopsdm', 'PENGAWAS')
+            ->count();
+        $totalPengurusKoperasi = (clone $pengurusBaseQuery)
+            ->where('type_kopsdm', 'PENGURUS')
+            ->count();
         $ketuaCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%KETUA KOPERASI%')->count();
         $sekretarisCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%SEKRETARIS%')->where('jab_kopsdm', 'not like', '%WAKIL%')->count();
         $bendaharaCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%BENDAHARA%')->where('jab_kopsdm', 'not like', '%WAKIL%')->count();
@@ -196,6 +212,59 @@ class AdminController extends Controller
         $pengurusFotoOptions = $user->isOperatorDesa()
             ? Kopsdm::where('flag_del', 0)
                 ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'))
+                ->orderBy('id_koperasi')
+                ->orderBy('order_kopsdm')
+                ->orderBy('id_kopsdm')
+                ->get()
+            : collect();
+        $jenisUsahaOptions = [
+            ['id' => 1, 'name' => 'GERAI SEMBAKO', 'icon' => 'fa-store'],
+            ['id' => 2, 'name' => 'GERAI APOTEK DESA', 'icon' => 'fa-prescription-bottle-medical'],
+            ['id' => 3, 'name' => 'GERAI KANTOR KOPERASI', 'icon' => 'fa-building-columns'],
+            ['id' => 4, 'name' => 'GERAI UNIT USAHA SIMPAN PINJAM', 'icon' => 'fa-hand-holding-dollar'],
+            ['id' => 5, 'name' => 'GERAI KLINIK DESA', 'icon' => 'fa-kit-medical'],
+            ['id' => 6, 'name' => 'GERAI COLD STORAGE/COLD CHAIN', 'icon' => 'fa-snowflake'],
+            ['id' => 7, 'name' => 'GERAI LOGISTIK (DISTRIBUSI)', 'icon' => 'fa-truck-ramp-box'],
+            ['id' => 8, 'name' => 'GERAI USAHA LAINNYA (KBLI 2020)', 'icon' => 'fa-boxes-stacked'],
+            ['id' => 9, 'name' => 'GERAI KIOS PUPUK', 'icon' => 'fa-seedling'],
+            ['id' => 10, 'name' => 'GERAI PANGKALAN LPG', 'icon' => 'fa-fire-flame-simple'],
+            ['id' => 11, 'name' => 'GERAI AGEN POS INDONESIA', 'icon' => 'fa-envelope-open-text'],
+            ['id' => 12, 'name' => 'GERAI AGEN LAKU PANDAI', 'icon' => 'fa-wallet'],
+            ['id' => 13, 'name' => 'AKUN MICROSITE', 'icon' => 'fa-globe'],
+        ];
+        $operatorKoperasiProfiles = $user->isOperatorDesa()
+            ? (clone $baseQuery)
+                ->with(['kecamatan', 'kelurahan'])
+                ->orderBy('name_koperasi')
+                ->get()
+                ->map(function (Koperasi $koperasi) use ($jenisUsahaOptions): array {
+                    $selectedUsahaIds = collect($jenisUsahaOptions)
+                        ->filter(fn (array $usaha): bool => strtoupper((string) $koperasi->getAttribute('id_koperasitype'.$usaha['id'])) === 'YES')
+                        ->pluck('id')
+                        ->all();
+
+                    return [
+                        'koperasi' => $koperasi,
+                        'selected_usaha_ids' => $selectedUsahaIds,
+                    ];
+                })
+            : collect();
+        $totalJenisUsaha = $operatorKoperasiProfiles->sum(
+            fn (array $profile): int => count($profile['selected_usaha_ids'])
+        );
+        $operatorPengurus = $user->isOperatorDesa()
+            ? (clone $pengurusBaseQuery)
+                ->where('type_kopsdm', 'PENGURUS')
+                ->with('koperasi')
+                ->orderBy('id_koperasi')
+                ->orderBy('order_kopsdm')
+                ->orderBy('id_kopsdm')
+                ->get()
+            : collect();
+        $operatorPengawas = $user->isOperatorDesa()
+            ? (clone $pengurusBaseQuery)
+                ->where('type_kopsdm', 'PENGAWAS')
+                ->with('koperasi')
                 ->orderBy('id_koperasi')
                 ->orderBy('order_kopsdm')
                 ->orderBy('id_kopsdm')
@@ -406,6 +475,8 @@ class AdminController extends Controller
             'rekapTerendahNilai',
             'totalKoperasi',
             'totalAnggota',
+            'totalSimpananPokok',
+            'totalSimpananWajib',
             'opsSudah',
             'opsBelum',
             'opsSudahPersen',
@@ -424,6 +495,8 @@ class AdminController extends Controller
             'koperasis',
             'penguruses',
             'statsPengurus',
+            'totalPengawasKoperasi',
+            'totalPengurusKoperasi',
             'perPagePengurus',
             'allKoperasis',
             'anggotaKoperasis',
@@ -434,6 +507,11 @@ class AdminController extends Controller
             'anggotaRecords',
             'koperasiTypes',
             'pengurusFotoOptions',
+            'jenisUsahaOptions',
+            'operatorKoperasiProfiles',
+            'totalJenisUsaha',
+            'operatorPengurus',
+            'operatorPengawas',
             'locationPhotoKoperasis',
             'perPage',
             'lampirans'
@@ -694,14 +772,42 @@ class AdminController extends Controller
      */
     public function updateUsahaKoperasi(Request $request, Koperasi $koperasi)
     {
-        $validated = $request->validate([
-            'cat_koperasi' => 'required|string|max:255',
-        ]);
+        $hasTypesInput = $request->has('has_types_input');
+        $rules = [
+            'cat_koperasi' => [$hasTypesInput ? 'nullable' : 'required', 'string', 'max:255'],
+            'has_types_input' => ['sometimes', 'accepted'],
+            'reset_types' => ['sometimes', 'accepted'],
+        ];
 
-        $koperasi->update($validated);
+        for ($index = 1; $index <= 13; $index++) {
+            $rules["id_koperasitype{$index}"] = ['nullable', 'string', 'in:Yes'];
+        }
 
-        return redirect()->route('admin.dashboard', ['tab' => 'koperasi'])
-            ->with('success', 'Data Usaha Koperasi berhasil diperbarui.');
+        $validated = $request->validate($rules);
+        $updates = [];
+
+        if (array_key_exists('cat_koperasi', $validated)) {
+            $updates['cat_koperasi'] = $validated['cat_koperasi'];
+        }
+
+        if ($hasTypesInput) {
+            $koperasi = $this->findVisibleKoperasi($request, (int) $koperasi->id_koperasi);
+
+            for ($index = 1; $index <= 13; $index++) {
+                $key = "id_koperasitype{$index}";
+                $updates[$key] = $request->boolean('reset_types') || ! $request->boolean($key)
+                    ? 'No'
+                    : 'Yes';
+            }
+        }
+
+        $koperasi->update($updates);
+
+        $redirect = $hasTypesInput && $request->user()->isOperatorDesa()
+            ? redirect()->to(route('admin.dashboard').'#jenis-usaha')
+            : redirect()->route('admin.dashboard', ['tab' => 'koperasi']);
+
+        return $redirect->with('success', 'Data Usaha Koperasi berhasil diperbarui.');
     }
 
     /**
