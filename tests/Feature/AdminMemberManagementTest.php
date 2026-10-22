@@ -68,6 +68,44 @@ class AdminMemberManagementTest extends TestCase
         $response->assertDontSee('<aside', false);
     }
 
+    public function test_operator_desa_metrics_count_members_supervisors_and_officers_only_in_its_village(): void
+    {
+        $cooperative = $this->createCooperative(9921, 8, 1, 92191);
+        $otherVillageCooperative = $this->createCooperative(9922, 40, 1, 92192);
+        $cooperative->update([
+            'jum_sim_pokok' => 50000,
+            'jum_sim_wajib' => 10000,
+        ]);
+        $otherVillageCooperative->update([
+            'jum_sim_pokok' => 900000,
+            'jum_sim_wajib' => 800000,
+        ]);
+        $this->createManager(9921, $cooperative->id_koperasi);
+        $this->createManager(9923, $cooperative->id_koperasi, null, 'PENGAWAS');
+        $this->createManager(9922, $otherVillageCooperative->id_koperasi);
+        $this->createManager(9924, $otherVillageCooperative->id_koperasi, null, 'PENGAWAS');
+        $operator = $this->createOperatorDesa(9921, 92191);
+
+        $response = $this->actingAs($operator)->get(route('admin.dashboard'));
+
+        $response->assertOk();
+        $response->assertSeeInOrder([
+            'Total Anggota',
+            'Total Pengawas Koperasi',
+            'Total Pengurus Koperasi',
+        ]);
+        $response->assertDontSee('Total Koperasi');
+        $response->assertSee('data-dashboard-stat="members" data-value="8"', false);
+        $response->assertSee('data-dashboard-stat="supervisors" data-value="1"', false);
+        $response->assertSee('data-dashboard-stat="officers" data-value="1"', false);
+        $response->assertSee('Simpanan Pokok');
+        $response->assertSee('data-dashboard-stat="savings-principal" data-value="50000"', false);
+        $response->assertSee('Simpanan Wajib');
+        $response->assertSee('data-dashboard-stat="savings-mandatory" data-value="10000"', false);
+        $response->assertSee('50.000');
+        $response->assertSee('10.000');
+    }
+
     public function test_operator_desa_can_add_a_manager_to_its_cooperative(): void
     {
         $this->createCooperative(9912, 0);
@@ -404,14 +442,14 @@ class AdminMemberManagementTest extends TestCase
         ]);
     }
 
-    private function createManager(int $id, int $cooperativeId, ?string $photo = null): Kopsdm
+    private function createManager(int $id, int $cooperativeId, ?string $photo = null, string $type = 'PENGURUS'): Kopsdm
     {
         return Kopsdm::create([
             'id_kopsdm' => $id,
             'id_koperasi' => $cooperativeId,
             'name_kopsdm' => 'Pengurus Tes '.$id,
             'jab_kopsdm' => 'KETUA KOPERASI',
-            'type_kopsdm' => 'PENGURUS',
+            'type_kopsdm' => $type,
             'order_kopsdm' => '1',
             'comt_kopsdm' => '-',
             'foto_kopsdm' => $photo,

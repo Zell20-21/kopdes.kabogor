@@ -54,6 +54,13 @@ class AdminController extends Controller
         // Aggregated statistics for Informasi Koperasi (GovTech KOP)
         $totalKoperasi = (clone $baseQuery)->count();
         $totalAnggota = (clone $baseQuery)->sum('jum_anggota');
+        $simpananTotals = (clone $baseQuery)
+            ->selectRaw(
+                'COALESCE(SUM(jum_sim_pokok), 0) as total_simpanan_pokok, COALESCE(SUM(jum_sim_wajib), 0) as total_simpanan_wajib'
+            )
+            ->first();
+        $totalSimpananPokok = (int) $simpananTotals->total_simpanan_pokok;
+        $totalSimpananWajib = (int) $simpananTotals->total_simpanan_wajib;
 
         $opsSudah = (clone $baseQuery)->where('st_ops', 'SUDAH')->count();
         $opsBelum = (clone $baseQuery)->where('st_ops', 'BELUM')->count();
@@ -145,6 +152,12 @@ class AdminController extends Controller
             ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'));
 
         $totalPengurusCount = (clone $pengurusBaseQuery)->count();
+        $totalPengawasKoperasi = (clone $pengurusBaseQuery)
+            ->where('type_kopsdm', 'PENGAWAS')
+            ->count();
+        $totalPengurusKoperasi = (clone $pengurusBaseQuery)
+            ->where('type_kopsdm', 'PENGURUS')
+            ->count();
         $ketuaCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%KETUA KOPERASI%')->count();
         $sekretarisCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%SEKRETARIS%')->where('jab_kopsdm', 'not like', '%WAKIL%')->count();
         $bendaharaCount = (clone $pengurusBaseQuery)->where('jab_kopsdm', 'like', '%BENDAHARA%')->where('jab_kopsdm', 'not like', '%WAKIL%')->count();
@@ -300,6 +313,8 @@ class AdminController extends Controller
             'activeTab',
             'totalKoperasi',
             'totalAnggota',
+            'totalSimpananPokok',
+            'totalSimpananWajib',
             'opsSudah',
             'opsBelum',
             'opsSudahPersen',
@@ -318,6 +333,8 @@ class AdminController extends Controller
             'koperasis',
             'penguruses',
             'statsPengurus',
+            'totalPengawasKoperasi',
+            'totalPengurusKoperasi',
             'perPagePengurus',
             'allKoperasis',
             'anggotaKoperasis',

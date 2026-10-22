@@ -77,22 +77,6 @@
 
             <!-- 3 Kartu Metrik Terpadu & Interaktif -->
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <article class="group relative flex min-h-36 flex-col justify-between rounded-2xl border-t-4 border-t-rose-600 border-x border-b border-slate-200/90 bg-white p-5 shadow-xs transition duration-200 hover:-translate-y-1 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Koperasi</span>
-                        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50 text-rose-700 shadow-2xs transition group-hover:scale-105">
-                            <i class="fa-solid fa-building text-base"></i>
-                        </span>
-                    </div>
-                    <div>
-                        <p class="mt-3 text-3xl font-black text-slate-900">{{ number_format($totalKoperasi) }}</p>
-                        <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                            <i class="fa-regular fa-circle-check text-emerald-600"></i>
-                            Dalam wilayah akun Anda
-                        </p>
-                    </div>
-                </article>
-
                 <article class="group relative flex min-h-36 flex-col justify-between rounded-2xl border-t-4 border-t-red-700 border-x border-b border-slate-200/90 bg-white p-5 shadow-xs transition duration-200 hover:-translate-y-1 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Anggota</span>
@@ -101,30 +85,113 @@
                         </span>
                     </div>
                     <div>
-                        <p class="mt-3 text-3xl font-black text-slate-900">{{ number_format($totalAnggota) }}</p>
+                        <p data-dashboard-stat="members" data-value="{{ (int) $totalAnggota }}" class="mt-3 text-3xl font-black text-slate-900">{{ number_format($totalAnggota) }}</p>
                         <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
                             <i class="fa-regular fa-circle-check text-emerald-600"></i>
-                            Anggota terdata pada koperasi
+                            Anggota pada koperasi di desa Anda
+                        </p>
+                    </div>
+                </article>
+
+                <article class="group relative flex min-h-36 flex-col justify-between rounded-2xl border-t-4 border-t-amber-500 border-x border-b border-slate-200/90 bg-white p-5 shadow-xs transition duration-200 hover:-translate-y-1 hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Pengawas Koperasi</span>
+                        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-700 shadow-2xs transition group-hover:scale-105">
+                            <i class="fa-solid fa-user-shield text-base"></i>
+                        </span>
+                    </div>
+                    <div>
+                        <p data-dashboard-stat="supervisors" data-value="{{ $totalPengawasKoperasi }}" class="mt-3 text-3xl font-black text-slate-900">{{ number_format($totalPengawasKoperasi) }}</p>
+                        <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                            <i class="fa-regular fa-circle-check text-emerald-600"></i>
+                            Pengawas aktif di desa Anda
                         </p>
                     </div>
                 </article>
 
                 <article class="group relative flex min-h-36 flex-col justify-between rounded-2xl border-t-4 border-t-sky-600 border-x border-b border-slate-200/90 bg-white p-5 shadow-xs transition duration-200 hover:-translate-y-1 hover:shadow-md">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Pengurus Koperasi</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Pengurus Koperasi</span>
                         <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-50 text-sky-700 shadow-2xs transition group-hover:scale-105">
                             <i class="fa-solid fa-user-tie text-base"></i>
                         </span>
                     </div>
                     <div>
-                        <p class="mt-3 text-3xl font-black text-slate-900">{{ number_format($statsPengurus['total'] ?? 0) }}</p>
+                        <p data-dashboard-stat="officers" data-value="{{ $totalPengurusKoperasi }}" class="mt-3 text-3xl font-black text-slate-900">{{ number_format($totalPengurusKoperasi) }}</p>
                         <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
                             <i class="fa-regular fa-circle-check text-emerald-600"></i>
-                            Pengurus dan pengawas aktif
+                            Pengurus aktif di desa Anda
                         </p>
                     </div>
                 </article>
             </div>
+
+            <section aria-labelledby="simpanan-heading" class="overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-emerald-50/60 p-5 shadow-xs sm:p-6">
+                <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Ringkasan Keuangan</p>
+                        <h3 id="simpanan-heading" class="mt-1 text-xl font-black tracking-tight text-slate-900 sm:text-2xl">Simpanan koperasi</h3>
+                        <p class="mt-1 text-sm text-slate-500">Akumulasi simpanan dari koperasi yang berada di desa / kelurahan Anda.</p>
+                    </div>
+                    <span class="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs">
+                        <span class="relative flex h-2 w-2">
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+                            <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-600"></span>
+                        </span>
+                        Data wilayah aktif
+                    </span>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                    <article data-dashboard-stat="savings-principal" data-value="{{ $totalSimpananPokok }}" class="group relative isolate flex min-h-40 overflow-hidden rounded-2xl border border-emerald-100 bg-white p-5 shadow-xs transition duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-900/10 focus-within:ring-2 focus-within:ring-emerald-300 sm:p-6">
+                        <div aria-hidden="true" class="absolute -right-8 -top-10 -z-10 h-36 w-36 rounded-full bg-emerald-100/70 blur-2xl transition duration-500 group-hover:scale-150"></div>
+                        <div class="flex w-full items-start justify-between gap-4">
+                            <div class="flex min-h-28 flex-col justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition duration-300 group-hover:rotate-[-6deg] group-hover:scale-110">
+                                        <i class="fa-solid fa-piggy-bank text-lg"></i>
+                                    </span>
+                                    <div>
+                                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Simpanan Pokok</p>
+                                        <p class="mt-0.5 text-xs text-slate-400">Total wilayah desa Anda</p>
+                                    </div>
+                                </div>
+                                <p class="mt-5 flex flex-wrap items-baseline gap-x-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+                                    <span class="text-base font-bold text-emerald-700 sm:text-lg">Rp</span>
+                                    <span>{{ number_format($totalSimpananPokok, 0, ',', '.') }}</span>
+                                </p>
+                            </div>
+                            <span aria-hidden="true" class="mt-1 text-emerald-300 transition duration-300 group-hover:translate-x-1 group-hover:text-emerald-600">
+                                <i class="fa-solid fa-arrow-trend-up text-xl"></i>
+                            </span>
+                        </div>
+                    </article>
+
+                    <article data-dashboard-stat="savings-mandatory" data-value="{{ $totalSimpananWajib }}" class="group relative isolate flex min-h-40 overflow-hidden rounded-2xl border border-rose-100 bg-white p-5 shadow-xs transition duration-300 hover:-translate-y-1 hover:border-rose-300 hover:shadow-lg hover:shadow-rose-900/10 focus-within:ring-2 focus-within:ring-rose-300 sm:p-6">
+                        <div aria-hidden="true" class="absolute -right-8 -top-10 -z-10 h-36 w-36 rounded-full bg-rose-100/70 blur-2xl transition duration-500 group-hover:scale-150"></div>
+                        <div class="flex w-full items-start justify-between gap-4">
+                            <div class="flex min-h-28 flex-col justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-100 text-rose-700 transition duration-300 group-hover:rotate-[6deg] group-hover:scale-110">
+                                        <i class="fa-solid fa-hand-holding-dollar text-lg"></i>
+                                    </span>
+                                    <div>
+                                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Simpanan Wajib</p>
+                                        <p class="mt-0.5 text-xs text-slate-400">Total wilayah desa Anda</p>
+                                    </div>
+                                </div>
+                                <p class="mt-5 flex flex-wrap items-baseline gap-x-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+                                    <span class="text-base font-bold text-rose-700 sm:text-lg">Rp</span>
+                                    <span>{{ number_format($totalSimpananWajib, 0, ',', '.') }}</span>
+                                </p>
+                            </div>
+                            <span aria-hidden="true" class="mt-1 text-rose-300 transition duration-300 group-hover:translate-x-1 group-hover:text-rose-600">
+                                <i class="fa-solid fa-arrow-trend-up text-xl"></i>
+                            </span>
+                        </div>
+                    </article>
+                </div>
+            </section>
         </section>
 
         <!-- Dokumentasi & Foto Lokasi Koperasi (Tata Letak Responsif & Berimbang) -->
