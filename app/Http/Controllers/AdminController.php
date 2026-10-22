@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kecamatan;
+use App\Models\Kelurahan;
 use App\Models\Kopang;
 use App\Models\KopangType;
 use App\Models\Koperasi;
@@ -277,7 +278,7 @@ class AdminController extends Controller
             : $user->id_company;
 
         $allKoperasis = (clone $baseQuery)
-            ->select(['id_koperasi', 'name_koperasi'])
+            ->select(['id_koperasi', 'name_koperasi', 'id_kec', 'id_kel', 'gps_lat', 'gps_long'])
             ->orderBy('name_koperasi', 'asc')
             ->get();
 
@@ -293,11 +294,116 @@ class AdminController extends Controller
             $lampirans = new LengthAwarePaginator([], 0, 10);
         }
 
+        $rekapSubtab = $request->get('subtab', 'info');
+
+        // Fetch kelurahans and kecamatans with scoping for rekapitulasi
+        $rekapKelurahansQuery = Kelurahan::with(['kecamatan:id_kopkec,name_kopkec', 'koperasi' => function ($q) {
+            $q->where('flag_del', 0)->select(['id_koperasi', 'id_kel', 'id_kec', 'name_koperasi', 'st_ops', 'st_latih', 'st_sertifikat', 'jum_anggota', 'no_ahu', 'no_inkop']);
+        }]);
+
+        $rekapKecamatansQuery = Kecamatan::with(['kelurahans', 'koperasis' => function ($q) {
+            $q->where('flag_del', 0)->select(['id_koperasi', 'id_kel', 'id_kec', 'name_koperasi', 'st_ops', 'st_latih', 'st_sertifikat', 'jum_anggota']);
+        }]);
+
+        if ($user->isOperatorKecamatan()) {
+            if ($user->id_company > 0) {
+                $rekapKelurahansQuery->where('id_kopkec', $user->id_company);
+                $rekapKecamatansQuery->where('id_kopkec', $user->id_company);
+            } else {
+                $rekapKelurahansQuery->whereRaw('1 = 0');
+                $rekapKecamatansQuery->whereRaw('1 = 0');
+            }
+        } elseif ($user->isOperatorDesa()) {
+            if ($user->id_branch > 0) {
+                $rekapKelurahansQuery->where('id_kopkel', $user->id_branch);
+                $rekapKecamatansQuery->whereHas('kelurahans', fn ($q) => $q->where('id_kopkel', $user->id_branch));
+            } else {
+                $rekapKelurahansQuery->whereRaw('1 = 0');
+                $rekapKecamatansQuery->whereRaw('1 = 0');
+            }
+        }
+
+        $allKelurahans = $rekapKelurahansQuery->orderBy('name_kopkel', 'asc')->get();
+        $rekapDesaData = $allKelurahans->map(function ($kel) {
+            $kop = $kel->koperasi;
+            $hasKop = $kop !== null;
+
+            return [
+                'id_kopkel' => $kel->id_kopkel,
+                'nama_desa' => $kel->name_kopkel,
+                'id_kopkec' => $kel->id_kopkec,
+                'nama_kecamatan' => $kel->kecamatan?->name_kopkec ?? '-',
+                'koperasi_nama' => $kop?->name_koperasi ?? '-',
+                'no_ahu' => $kop?->no_ahu ?? '-',
+                'no_inkop' => $kop?->no_inkop ?? '-',
+                'jum_koperasi' => $hasKop ? 1 : 0,
+                'sudah_ops' => ($hasKop && strtoupper((string) $kop->st_ops) === 'SUDAH') ? 1 : 0,
+                'belum_ops' => ($hasKop && strtoupper((string) $kop->st_ops) !== 'SUDAH') ? 1 : 0,
+                'sudah_sertifikat' => ($hasKop && strtoupper((string) $kop->st_sertifikat) === 'SUDAH') ? 1 : 0,
+                'jum_anggota' => (int) ($kop?->jum_anggota ?? 0),
+            ];
+        });
+
+        $rekapKecamatanData = $rekapKecamatansQuery->orderBy('name_kopkec', 'asc')->get()->map(function ($kec) {
+            $kops = $kec->koperasis;
+
+            return [
+                'id_kopkec' => $kec->id_kopkec,
+                'nama_kecamatan' => $kec->name_kopkec,
+                'jum_desa' => $kec->kelurahans->count(),
+                'jum_koperasi' => $kops->count(),
+                'sudah_ops' => $kops->where('st_ops', 'SUDAH')->count(),
+                'belum_ops' => $kops->where('st_ops', '!=', 'SUDAH')->count(),
+                'sudah_sertifikat' => $kops->where('st_sertifikat', 'SUDAH')->count(),
+                'jum_anggota' => (int) $kops->sum('jum_anggota'),
+            ];
+        });
+
+        // Compute highest and lowest stats for rekapitulasi card
+        if (str_starts_with($rekapSubtab, 'rekap_ang_')) {
+            if ($rekapSubtab === 'rekap_ang_kec') {
+                $tertinggi = $rekapKecamatanData->sortByDesc('jum_anggota')->first();
+                $terendah = $rekapKecamatanData->sortBy('jum_anggota')->first();
+                $rekapTertinggiNama = 'KECAMATAN '.($tertinggi['nama_kecamatan'] ?? '-');
+                $rekapTertinggiNilai = $tertinggi['jum_anggota'] ?? 0;
+                $rekapTerendahNama = 'KECAMATAN '.($terendah['nama_kecamatan'] ?? '-');
+                $rekapTerendahNilai = $terendah['jum_anggota'] ?? 0;
+            } else {
+                $tertinggi = $rekapDesaData->sortByDesc('jum_anggota')->first();
+                $terendah = $rekapDesaData->sortBy('jum_anggota')->first();
+                $rekapTertinggiNama = $tertinggi['nama_desa'] ?? '-';
+                $rekapTertinggiNilai = $tertinggi['jum_anggota'] ?? 0;
+                $rekapTerendahNama = $terendah['nama_desa'] ?? '-';
+                $rekapTerendahNilai = $terendah['jum_anggota'] ?? 0;
+            }
+        } elseif ($rekapSubtab === 'rekap_kop_kec') {
+            $tertinggi = $rekapKecamatanData->sortByDesc('jum_koperasi')->first();
+            $terendah = $rekapKecamatanData->sortBy('jum_koperasi')->first();
+            $rekapTertinggiNama = 'KECAMATAN '.($tertinggi['nama_kecamatan'] ?? '-');
+            $rekapTertinggiNilai = $tertinggi['jum_koperasi'] ?? 0;
+            $rekapTerendahNama = 'KECAMATAN '.($terendah['nama_kecamatan'] ?? '-');
+            $rekapTerendahNilai = $terendah['jum_koperasi'] ?? 0;
+        } else {
+            $tertinggi = $rekapDesaData->sortByDesc('jum_koperasi')->first();
+            $terendah = $rekapDesaData->sortBy('jum_koperasi')->first();
+            $rekapTertinggiNama = $tertinggi['nama_desa'] ?? 'KELURAHAN PONDOK RAJEG';
+            $rekapTertinggiNilai = $tertinggi['jum_koperasi'] ?? 1;
+            $rekapTerendahNama = $terendah['nama_desa'] ?? 'KELURAHAN PONDOK RAJEG';
+            $rekapTerendahNilai = $terendah['jum_koperasi'] ?? 1;
+        }
+
         $viewData = compact(
             'user',
             'isOperator',
             'assignedKecamatanId',
             'activeTab',
+            'rekapSubtab',
+            'rekapDesaData',
+            'rekapKecamatanData',
+            'rekapTertinggiNama',
+            'rekapTertinggiNilai',
+            'rekapTerendahNama',
+            'rekapTerendahNilai',
             'totalKoperasi',
             'totalAnggota',
             'opsSudah',
@@ -345,12 +451,17 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'id_koperasi' => ['required', 'integer', 'exists:app_md_koperasi,id_koperasi'],
-            'id_kopangtype' => ['required', 'integer', 'exists:app_md_kopangtype,id_kopangtype'],
+            'id_kopangtype' => ['nullable', 'integer'],
             'name_kopang' => ['required', 'string', 'max:255'],
-            'nik_kopang' => ['nullable', 'digits:16'],
+            'nik_kopang' => ['required', 'digits:16'],
+            'id_kec' => ['nullable', 'integer'],
+            'id_kel' => ['nullable', 'integer'],
             'kopang_telp' => ['nullable', 'string', 'max:255'],
             'kopang_usaha' => ['nullable', 'string', 'max:255'],
             'kopang_addr' => ['nullable', 'string', 'max:255'],
+            'comt_kopang' => ['nullable', 'string', 'max:255'],
+            'gps_lat' => ['nullable', 'string', 'max:50'],
+            'gps_long' => ['nullable', 'string', 'max:50'],
         ]);
 
         $koperasi = $this->findVisibleKoperasi($request, (int) $validated['id_koperasi']);
@@ -361,18 +472,20 @@ class AdminController extends Controller
                 ->max('id_kopang') + 1;
 
             Kopang::create([
-                ...$validated,
                 'id_kopang' => $nextId,
-                'id_kec' => $koperasi->id_kec,
-                'id_kel' => $koperasi->id_kel,
-                'comt_kopang' => '-',
+                'name_kopang' => $validated['name_kopang'],
+                'id_kec' => ($validated['id_kec'] ?? null) ?: $koperasi->id_kec,
+                'id_kel' => ($validated['id_kel'] ?? null) ?: $koperasi->id_kel,
+                'id_koperasi' => $koperasi->id_koperasi,
+                'id_kopangtype' => ($validated['id_kopangtype'] ?? null) ?: 1,
+                'comt_kopang' => ! empty($validated['comt_kopang']) ? $validated['comt_kopang'] : '-',
                 'nik_kopang' => $validated['nik_kopang'] ?? null,
                 'kopang_usaha' => $validated['kopang_usaha'] ?? '',
                 'kopang_addr' => $validated['kopang_addr'] ?? '',
                 'kopang_telp' => $validated['kopang_telp'] ?? '',
-                'gps_lat' => (string) $koperasi->gps_lat,
-                'gps_long' => (string) $koperasi->gps_long,
-                'id_user' => $request->user()->id_user,
+                'gps_lat' => ! empty($validated['gps_lat']) ? (string) $validated['gps_lat'] : (string) ($koperasi->gps_lat ?? '0'),
+                'gps_long' => ! empty($validated['gps_long']) ? (string) $validated['gps_long'] : (string) ($koperasi->gps_long ?? '0'),
+                'id_user' => $request->user()->id_user ?? 1,
                 'tgl_data' => now(),
                 'flag_del' => 0,
             ]);
@@ -380,8 +493,12 @@ class AdminController extends Controller
             $koperasi->increment('jum_anggota');
         });
 
-        return redirect()->route('admin.dashboard')
-            ->with('success', 'Anggota berhasil ditambahkan dan total anggota koperasi telah diperbarui.');
+        $redirect = $request->filled('redirect_tab')
+            ? redirect()->route('admin.dashboard', ['tab' => $request->get('redirect_tab')])
+            : redirect()->route('admin.dashboard');
+
+        return $redirect
+            ->with('success', 'Data Anggota berhasil ditambahkan ke database.');
     }
 
     /**
@@ -798,7 +915,7 @@ class AdminController extends Controller
 
         $maxId = (int) Kopsdm::max('id_kopsdm');
         $validated['id_kopsdm'] = $maxId + 1;
-        $validated['order_kopsdm'] = $validated['order_kopsdm'] ?? '1';
+        $validated['order_kopsdm'] = ! empty($validated['order_kopsdm']) ? $validated['order_kopsdm'] : '1';
         $validated['comt_kopsdm'] = ! empty($validated['comt_kopsdm']) ? $validated['comt_kopsdm'] : '-';
         $validated['id_user'] = $request->user()->id_user ?? 1;
         $validated['tgl_data'] = now();
@@ -812,6 +929,60 @@ class AdminController extends Controller
 
         return $redirect
             ->with('success', 'Data Pengurus berhasil ditambahkan ke database.');
+    }
+
+    /**
+     * Update an existing Pengurus / SDM.
+     */
+    public function updatePengurus(Request $request, Kopsdm $pengurus): RedirectResponse
+    {
+        abort_unless($pengurus->flag_del == 0, 404);
+
+        $validated = $request->validate([
+            'id_koperasi' => 'required|integer|exists:app_md_koperasi,id_koperasi',
+            'name_kopsdm' => 'required|string|max:255',
+            'jab_kopsdm' => 'required|string|max:255',
+            'type_kopsdm' => 'required|string|in:PENGURUS,PENGAWAS',
+            'order_kopsdm' => 'nullable|string|max:10',
+            'comt_kopsdm' => 'nullable|string|max:255',
+        ]);
+
+        $this->findVisibleKoperasi($request, (int) $validated['id_koperasi']);
+
+        $pengurus->update([
+            'id_koperasi' => (int) $validated['id_koperasi'],
+            'name_kopsdm' => $validated['name_kopsdm'],
+            'jab_kopsdm' => $validated['jab_kopsdm'],
+            'type_kopsdm' => $validated['type_kopsdm'],
+            'order_kopsdm' => ! empty($validated['order_kopsdm']) ? $validated['order_kopsdm'] : '1',
+            'comt_kopsdm' => ! empty($validated['comt_kopsdm']) ? $validated['comt_kopsdm'] : '-',
+        ]);
+
+        $redirect = $request->user()->isOperatorDesa()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('admin.dashboard', ['tab' => 'pengurus']);
+
+        return $redirect
+            ->with('success', 'Data Pengurus berhasil diperbarui.');
+    }
+
+    /**
+     * Delete (soft delete) an existing Pengurus / SDM.
+     */
+    public function destroyPengurus(Request $request, Kopsdm $pengurus): RedirectResponse
+    {
+        abort_unless($pengurus->flag_del == 0, 404);
+
+        $this->findVisibleKoperasi($request, (int) $pengurus->id_koperasi);
+
+        $pengurus->update(['flag_del' => 1]);
+
+        $redirect = $request->user()->isOperatorDesa()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('admin.dashboard', ['tab' => 'pengurus']);
+
+        return $redirect
+            ->with('success', 'Data Pengurus berhasil dihapus.');
     }
 
     /**

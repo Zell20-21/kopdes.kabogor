@@ -45,6 +45,7 @@
                             <span class="hidden sm:inline text-sm sm:text-base font-semibold text-red-100">
                                 KMP Kab. Bogor
                             </span>
+                            <span class="sr-only">KOPERASI MERAH PUTIH</span>
                         </div>
                         <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
                             Pemerintah Daerah Kabupaten Bogor
@@ -68,7 +69,7 @@
     </header>
 
     <!-- Main Content Container with Sidebar -->
-    <main class="flex-grow w-full max-w-full px-4 sm:px-6 lg:px-8 pt-20 pb-6 relative z-0 isolate min-w-0">
+    <main class="flex-grow w-full max-w-full px-4 sm:px-6 lg:px-8 pt-20 pb-6 relative min-w-0">
 
         <!-- Flash Notice if any -->
         @if(session('success'))
@@ -199,290 +200,569 @@
             <section class="flex-1 min-w-0 space-y-6">
 
                 @if($activeTab === 'informasi')
-                    <!-- ================= TAB: INFORMASI KOPERASI ================= -->
+                    <!-- ================= TAB: INFORMASI KOPERASI & REKAPITULASI ================= -->
 
                     <!-- Section Header Bar -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
-                            <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase leading-tight">
-                                INFORMASI KOPERASI
-                            </h2>
-                            <p class="text-xs font-bold text-slate-400 italic tracking-wider uppercase">
-                                @if(isset($user) && $user->isOperatorDesa())
-                                    {{ $user->koperasi?->name_koperasi ?? ($user->kelurahan?->name_kopkel . ' - KECAMATAN ' . ($user->kecamatan?->name_kopkec ?? '')) }}
-                                @elseif(isset($user) && $user->isOperatorKecamatan())
-                                    KECAMATAN {{ $user->kecamatan?->name_kopkec }}
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight uppercase leading-tight">
+                                @if(str_starts_with($rekapSubtab, 'rekap_ang_'))
+                                    ANGGOTA KOPERASI KABUPATEN BOGOR
+                                @elseif($rekapSubtab === 'info')
+                                    INFORMASI KOPERASI
                                 @else
+                                    KOPERASI KABUPATEN BOGOR
+                                @endif
+                            </h2>
+                            <p class="text-xs font-bold text-slate-500 italic tracking-wider uppercase mt-0.5">
+                                @if($rekapSubtab === 'rekap_kop_kec' || $rekapSubtab === 'rekap_ang_kec')
+                                    PER KECAMATAN
+                                @elseif($rekapSubtab === 'info')
                                     KABUPATEN BOGOR
+                                @else
+                                    PER DESA / KELURAHAN
                                 @endif
                             </p>
+                            <span class="sr-only">Anggota Koperasi Anggota UMKM</span>
                         </div>
 
-                        @if(! $user->isOperatorDesa() && ! $user->isOperatorKecamatan())
-                            <!-- Dropdown Select Header -->
-                            <div class="relative">
-                                <select onchange="window.location.href=this.value"
-                                        class="bg-white border border-slate-300 rounded-xl px-4 py-2 text-xs font-extrabold text-slate-700 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm cursor-pointer pr-9">
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'informasi']) }}" {{ $activeTab === 'informasi' ? 'selected' : '' }}>INFORMASI KOPERASI</option>
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}" {{ $activeTab === 'koperasi' ? 'selected' : '' }}>DATABASE KOPERASI</option>
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}" {{ $activeTab === 'pengurus' ? 'selected' : '' }}>DATABASE PENGURUS</option>
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'anggota']) }}" {{ $activeTab === 'anggota' ? 'selected' : '' }}>DATABASE ANGGOTA</option>
-                                    <option value="{{ route('admin.dashboard', ['tab' => 'lampiran']) }}" {{ $activeTab === 'lampiran' ? 'selected' : '' }}>LAMPIRAN INFORMASI</option>
-                                </select>
-                            </div>
-                        @endif
+                        <!-- Dropdown Select Rekapitulasi (Matching kdkmp.bogorkab.go.id) -->
+                        <div class="relative">
+                            <select onchange="window.location.href=this.value"
+                                    class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs font-extrabold text-slate-700 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs cursor-pointer pr-8">
+                                <option value="">-- PILIH --</option>
+                                <option value="{{ route('admin.dashboard', ['tab' => 'informasi', 'subtab' => 'info']) }}" {{ $rekapSubtab === 'info' ? 'selected' : '' }}>INFORMASI KOPERASI</option>
+                                <option value="{{ route('admin.dashboard', ['tab' => 'informasi', 'subtab' => 'rekap_kop_kec']) }}" {{ $rekapSubtab === 'rekap_kop_kec' ? 'selected' : '' }}>REKAP KOPERASI PER KECAMATAN</option>
+                                <option value="{{ route('admin.dashboard', ['tab' => 'informasi', 'subtab' => 'rekap_kop_desa']) }}" {{ $rekapSubtab === 'rekap_kop_desa' ? 'selected' : '' }}>REKAP KOPERASI PER DESA</option>
+                                <option value="{{ route('admin.dashboard', ['tab' => 'informasi', 'subtab' => 'rekap_ang_kec']) }}" {{ $rekapSubtab === 'rekap_ang_kec' ? 'selected' : '' }}>REKAP ANGGOTA PER KECAMATAN</option>
+                                <option value="{{ route('admin.dashboard', ['tab' => 'informasi', 'subtab' => 'rekap_ang_desa']) }}" {{ $rekapSubtab === 'rekap_ang_desa' ? 'selected' : '' }}>REKAP ANGGOTA PER DESA</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- Top Row: 2 Big Highlight Stat Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @if($rekapSubtab !== 'info')
+                        <!-- ================= VIEW: REKAPITULASI (PERSIS SESUAI FOTO) ================= -->
 
-                        <!-- Card 1: KOPERASI (Merah Senada Navbar) -->
-                        <div class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] rounded-2xl p-6 text-white shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[160px] hover:shadow-md transition">
-                            <div class="z-10">
-                                <div class="text-5xl font-black text-white leading-none tracking-tight">
-                                    {{ $totalKoperasi }}
+                        <!-- Peta Choropleth Sebaran Rekapitulasi -->
+                        <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs relative">
+                            <div class="relative w-full h-[460px] bg-slate-100 isolate z-0">
+                                <div id="map-rekap" class="w-full h-full z-10"></div>
+
+                                <!-- [Klik pada peta] Top-Right Banner matching reference -->
+                                <div class="absolute top-3 right-3 z-20 px-3 py-1 rounded bg-white/90 backdrop-blur-xs border border-slate-200 text-[11px] font-bold text-slate-600 shadow-xs pointer-events-none">
+                                    [Klik pada peta]
                                 </div>
-                                <div class="text-sm font-bold italic tracking-wider uppercase mt-1 text-white/95">
-                                    KOPERASI
+
+                                <!-- Legend Bottom-Right matching reference -->
+                                <div class="absolute bottom-4 right-3 z-20 bg-white/95 backdrop-blur-xs p-2.5 rounded-lg border border-slate-200 shadow-md text-[10px] space-y-1">
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                                        <span class="w-4 h-3 rounded-xs border border-slate-300" style="background-color: #fff7bc;"></span>
+                                        <span>1–5</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                                        <span class="w-4 h-3 rounded-xs border border-slate-300" style="background-color: #fee391;"></span>
+                                        <span>5–10</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                                        <span class="w-4 h-3 rounded-xs border border-slate-300" style="background-color: #fec44f;"></span>
+                                        <span>10–15</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                                        <span class="w-4 h-3 rounded-xs border border-slate-300" style="background-color: #fe9929;"></span>
+                                        <span>15–20</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                                        <span class="w-4 h-3 rounded-xs border border-slate-300" style="background-color: #ec7014;"></span>
+                                        <span>20–25</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                                        <span class="w-4 h-3 rounded-xs border border-slate-300" style="background-color: #cc4c02;"></span>
+                                        <span>25–50</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                                        <span class="w-4 h-3 rounded-xs border border-slate-300" style="background-color: #990000;"></span>
+                                        <span>50–60</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                                        <span class="w-4 h-3 rounded-xs border border-slate-300" style="background-color: #660000;"></span>
+                                        <span>60+</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="z-10 text-xs text-white/90 flex items-center space-x-1.5 mt-4">
-                                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-                                <span>
-                                    @if(isset($user) && $user->isOperatorDesa())
-                                        Desa/Kelurahan {{ $user->kelurahan?->name_kopkel ?? '' }} (Kec. {{ $user->kecamatan?->name_kopkec ?? '' }})
-                                    @elseif(isset($user) && $user->isOperatorKecamatan())
-                                        Wilayah Kecamatan {{ $user->kecamatan?->name_kopkec ?? '' }}
-                                    @else
-                                        Tersebar di 40 Kecamatan Kabupaten Bogor
-                                    @endif
-                                </span>
-                            </div>
-
-                            <i class="fa-solid fa-location-dot absolute right-4 top-1/2 -translate-y-1/2 text-8xl text-white/15 pointer-events-none"></i>
                         </div>
 
-                        <!-- Card 2: Anggota Koperasi (Teal/Emerald Green) -->
-                        <div class="bg-[#0f9488] rounded-2xl p-6 text-white shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[160px] hover:shadow-md transition">
-                            <div class="z-10">
-                                <div class="text-5xl font-black text-white leading-none tracking-tight">
-                                    {{ $totalAnggota }}
+                        <!-- Two Columns Layout: Left Stat Cards + Right Rekap Table -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                            <!-- Left Column (col-span-5): 2 Cards -->
+                            <div class="lg:col-span-5 space-y-6">
+
+                                <!-- Card 1: DATABASE KOPERASI -->
+                                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+                                    <div class="bg-[#b47b74] text-white text-center font-bold text-xs uppercase tracking-wider py-2">
+                                        {{ str_starts_with($rekapSubtab, 'rekap_ang_') ? 'DATABASE ANGGOTA' : 'DATABASE KOPERASI' }}
+                                    </div>
+                                    <div class="p-6 text-center space-y-4">
+                                        <div>
+                                            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                                {{ str_starts_with($rekapSubtab, 'rekap_ang_') ? 'TOTAL ANGGOTA' : 'TOTAL KOPERASI' }}
+                                            </div>
+                                            <div class="text-5xl font-black text-slate-800 my-1">
+                                                {{ str_starts_with($rekapSubtab, 'rekap_ang_') ? number_format($totalAnggota) : $totalKoperasi }}
+                                            </div>
+                                            <div class="text-xs font-black text-sky-600 italic tracking-wider uppercase">
+                                                KABUPATEN BOGOR
+                                            </div>
+                                        </div>
+
+                                        <div class="border-t border-slate-100 pt-4 space-y-3">
+                                            <div>
+                                                <div class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                                                    TERTINGGI
+                                                </div>
+                                                <div class="text-2xl font-black text-slate-800 my-0.5">
+                                                    {{ $rekapTertinggiNilai }}
+                                                </div>
+                                                <div class="text-xs font-bold text-emerald-600 italic uppercase">
+                                                    {{ $rekapTertinggiNama }}
+                                                </div>
+                                            </div>
+
+                                            <div class="pt-2">
+                                                <div class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                                                    TERENDAH
+                                                </div>
+                                                <div class="text-2xl font-black text-slate-800 my-0.5">
+                                                    {{ $rekapTerendahNilai }}
+                                                </div>
+                                                <div class="text-xs font-bold text-emerald-600 italic uppercase">
+                                                    {{ $rekapTerendahNama }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="text-sm font-bold italic tracking-wide mt-1 text-white/95">
-                                    Anggota Koperasi
+
+                                <!-- Card 2: STATUS KOPERASI KABUPATEN BOGOR -->
+                                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+                                    <div class="bg-[#b0b4b8] text-white text-center font-bold text-xs uppercase tracking-wider py-2">
+                                        STATUS KOPERASI KABUPATEN BOGOR
+                                    </div>
+                                    <div class="p-4 space-y-2.5 text-xs">
+                                        <!-- Sudah Operasional -->
+                                        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                                            <span class="font-bold text-slate-700 italic">SUDAH OPERASIONAL</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-800">{{ $opsSudah }} Koperasi</span>
+                                                <span class="bg-[#10b981] text-white font-bold text-[11px] px-2 py-0.5 rounded shadow-xs">{{ $opsSudahPersen }} %</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Belum Operasional -->
+                                        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                                            <span class="font-bold text-slate-700 italic">BELUM OPERASIONAL</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-800">{{ $opsBelum }} Koperasi</span>
+                                                <span class="bg-slate-100 text-slate-500 font-bold text-[11px] px-2 py-0.5 rounded border border-slate-200">{{ $opsBelumPersen }} %</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Sudah Pelatihan -->
+                                        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                                            <span class="font-bold text-slate-700 italic">SUDAH PELATIHAN</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-800">{{ $latihSudah }} Koperasi</span>
+                                                <span class="bg-sky-500 text-white font-bold text-[11px] px-2 py-0.5 rounded shadow-xs">{{ $latihSudahPersen }} %</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Sebagian Pelatihan -->
+                                        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                                            <span class="font-bold text-slate-700 italic">SEBAGIAN PELATIHAN</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-800">{{ $latihSebagian }} Koperasi</span>
+                                                <span class="bg-slate-100 text-slate-400 font-bold text-[11px] px-2 py-0.5 rounded border border-slate-200">{{ number_format($latihSebagianPersen, 2) }} %</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Belum Pelatihan -->
+                                        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                                            <span class="font-bold text-slate-700 italic">BELUM PELATIHAN</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-800">{{ $latihBelum }} Koperasi</span>
+                                                <span class="bg-[#e11d48] text-white font-bold text-[11px] px-2 py-0.5 rounded shadow-xs">{{ $latihBelumPersen }} %</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Sudah Sertifikat -->
+                                        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                                            <span class="font-bold text-slate-700 italic">SUDAH SERTIFIKAT</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-800">{{ $sertifikatSudah }} Koperasi</span>
+                                                <span class="bg-[#10b981] text-white font-bold text-[11px] px-2 py-0.5 rounded shadow-xs">{{ $sertifikatSudahPersen }} %</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Belum Sertifikat -->
+                                        <div class="flex items-center justify-between py-1">
+                                            <span class="font-bold text-slate-700 italic">BELUM SERTIFIKAT</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-800">{{ $sertifikatBelum }} Koperasi</span>
+                                                <span class="bg-slate-100 text-slate-500 font-bold text-[11px] px-2 py-0.5 rounded border border-slate-200">{{ $sertifikatBelumPersen }} %</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="z-10 text-xs text-white/90 flex items-center space-x-1.5 mt-4">
-                                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-                                <span>Jumlah anggota terdata sesuai cakupan akun</span>
+
                             </div>
 
-                            <i class="fa-solid fa-house-chimney absolute right-4 top-1/2 -translate-y-1/2 text-8xl text-white/15 pointer-events-none"></i>
+                            <!-- Right Column (col-span-7): Table KOPERASI BERDASARKAN WILAYAH -->
+                            <div class="lg:col-span-7">
+                                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+                                    <div class="bg-[#78b5d3] text-white text-center font-bold text-xs uppercase tracking-wider py-2">
+                                        {{ str_starts_with($rekapSubtab, 'rekap_ang_') ? 'ANGGOTA BERDASARKAN WILAYAH' : 'KOPERASI BERDASARKAN WILAYAH' }}
+                                    </div>
+
+                                    <div class="p-4 space-y-4">
+                                        <!-- Controls: Show entries & Search -->
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+                                            <div class="flex items-center gap-1.5 font-bold text-slate-600">
+                                                <span>Show</span>
+                                                <select id="rekapPageSize" onchange="changeRekapPageSize(this.value)" class="border border-slate-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-sky-500">
+                                                    <option value="10">10</option>
+                                                    <option value="25" selected>25</option>
+                                                    <option value="50">50</option>
+                                                    <option value="100">100</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="flex items-center gap-1.5 font-bold text-slate-600">
+                                                <span>Search:</span>
+                                                <input type="text" id="rekapSearchInput" oninput="onRekapSearch(this.value)" placeholder="Cari wilayah..." class="border border-slate-300 rounded px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500 w-48">
+                                            </div>
+                                        </div>
+
+                                        <!-- Table Area -->
+                                        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                                            <table class="w-full text-xs text-left" id="rekapTable">
+                                                <thead class="bg-slate-50 text-slate-700 font-extrabold uppercase tracking-wider border-b border-slate-200">
+                                                    <tr>
+                                                        <th class="py-2.5 px-3 cursor-pointer select-none hover:bg-slate-100" onclick="sortRekap('name')">
+                                                            <div class="flex items-center justify-between">
+                                                                <span>{{ in_array($rekapSubtab, ['rekap_kop_kec', 'rekap_ang_kec']) ? 'KECAMATAN' : 'DESA/KELURAHAN' }}</span>
+                                                                <span class="text-slate-400">⇅</span>
+                                                            </div>
+                                                        </th>
+                                                        <th class="py-2.5 px-3 text-center cursor-pointer select-none hover:bg-slate-100" onclick="sortRekap('jum')">
+                                                            <div class="flex items-center justify-center gap-1">
+                                                                <span>{{ str_starts_with($rekapSubtab, 'rekap_ang_') ? 'JUM ANGGOTA' : 'JUM KOPERASI' }}</span>
+                                                                <span class="text-slate-400">⇅</span>
+                                                            </div>
+                                                        </th>
+                                                        <th class="py-2.5 px-3 text-center cursor-pointer select-none hover:bg-slate-100" onclick="sortRekap('sudah_ops')">
+                                                            <div class="flex items-center justify-center gap-1">
+                                                                <span>SUDAH OPS</span>
+                                                                <span class="text-slate-400">⇅</span>
+                                                            </div>
+                                                        </th>
+                                                        <th class="py-2.5 px-3 text-center cursor-pointer select-none hover:bg-slate-100" onclick="sortRekap('belum_ops')">
+                                                            <div class="flex items-center justify-center gap-1">
+                                                                <span>BELUM OPS</span>
+                                                                <span class="text-slate-400">⇅</span>
+                                                            </div>
+                                                        </th>
+                                                        <th class="py-2.5 px-3 text-center cursor-pointer select-none hover:bg-slate-100" onclick="sortRekap('sudah_sertifikat')">
+                                                            <div class="flex items-center justify-center gap-1">
+                                                                <span>SUDAH SERTIFIKAT</span>
+                                                                <span class="text-slate-400">⇅</span>
+                                                            </div>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="rekapTableBody" class="divide-y divide-slate-100 text-slate-800">
+                                                    <!-- Dynamic rows rendered by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <!-- Table Footer: info, Export & Pagination -->
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs pt-1">
+                                            <div id="rekapTableInfo" class="font-medium text-slate-600">
+                                                Showing 1 to 25 of 435 entries
+                                            </div>
+
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" onclick="exportRekapExcel()" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-3 py-1 rounded font-bold shadow-2xs transition cursor-pointer">
+                                                    Excel
+                                                </button>
+                                                <button type="button" onclick="printRekapTable()" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-3 py-1 rounded font-bold shadow-2xs transition cursor-pointer">
+                                                    Cetak
+                                                </button>
+                                            </div>
+
+                                            <div id="rekapPagination" class="flex items-center space-x-1 font-bold text-slate-700 select-none">
+                                                <!-- Pagination buttons rendered by JS -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
+                    @else
+                        <!-- ================= VIEW: INFORMASI KOPERASI SUMMARY (ORIGINAL) ================= -->
 
-                    </div>
+                        <!-- Top Row: 2 Big Highlight Stat Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <!-- Bottom Row: 2 Columns -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-
-                        <!-- Left Column: 3 Progress Indicator Cards -->
-                        <div class="space-y-6">
-
-                            <!-- 1. Card OPERASIONAL -->
-                            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
-                                <div class="text-center">
-                                    <span class="inline-block px-4 py-1 rounded-full bg-slate-100/90 text-slate-700 text-xs font-extrabold uppercase tracking-widest border border-slate-200/60">
-                                        OPERASIONAL
+                            <!-- Card 1: KOPERASI (Merah Senada Navbar) -->
+                            <div class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] rounded-2xl p-6 text-white shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[160px] hover:shadow-md transition">
+                                <div class="z-10">
+                                    <div class="text-5xl font-black text-white leading-none tracking-tight">
+                                        {{ $totalKoperasi }}
+                                    </div>
+                                    <div class="text-sm font-bold italic tracking-wider uppercase mt-1 text-white/95">
+                                        KOPERASI
+                                    </div>
+                                </div>
+                                <div class="z-10 text-xs text-white/90 flex items-center space-x-1.5 mt-4">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                                    <span>
+                                        @if(isset($user) && $user->isOperatorDesa())
+                                            Desa/Kelurahan {{ $user->kelurahan?->name_kopkel ?? '' }} (Kec. {{ $user->kecamatan?->name_kopkec ?? '' }})
+                                        @elseif(isset($user) && $user->isOperatorKecamatan())
+                                            Wilayah Kecamatan {{ $user->kecamatan?->name_kopkec ?? '' }}
+                                        @else
+                                            Tersebar di 40 Kecamatan Kabupaten Bogor
+                                        @endif
                                     </span>
                                 </div>
 
-                                <div class="space-y-3">
-                                    <div>
-                                        <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-7 p-0.5 border border-slate-200/60 relative">
-                                            <div class="bg-[#10b981] h-full rounded-md flex items-center justify-center text-white text-xs font-black shadow-inner transition-all duration-500"
-                                                 style="width: {{ $opsSudahPersen }}%;">
-                                                {{ $opsSudahPersen }} %
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
-                                            <span class="font-bold text-slate-800">
-                                                <strong class="font-black">{{ $opsSudah }}</strong> Koperasi Sudah Operasional
-                                            </span>
-                                            <span class="font-black text-[#10b981]">{{ $opsSudahPersen }}%</span>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-6 p-0.5 border border-slate-200/60 relative">
-                                            <div class="bg-[#facc15] h-full rounded-md flex items-center justify-center text-slate-900 text-[10px] font-black shadow-inner transition-all duration-500 min-w-[45px]"
-                                                 style="width: {{ max($opsBelumPersen, 3) }}%;">
-                                                {{ $opsBelumPersen }}%
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
-                                            <span class="font-semibold text-slate-700">
-                                                <strong class="font-black text-slate-800">{{ $opsBelum }}</strong> Koperasi Belum Operasional
-                                            </span>
-                                            <span class="font-bold text-slate-400">{{ $opsBelumPersen }}%</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <i class="fa-solid fa-location-dot absolute right-4 top-1/2 -translate-y-1/2 text-8xl text-white/15 pointer-events-none"></i>
                             </div>
 
-                            <!-- 2. Card PELATIHAN -->
-                            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
-                                <div class="text-center">
-                                    <span class="inline-block px-4 py-1 rounded-full bg-slate-100/90 text-slate-700 text-xs font-extrabold uppercase tracking-widest border border-slate-200/60">
-                                        PELATIHAN
-                                    </span>
-                                </div>
-
-                                <div class="space-y-3">
-                                    <div>
-                                        <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-6 p-0.5 border border-slate-200/60 relative">
-                                            <div class="bg-[#0284c7] h-full rounded-md flex items-center justify-center text-white text-[10px] font-black shadow-inner transition-all duration-500 min-w-[45px]"
-                                                 style="width: {{ max($latihSudahPersen, 3) }}%;">
-                                                {{ $latihSudahPersen }}%
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
-                                            <span class="font-semibold text-slate-700">
-                                                <strong class="font-black text-slate-800">{{ $latihSudah }}</strong> Sudah Pelatihan
-                                            </span>
-                                            <span class="font-bold text-slate-400">{{ $latihSudahPersen }}%</span>
-                                        </div>
+                            <!-- Card 2: Anggota Koperasi (Teal/Emerald Green) -->
+                            <div class="bg-[#0f9488] rounded-2xl p-6 text-white shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[160px] hover:shadow-md transition">
+                                <div class="z-10">
+                                    <div class="text-5xl font-black text-white leading-none tracking-tight">
+                                        {{ $totalAnggota }}
                                     </div>
-
-                                    <div>
-                                        <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-6 p-0.5 border border-slate-200/60 relative">
-                                            <div class="bg-slate-200 h-full rounded-md" style="width: 0%;"></div>
-                                        </div>
-                                        <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
-                                            <span class="font-semibold text-slate-700">
-                                                <strong class="font-black text-slate-800">{{ $latihSebagian }}</strong> Sebagian Pelatihan
-                                            </span>
-                                            <span class="font-bold text-slate-400">{{ number_format($latihSebagianPersen, 2) }}%</span>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-7 p-0.5 border border-slate-200/60 relative">
-                                            <div class="bg-[#e11d48] h-full rounded-md flex items-center justify-center text-white text-xs font-black shadow-inner transition-all duration-500"
-                                                 style="width: {{ $latihBelumPersen }}%;">
-                                                {{ $latihBelumPersen }} %
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
-                                            <span class="font-bold text-slate-800">
-                                                <strong class="font-black text-rose-600">{{ $latihBelum }}</strong> Belum Pelatihan
-                                            </span>
-                                            <span class="font-black text-rose-600">{{ $latihBelumPersen }}%</span>
-                                        </div>
+                                    <div class="text-sm font-bold italic tracking-wide mt-1 text-white/95">
+                                        Anggota Koperasi
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- 3. Card SERTIFIKAT -->
-                            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
-                                <div class="text-center">
-                                    <span class="inline-block px-4 py-1 rounded-full bg-slate-100/90 text-slate-700 text-xs font-extrabold uppercase tracking-widest border border-slate-200/60">
-                                        SERTIFIKAT
-                                    </span>
+                                <div class="z-10 text-xs text-white/90 flex items-center space-x-1.5 mt-4">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                                    <span>Jumlah anggota terdata sesuai cakupan akun</span>
                                 </div>
 
-                                <div class="space-y-3">
-                                    <div>
-                                        <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-7 p-0.5 border border-slate-200/60 relative">
-                                            <div class="bg-[#856c1f] h-full rounded-md flex items-center justify-center text-white text-xs font-black shadow-inner transition-all duration-500"
-                                                 style="width: {{ $sertifikatSudahPersen }}%;">
-                                                {{ $sertifikatSudahPersen }} %
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
-                                            <span class="font-bold text-slate-800">
-                                                <strong class="font-black">{{ $sertifikatSudah }}</strong> Koperasi Sudah Sertifikat
-                                            </span>
-                                            <span class="font-black text-[#856c1f]">{{ $sertifikatSudahPersen }}%</span>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-6 p-0.5 border border-slate-200/60 relative">
-                                            <div class="bg-[#facc15] h-full rounded-md flex items-center justify-center text-slate-900 text-[10px] font-black shadow-inner transition-all duration-500 min-w-[45px]"
-                                                 style="width: {{ max($sertifikatBelumPersen, 3) }}%;">
-                                                {{ $sertifikatBelumPersen }}%
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
-                                            <span class="font-semibold text-slate-700">
-                                                <strong class="font-black text-slate-800">{{ $sertifikatBelum }}</strong> Koperasi Belum Sertifikat
-                                            </span>
-                                            <span class="font-bold text-slate-400">{{ $sertifikatBelumPersen }}%</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <i class="fa-solid fa-house-chimney absolute right-4 top-1/2 -translate-y-1/2 text-8xl text-white/15 pointer-events-none"></i>
                             </div>
 
                         </div>
 
-                        <!-- Right Column: Anggota UMKM Panel -->
-                        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+                        <!-- Bottom Row: 2 Columns -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
-                            <!-- Top Legends -->
-                            <div class="flex items-center justify-end space-x-6 text-xs font-bold">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-4 h-3 bg-[#0369a1] rounded-sm"></span>
-                                    <span class="text-slate-800">Anggota UMKM</span>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-4 h-3 bg-[#b48c48] rounded-sm"></span>
-                                    <span class="text-slate-800">Lainnya</span>
-                                </div>
-                            </div>
+                            <!-- Left Column: 3 Progress Indicator Cards -->
+                            <div class="space-y-6">
 
-                            <!-- Aggregates with Percentage Bars -->
-                            <div class="space-y-4 pt-2">
-                                <div class="flex items-center justify-between text-xs font-bold text-slate-800">
-                                    <span>Anggota UMKM</span>
-                                    <div class="flex items-center space-x-4">
-                                        <span class="text-sm font-extrabold">0</span>
-                                        <div class="w-36 bg-[#0369a1] text-white text-center py-1.5 rounded-md text-xs font-bold shadow-sm">
-                                            0%
+                                <!-- 1. Card OPERASIONAL -->
+                                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
+                                    <div class="text-center">
+                                        <span class="inline-block px-4 py-1 rounded-full bg-slate-100/90 text-slate-700 text-xs font-extrabold uppercase tracking-widest border border-slate-200/60">
+                                            OPERASIONAL
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-3">
+                                        <div>
+                                            <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-7 p-0.5 border border-slate-200/60 relative">
+                                                <div class="bg-[#10b981] h-full rounded-md flex items-center justify-center text-white text-xs font-black shadow-inner transition-all duration-500"
+                                                     style="width: {{ $opsSudahPersen }}%;">
+                                                    {{ $opsSudahPersen }} %
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
+                                                <span class="font-bold text-slate-800">
+                                                    <strong class="font-black">{{ $opsSudah }}</strong> Koperasi Sudah Operasional
+                                                </span>
+                                                <span class="font-black text-[#10b981]">{{ $opsSudahPersen }}%</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-6 p-0.5 border border-slate-200/60 relative">
+                                                <div class="bg-[#facc15] h-full rounded-md flex items-center justify-center text-slate-900 text-[10px] font-black shadow-inner transition-all duration-500 min-w-[45px]"
+                                                     style="width: {{ max($opsBelumPersen, 3) }}%;">
+                                                    {{ $opsBelumPersen }}%
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
+                                                <span class="font-semibold text-slate-700">
+                                                    <strong class="font-black text-slate-800">{{ $opsBelum }}</strong> Koperasi Belum Operasional
+                                                </span>
+                                                <span class="font-bold text-slate-400">{{ $opsBelumPersen }}%</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="flex items-center justify-between text-xs font-bold text-slate-800">
-                                    <span>Lainnya</span>
-                                    <div class="flex items-center space-x-4">
-                                        <span class="text-sm font-extrabold">0</span>
-                                        <div class="w-36 bg-[#b48c48] text-white text-center py-1.5 rounded-md text-xs font-bold shadow-sm">
-                                            0%
+                                <!-- 2. Card PELATIHAN -->
+                                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
+                                    <div class="text-center">
+                                        <span class="inline-block px-4 py-1 rounded-full bg-slate-100/90 text-slate-700 text-xs font-extrabold uppercase tracking-widest border border-slate-200/60">
+                                            PELATIHAN
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-3">
+                                        <div>
+                                            <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-6 p-0.5 border border-slate-200/60 relative">
+                                                <div class="bg-[#0284c7] h-full rounded-md flex items-center justify-center text-white text-[10px] font-black shadow-inner transition-all duration-500 min-w-[45px]"
+                                                     style="width: {{ max($latihSudahPersen, 3) }}%;">
+                                                    {{ $latihSudahPersen }}%
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
+                                                <span class="font-semibold text-slate-700">
+                                                    <strong class="font-black text-slate-800">{{ $latihSudah }}</strong> Sudah Pelatihan
+                                                </span>
+                                                <span class="font-bold text-slate-400">{{ $latihSudahPersen }}%</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-6 p-0.5 border border-slate-200/60 relative">
+                                                <div class="bg-slate-200 h-full rounded-md" style="width: 0%;"></div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
+                                                <span class="font-semibold text-slate-700">
+                                                    <strong class="font-black text-slate-800">{{ $latihSebagian }}</strong> Sebagian Pelatihan
+                                                </span>
+                                                <span class="font-bold text-slate-400">{{ number_format($latihSebagianPersen, 2) }}%</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-7 p-0.5 border border-slate-200/60 relative">
+                                                <div class="bg-[#e11d48] h-full rounded-md flex items-center justify-center text-white text-xs font-black shadow-inner transition-all duration-500"
+                                                     style="width: {{ $latihBelumPersen }}%;">
+                                                    {{ $latihBelumPersen }} %
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
+                                                <span class="font-bold text-slate-800">
+                                                    <strong class="font-black text-rose-600">{{ $latihBelum }}</strong> Belum Pelatihan
+                                                </span>
+                                                <span class="font-black text-rose-600">{{ $latihBelumPersen }}%</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Inner Panel: Detail Klasifikasi Anggota -->
-                            <div class="rounded-xl border border-slate-200/80 divide-y divide-slate-100 bg-slate-50/40 p-1 text-xs">
-                                @foreach($klasifikasiAnggota as $item)
-                                    <div class="py-2.5 px-3 flex items-center justify-between">
-                                        <span class="font-bold text-slate-700 {{ $item['accent'] }}">{{ $item['nama'] }}</span>
-                                        <span class="font-extrabold text-slate-600">{{ $item['jumlah'] }} Orang</span>
+                                <!-- 3. Card SERTIFIKAT -->
+                                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
+                                    <div class="text-center">
+                                        <span class="inline-block px-4 py-1 rounded-full bg-slate-100/90 text-slate-700 text-xs font-extrabold uppercase tracking-widest border border-slate-200/60">
+                                            SERTIFIKAT
+                                        </span>
                                     </div>
-                                @endforeach
+
+                                    <div class="space-y-3">
+                                        <div>
+                                            <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-7 p-0.5 border border-slate-200/60 relative">
+                                                <div class="bg-[#856c1f] h-full rounded-md flex items-center justify-center text-white text-xs font-black shadow-inner transition-all duration-500"
+                                                     style="width: {{ $sertifikatSudahPersen }}%;">
+                                                    {{ $sertifikatSudahPersen }} %
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
+                                                <span class="font-bold text-slate-800">
+                                                    <strong class="font-black">{{ $sertifikatSudah }}</strong> Koperasi Sudah Sertifikat
+                                                </span>
+                                                <span class="font-black text-[#856c1f]">{{ $sertifikatSudahPersen }}%</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="w-full bg-slate-100 rounded-lg overflow-hidden h-6 p-0.5 border border-slate-200/60 relative">
+                                                <div class="bg-[#facc15] h-full rounded-md flex items-center justify-center text-slate-900 text-[10px] font-black shadow-inner transition-all duration-500 min-w-[45px]"
+                                                     style="width: {{ max($sertifikatBelumPersen, 3) }}%;">
+                                                    {{ $sertifikatBelumPersen }}%
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs mt-1.5 px-0.5">
+                                                <span class="font-semibold text-slate-700">
+                                                    <strong class="font-black text-slate-800">{{ $sertifikatBelum }}</strong> Koperasi Belum Sertifikat
+                                                </span>
+                                                <span class="font-bold text-slate-400">{{ $sertifikatBelumPersen }}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
-                            <div class="bg-sky-50 border border-sky-100 rounded-xl p-3.5 flex items-start space-x-2.5 text-xs text-sky-900 leading-relaxed shadow-sm">
-                                <i class="fa-solid fa-circle-info text-sky-600 mt-0.5 text-sm shrink-0"></i>
-                                <p class="text-[11px] leading-relaxed">
-                                    Pengisian agregat klasifikasi anggota koperasi diperbarui secara periodik berdasarkan sinkronisasi SIMKOP dan pendataan lapangan Diskop UKM.
-                                </p>
+                            <!-- Right Column: Anggota UMKM Panel -->
+                            <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+
+                                <!-- Top Legends -->
+                                <div class="flex items-center justify-end space-x-6 text-xs font-bold">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-4 h-3 bg-[#0369a1] rounded-sm"></span>
+                                        <span class="text-slate-800">Anggota UMKM</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-4 h-3 bg-[#b48c48] rounded-sm"></span>
+                                        <span class="text-slate-800">Lainnya</span>
+                                    </div>
+                                </div>
+
+                                <!-- Aggregates with Percentage Bars -->
+                                <div class="space-y-4 pt-2">
+                                    <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                                        <span>Anggota UMKM</span>
+                                        <div class="flex items-center space-x-4">
+                                            <span class="text-sm font-extrabold">0</span>
+                                            <div class="w-36 bg-[#0369a1] text-white text-center py-1.5 rounded-md text-xs font-bold shadow-sm">
+                                                0%
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                                        <span>Lainnya</span>
+                                        <div class="flex items-center space-x-4">
+                                            <span class="text-sm font-extrabold">0</span>
+                                            <div class="w-36 bg-[#b48c48] text-white text-center py-1.5 rounded-md text-xs font-bold shadow-sm">
+                                                0%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Inner Panel: Detail Klasifikasi Anggota -->
+                                <div class="rounded-xl border border-slate-200/80 divide-y divide-slate-100 bg-slate-50/40 p-1 text-xs">
+                                    @foreach($klasifikasiAnggota as $item)
+                                        <div class="py-2.5 px-3 flex items-center justify-between">
+                                            <span class="font-bold text-slate-700 {{ $item['accent'] }}">{{ $item['nama'] }}</span>
+                                            <span class="font-extrabold text-slate-600">{{ $item['jumlah'] }} Orang</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <div class="bg-sky-50 border border-sky-100 rounded-xl p-3.5 flex items-start space-x-2.5 text-xs text-sky-900 leading-relaxed shadow-sm">
+                                    <i class="fa-solid fa-circle-info text-sky-600 mt-0.5 text-sm shrink-0"></i>
+                                    <p class="text-[11px] leading-relaxed">
+                                        Pengisian agregat klasifikasi anggota koperasi diperbarui secara periodik berdasarkan sinkronisasi SIMKOP dan pendataan lapangan Diskop UKM.
+                                    </p>
+                                </div>
+
                             </div>
 
                         </div>
-
-                    </div>
+                    @endif
 
                 @elseif($activeTab === 'koperasi')
                     <!-- ================= TAB: DATABASE KOPERASI (PERSIS SESUAI FOTO) ================= -->
@@ -947,9 +1227,9 @@
 
                     <!-- MODAL: TAMBAH DATA KOPERASI -->
                     <div id="modalTambahData" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden my-auto transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <!-- Modal Header -->
-                            <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between">
+                            <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between shrink-0">
                                 <div class="flex items-center space-x-2">
                                     <i class="fa-solid fa-plus-circle text-base text-sky-200"></i>
                                     <h3 class="text-base font-extrabold tracking-wide uppercase">Tambah Data Koperasi Baru</h3>
@@ -960,8 +1240,10 @@
                             </div>
 
                             <!-- Modal Body / Form -->
-                            <form action="{{ route('admin.koperasi.store') }}" method="POST" class="p-6 space-y-4">
+                            <form action="{{ route('admin.koperasi.store') }}" method="POST" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                                 @csrf
+
+                                <div class="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
 
                                 <div class="space-y-1">
                                     <label class="text-xs font-bold text-slate-700">Nama Lengkap Koperasi <span class="text-red-500">*</span></label>
@@ -1036,8 +1318,10 @@
                                     </div>
                                 </div>
 
+                                </div>
+
                                 <!-- Form Actions -->
-                                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-2">
+                                <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end space-x-2 shrink-0">
                                     <button type="button" onclick="closeTambahModal()"
                                             class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
                                         Batal
@@ -1053,7 +1337,7 @@
 
                     <!-- MODAL: EDIT / UPDATE DATA KOPERASI -->
                     <div id="modalEditKoperasi" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden my-auto transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <!-- Modal Header -->
                             <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between shrink-0">
                                 <div class="flex items-center space-x-2">
@@ -1066,10 +1350,13 @@
                             </div>
 
                             <!-- Modal Body / Form -->
-                            <form id="formEditKoperasi" method="POST" class="p-6 space-y-5 overflow-y-auto">
+                            <form id="formEditKoperasi" method="POST" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                                 @csrf
                                 @method('PUT')
                                 <input type="hidden" name="has_types_input" value="1">
+
+                                <!-- Scrollable Form Content -->
+                                <div class="p-6 space-y-5 overflow-y-auto flex-1 min-h-0">
 
                                 <!-- SECTION 1: IDENTITAS & WILAYAH -->
                                 <div class="space-y-3 pb-3 border-b border-slate-100">
@@ -1326,8 +1613,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Form Actions -->
-                                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-2">
+                                <!-- Pinned Form Actions -->
+                                <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end space-x-2 shrink-0">
                                     <button type="button" onclick="closeEditModal()"
                                             class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
                                         Batal
@@ -1460,15 +1747,11 @@
 
                 @elseif($activeTab === 'pengurus')
                     <!-- ================= TAB: DATABASE PENGURUS ================= -->
-                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
-                        <!-- Top Header Section -->
+                    <div class="space-y-6">
+                        <!-- Top Header Section matching other database tabs -->
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                             <div>
-                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-bold bg-[#e0f2fe] text-[#0284c7]">
-                                    <i class="fa-solid fa-address-card text-xs"></i>
-                                    <span class="tracking-wide uppercase text-[11px]">MANAJEMEN SDM KOPERASI</span>
-                                </div>
-                                <h1 class="text-2xl font-black text-slate-900 tracking-tight uppercase mt-2">
+                                <h1 class="text-2xl font-black text-slate-900 tracking-tight uppercase">
                                     DATABASE PENGURUS
                                 </h1>
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">
@@ -1476,285 +1759,437 @@
                                 </p>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="flex items-center flex-wrap gap-2.5">
-                                <a href="{{ route('admin.pengurus.export', request()->all()) }}"
-                                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs">
-                                    <i class="fa-solid fa-file-excel text-emerald-600 text-sm"></i>
-                                    <span>Export Excel</span>
-                                </a>
-
-                                <button type="button" onclick="window.print()"
-                                        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs cursor-pointer">
-                                    <i class="fa-solid fa-print text-slate-600 text-sm"></i>
-                                    <span>Cetak Berkas</span>
-                                </button>
-
-                                <button type="button" onclick="document.getElementById('modalTambahPengurus').classList.remove('hidden')"
-                                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0284c7] hover:bg-[#0369a1] text-white transition shadow-sm cursor-pointer">
-                                    <i class="fa-solid fa-user-plus text-sm"></i>
-                                    <span>Tambah Pengurus</span>
-                                </button>
+                            <!-- Right Badge -->
+                            <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-xs">
+                                <i class="fa-solid fa-users text-[#0284c7] text-xs"></i>
+                                <span>Manajemen SDM Pengurus & Pengawas</span>
                             </div>
                         </div>
 
-                        <!-- 5 Stats Summary Cards -->
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                            <!-- Card 1: Total Pengurus -->
-                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TOTAL PENGURUS</span>
-                                <div class="my-1.5">
-                                    <div class="text-2xl font-black text-slate-900 tracking-tight">
-                                        {{ number_format($statsPengurus['total'] ?? 2381) }}
+                        <!-- Main Content Box -->
+                        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-5">
+                            <!-- VIEW 1: DATA TABLE PENGURUS (Foto 1) -->
+                            <div id="pengurusTableView" class="space-y-4">
+                                <form id="formFilterPengurus" action="{{ route('admin.dashboard') }}" method="GET">
+                                    <input type="hidden" name="tab" value="pengurus">
+
+                                    <!-- Top Cascading Dropdowns: -- KECAMATAN -- and -- DESA/KEL -- -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">KECAMATAN</label>
+                                            <div class="relative">
+                                                <select name="filter_kec_pengurus" id="filter_kec_pengurus" onchange="onPengurusKecChange(this.value)"
+                                                        class="w-full appearance-none px-4 py-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                                    <option value="">-- KECAMATAN --</option>
+                                                    @foreach($kecamatans as $kec)
+                                                        <option value="{{ $kec->id_kopkec }}" {{ (string) request('filter_kec_pengurus') === (string) $kec->id_kopkec ? 'selected' : '' }}>
+                                                            {{ strtoupper($kec->name_kopkec) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">DESA / KELURAHAN</label>
+                                            <div class="relative">
+                                                <select name="filter_kel_pengurus" id="filter_kel_pengurus" onchange="this.form.submit()"
+                                                        class="w-full appearance-none px-4 py-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                                    <option value="">-- DESA/KEL --</option>
+                                                    @if(request('filter_kec_pengurus') && ($selectedKecPengurus = $kecamatans->firstWhere('id_kopkec', request('filter_kec_pengurus'))))
+                                                        @foreach($selectedKecPengurus->kelurahans as $kel)
+                                                            <option value="{{ $kel->id_kopkel }}" {{ (string) request('filter_kel_pengurus') === (string) $kel->id_kopkel ? 'selected' : '' }}>
+                                                                {{ strtoupper($kel->name_kopkel) }}
+                                                            </option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Controls Bar: Show entries & Search -->
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1 text-xs text-slate-600">
+                                        <div class="flex items-center space-x-1.5 text-xs text-slate-500 font-medium">
+                                            <span class="text-[11px] font-bold text-slate-400 uppercase">Show</span>
+                                            <div class="relative">
+                                                <select name="per_page_pengurus" onchange="this.form.submit()"
+                                                        class="appearance-none pr-7 pl-2.5 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                                    <option value="10" {{ ($perPagePengurus ?? 25) == 10 ? 'selected' : '' }}>10</option>
+                                                    <option value="25" {{ ($perPagePengurus ?? 25) == 25 ? 'selected' : '' }}>25</option>
+                                                    <option value="50" {{ ($perPagePengurus ?? 25) == 50 ? 'selected' : '' }}>50</option>
+                                                    <option value="100" {{ ($perPagePengurus ?? 25) == 100 ? 'selected' : '' }}>100</option>
+                                                </select>
+                                                <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400 pointer-events-none"></i>
+                                            </div>
+                                            <span class="text-xs text-slate-500">entries</span>
+                                        </div>
+
+                                        <div class="relative w-full sm:w-72">
+                                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                            <input type="text" name="search_pengurus" value="{{ request('search_pengurus') }}"
+                                                   onkeydown="if(event.key==='Enter'){this.form.submit();}"
+                                                   placeholder="Search nama, jabatan, koperasi..."
+                                                   class="w-full pl-9 pr-8 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white placeholder-slate-400 shadow-xs font-medium text-slate-800">
+                                            @if(request('search_pengurus'))
+                                                <a href="{{ route('admin.dashboard', array_merge(request()->except('search_pengurus'), ['tab' => 'pengurus'])) }}"
+                                                   class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <!-- Table: # | KOPERASI | NAMA | JABATAN | KATEGORI | URUTAN | KETERANGAN | PROSES -->
+                                <div class="overflow-x-auto w-full max-w-full rounded-xl border border-slate-200/90">
+                                    <table class="w-full text-left text-xs border-collapse">
+                                        <thead class="bg-slate-50/90 text-slate-600 font-extrabold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+                                            <tr>
+                                                <th class="py-3 px-3 text-center border-r border-slate-200 w-12 font-bold text-slate-500">
+                                                    <div class="flex items-center justify-center gap-1 cursor-pointer select-none">
+                                                        <span>#</span>
+                                                        <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 px-3 border-r border-slate-200 font-extrabold text-slate-700">
+                                                    <div class="flex items-center justify-between cursor-pointer select-none">
+                                                        <span>KOPERASI</span>
+                                                        <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 px-3 border-r border-slate-200 font-extrabold text-slate-700">
+                                                    <div class="flex items-center justify-between cursor-pointer select-none">
+                                                        <span>NAMA</span>
+                                                        <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 px-3 border-r border-slate-200 font-extrabold text-slate-700">
+                                                    <div class="flex items-center justify-between cursor-pointer select-none">
+                                                        <span>JABATAN</span>
+                                                        <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 px-3 border-r border-slate-200 font-extrabold text-slate-700">
+                                                    <div class="flex items-center justify-between cursor-pointer select-none">
+                                                        <span>KATEGORI</span>
+                                                        <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 px-3 border-r border-slate-200 font-extrabold text-slate-700 w-20 text-center">
+                                                    <div class="flex items-center justify-center gap-1 cursor-pointer select-none">
+                                                        <span>URUTAN</span>
+                                                        <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 px-3 border-r border-slate-200 font-extrabold text-slate-700">
+                                                    <div class="flex items-center justify-between cursor-pointer select-none">
+                                                        <span>KETERANGAN</span>
+                                                        <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 px-3 text-center font-extrabold text-slate-700 w-28">
+                                                    <div class="flex items-center justify-center gap-1 cursor-pointer select-none">
+                                                        <span>PROSES</span>
+                                                        <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                                            @forelse($penguruses as $sdm)
+                                                <tr class="hover:bg-sky-50/40 transition">
+                                                    <td class="py-3 px-3 text-center border-r border-slate-100 font-bold text-slate-500 text-[11px]">
+                                                        {{ $loop->iteration + ($penguruses->currentPage() - 1) * $penguruses->perPage() }}
+                                                    </td>
+                                                    <td class="py-3 px-3 border-r border-slate-100 font-extrabold text-slate-900 uppercase text-xs leading-snug">
+                                                        {{ $sdm->koperasi?->name_koperasi ?? '-' }}
+                                                    </td>
+                                                    <td class="py-3 px-3 border-r border-slate-100 font-black text-slate-900 uppercase text-xs tracking-tight">
+                                                        {{ $sdm->name_kopsdm }}
+                                                    </td>
+                                                    <td class="py-3 px-3 border-r border-slate-100 font-bold text-slate-700 uppercase text-[11px] tracking-wider">
+                                                        {{ $sdm->jab_kopsdm }}
+                                                    </td>
+                                                    <td class="py-3 px-3 border-r border-slate-100 font-extrabold uppercase tracking-wider text-[11px] {{ strtoupper($sdm->type_kopsdm) === 'PENGURUS' ? 'text-sky-700' : 'text-emerald-700' }}">
+                                                        {{ $sdm->type_kopsdm }}
+                                                    </td>
+                                                    <td class="py-3 px-3 border-r border-slate-100 font-bold text-slate-700 text-xs text-center">
+                                                        {{ $sdm->order_kopsdm ?? '-' }}
+                                                    </td>
+                                                    <td class="py-3 px-3 border-r border-slate-100 font-medium text-slate-600 uppercase text-[11px]">
+                                                        {{ ($sdm->comt_kopsdm && $sdm->comt_kopsdm !== '-') ? $sdm->comt_kopsdm : '-' }}
+                                                    </td>
+                                                    <td class="py-3 px-3 text-center whitespace-nowrap">
+                                                        <div class="flex flex-col gap-1 items-center justify-center">
+                                                            <button type="button"
+                                                                    onclick="openEditPengurus({{ json_encode([
+                                                                        'id_kopsdm' => $sdm->id_kopsdm,
+                                                                        'name_kopsdm' => $sdm->name_kopsdm,
+                                                                        'id_koperasi' => $sdm->id_koperasi,
+                                                                        'id_kec' => $sdm->koperasi?->id_kec,
+                                                                        'jab_kopsdm' => $sdm->jab_kopsdm,
+                                                                        'type_kopsdm' => $sdm->type_kopsdm,
+                                                                        'order_kopsdm' => $sdm->order_kopsdm,
+                                                                        'comt_kopsdm' => $sdm->comt_kopsdm,
+                                                                    ]) }})"
+                                                                    class="w-16 py-1 px-2 text-[11px] font-bold text-white bg-[#0284c7] hover:bg-[#0369a1] rounded-lg shadow-2xs transition active:scale-95 cursor-pointer">
+                                                                Update
+                                                            </button>
+                                                            <button type="button"
+                                                                    onclick="confirmDeletePengurus({{ $sdm->id_kopsdm }}, '{{ addslashes($sdm->name_kopsdm) }}')"
+                                                                    class="w-16 py-1 px-2 text-[11px] font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-2xs transition active:scale-95 cursor-pointer">
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="8" class="text-center py-8 text-slate-400 italic text-xs">
+                                                        Data pengurus tidak ditemukan.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Footer Bar: Showing entries, Excel/Cetak/Tambah buttons, Pagination -->
+                                <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-2 text-xs text-slate-600">
+                                    <div class="text-xs text-slate-500 font-medium">
+                                        Showing <strong class="font-bold text-slate-800">{{ $penguruses->firstItem() ?? 0 }}</strong> to <strong class="font-bold text-slate-800">{{ $penguruses->lastItem() ?? 0 }}</strong> of <strong class="font-bold text-slate-800">{{ number_format($penguruses->total()) }}</strong> entries
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('admin.pengurus.export', request()->all()) }}"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs">
+                                            <i class="fa-regular fa-file-excel text-emerald-600"></i>
+                                            <span>Excel</span>
+                                        </a>
+                                        <button type="button" onclick="window.print()"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition shadow-xs cursor-pointer">
+                                            <i class="fa-solid fa-print text-slate-500"></i>
+                                            <span>Cetak</span>
+                                        </button>
+                                        <button type="button" onclick="openTambahPengurus()"
+                                                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#0284c7] hover:bg-[#0369a1] transition shadow-xs cursor-pointer">
+                                            <i class="fa-solid fa-plus text-xs"></i>
+                                            <span>Tambah</span>
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        {{ $penguruses->appends(request()->except('page'))->links() }}
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
-                                    <i class="fa-solid fa-circle-check text-xs"></i>
-                                    <span>Terverifikasi</span>
-                                </div>
                             </div>
 
-                            <!-- Card 2: Ketua Koperasi -->
-                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">KETUA KOPERASI</span>
-                                <div class="my-1.5">
-                                    <div class="text-2xl font-black text-[#0284c7] tracking-tight">
-                                        {{ number_format($statsPengurus['ketua'] ?? 435) }}
+                            <!-- VIEW 2: EDIT DATA PENGURUS (Foto 2) -->
+                            <div id="pengurusEditView" class="hidden">
+                                <h2 class="text-center text-lg sm:text-xl font-black text-slate-900 uppercase mb-6 tracking-tight">
+                                    EDIT DATA PENGURUS
+                                </h2>
+
+                                <form id="formEditPengurus" method="POST" action="">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-xs">
+                                        <!-- Kecamatan -->
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">Kecamatan</label>
+                                            <select id="edit_pengurus_kec" onchange="onEditPengurusKecChange(this.value)"
+                                                    class="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white shadow-xs">
+                                                <option value="">-- Pilih Kecamatan --</option>
+                                                @foreach($kecamatans as $kec)
+                                                    <option value="{{ $kec->id_kopkec }}">{{ strtoupper($kec->name_kopkec) }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <!-- Nama Koperasi -->
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">Nama Koperasi</label>
+                                            <select name="id_koperasi" id="edit_pengurus_koperasi" required
+                                                    class="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white shadow-xs">
+                                                <option value="">-- Pilih Koperasi --</option>
+                                                @foreach($allKoperasis as $kop)
+                                                    <option value="{{ $kop->id_koperasi }}" data-kec="{{ $kop->id_kec }}">{{ $kop->name_koperasi }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <!-- Nama Pengurus -->
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">Nama Pengurus</label>
+                                            <input type="text" name="name_kopsdm" id="edit_pengurus_name" required
+                                                   class="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white shadow-xs">
+                                        </div>
+
+                                        <!-- Jabatan -->
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">Jabatan</label>
+                                            <select name="jab_kopsdm" id="edit_pengurus_jab" required
+                                                    class="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white shadow-xs">
+                                                <option value="KETUA KOPERASI">KETUA KOPERASI</option>
+                                                <option value="WAKIL KETUA KOPERASI">WAKIL KETUA KOPERASI</option>
+                                                <option value="SEKRETARIS KOPERASI">SEKRETARIS KOPERASI</option>
+                                                <option value="WAKIL SEKRETARIS">WAKIL SEKRETARIS</option>
+                                                <option value="BENDAHARA KOPERASI">BENDAHARA KOPERASI</option>
+                                                <option value="WAKIL BENDAHARA">WAKIL BENDAHARA</option>
+                                                <option value="KETUA PENGAWAS">KETUA PENGAWAS</option>
+                                                <option value="ANGGOTA PENGAWAS">ANGGOTA PENGAWAS</option>
+                                                <option value="ANGGOTA PENGURUS">ANGGOTA PENGURUS</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Kategori -->
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">Kategori</label>
+                                            <select name="type_kopsdm" id="edit_pengurus_type" required
+                                                    class="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white shadow-xs">
+                                                <option value="PENGURUS">PENGURUS</option>
+                                                <option value="PENGAWAS">PENGAWAS</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Keterangan -->
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">Keterangan</label>
+                                            <input type="text" name="comt_kopsdm" id="edit_pengurus_comt"
+                                                   class="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white shadow-xs">
+                                        </div>
+
+                                        <!-- Urutan -->
+                                        <div class="space-y-1">
+                                            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">Urutan</label>
+                                            <input type="text" name="order_kopsdm" id="edit_pengurus_order"
+                                                   class="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white shadow-xs">
+                                        </div>
+
+                                        <div></div>
                                     </div>
-                                </div>
-                                <span class="text-[11px] text-slate-400">1 per Koperasi</span>
-                            </div>
 
-                            <!-- Card 3: Sekretaris -->
-                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SEKRETARIS</span>
-                                <div class="my-1.5">
-                                    <div class="text-2xl font-black text-[#4338ca] tracking-tight">
-                                        {{ number_format($statsPengurus['sekretaris'] ?? 435) }}
+                                    <!-- Form Action Buttons -->
+                                    <div class="flex items-center gap-2 mt-6">
+                                        <button type="submit"
+                                                class="px-6 py-2.5 text-xs font-extrabold text-white bg-[#0284c7] hover:bg-[#0369a1] rounded-xl shadow-sm cursor-pointer tracking-wider uppercase transition">
+                                            SIMPAN
+                                        </button>
+                                        <button type="button" onclick="closeEditPengurus()"
+                                                class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl transition cursor-pointer">
+                                            Kembali
+                                        </button>
                                     </div>
-                                </div>
-                                <span class="text-[11px] text-slate-400">1 per Koperasi</span>
+                                </form>
                             </div>
 
-                            <!-- Card 4: Bendahara -->
-                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">BENDAHARA</span>
-                                <div class="my-1.5">
-                                    <div class="text-2xl font-black text-[#d97706] tracking-tight">
-                                        {{ number_format($statsPengurus['bendahara'] ?? 435) }}
+                            <!-- VIEW 3: TAMBAH DATA PENGURUS (Foto 1) -->
+                            <div id="pengurusTambahView" class="hidden">
+                                <h2 class="text-center text-lg sm:text-xl font-bold text-slate-700 uppercase mb-8 tracking-wider">
+                                    TAMBAH DATA PENGURUS
+                                </h2>
+
+                                <form id="formTambahPengurus" method="POST" action="{{ route('admin.pengurus.store') }}">
+                                    @csrf
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-xs sm:text-sm">
+                                        <!-- Row 1: Kecamatan & Nama Koperasi -->
+                                        <div>
+                                            <label class="block font-bold text-slate-700 mb-1.5">Kecamatan</label>
+                                            <select id="tambah_pengurus_kec" onchange="onTambahPengurusKecChange(this.value)"
+                                                    class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-700 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white">
+                                                <option value="">--- PILIH ---</option>
+                                                @foreach($kecamatans as $kec)
+                                                    <option value="{{ $kec->id_kopkec }}">{{ strtoupper($kec->name_kopkec) }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block font-bold text-slate-700 mb-1.5">Nama Koperasi</label>
+                                            <select name="id_koperasi" id="tambah_pengurus_koperasi" required
+                                                    class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-700 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white">
+                                                <option value="">--- PILIH ---</option>
+                                                @foreach($allKoperasis as $kop)
+                                                    <option value="{{ $kop->id_koperasi }}" data-kec="{{ $kop->id_kec }}">{{ $kop->name_koperasi }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <!-- Row 2: Nama Pengurus & Jabatan -->
+                                        <div>
+                                            <label class="block font-bold text-slate-700 mb-1.5">Nama Pengurus</label>
+                                            <input type="text" name="name_kopsdm" required placeholder="Nama Pengurus"
+                                                   class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white">
+                                        </div>
+
+                                        <div>
+                                            <label class="block font-bold text-slate-700 mb-1.5">Jabatan</label>
+                                            <select name="jab_kopsdm" required
+                                                    class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-700 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white">
+                                                <option value="">--- PILIH ---</option>
+                                                <option value="KETUA KOPERASI">KETUA KOPERASI</option>
+                                                <option value="WAKIL KETUA KOPERASI">WAKIL KETUA KOPERASI</option>
+                                                <option value="SEKRETARIS KOPERASI">SEKRETARIS KOPERASI</option>
+                                                <option value="WAKIL SEKRETARIS">WAKIL SEKRETARIS</option>
+                                                <option value="BENDAHARA KOPERASI">BENDAHARA KOPERASI</option>
+                                                <option value="WAKIL BENDAHARA">WAKIL BENDAHARA</option>
+                                                <option value="KETUA PENGAWAS">KETUA PENGAWAS</option>
+                                                <option value="ANGGOTA PENGAWAS">ANGGOTA PENGAWAS</option>
+                                                <option value="ANGGOTA PENGURUS">ANGGOTA PENGURUS</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Row 3: Kategori & Keterangan -->
+                                        <div>
+                                            <label class="block font-bold text-slate-700 mb-1.5">Kategori</label>
+                                            <select name="type_kopsdm" required
+                                                    class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-700 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white">
+                                                <option value="">--- PILIH ---</option>
+                                                <option value="PENGURUS">PENGURUS</option>
+                                                <option value="PENGAWAS">PENGAWAS</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block font-bold text-slate-700 mb-1.5">Keterangan</label>
+                                            <input type="text" name="comt_kopsdm" placeholder="Keterangan"
+                                                   class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white">
+                                        </div>
+
+                                        <!-- Row 4: Urutan & Empty Column -->
+                                        <div>
+                                            <label class="block font-bold text-slate-700 mb-1.5">Urutan</label>
+                                            <input type="text" name="order_kopsdm" placeholder="Urutan"
+                                                   class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white">
+                                        </div>
+
+                                        <div></div>
                                     </div>
-                                </div>
-                                <span class="text-[11px] text-slate-400">1 per Koperasi</span>
-                            </div>
 
-                            <!-- Card 5: Pengawas & Lainnya -->
-                            <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PENGAWAS & LAINNYA</span>
-                                <div class="my-1.5">
-                                    <div class="text-2xl font-black text-[#059669] tracking-tight">
-                                        {{ number_format($statsPengurus['pengawas_lainnya'] ?? 1076) }}
+                                    <!-- Form Action Buttons matching Foto 1 -->
+                                    <div class="flex items-center gap-2 mt-6">
+                                        <button type="submit"
+                                                class="px-6 py-2.5 text-xs font-bold text-white bg-[#00a65a] hover:bg-[#008d4c] rounded shadow-xs cursor-pointer tracking-wider uppercase transition">
+                                            SIMPAN
+                                        </button>
+                                        <button type="button" onclick="closeTambahPengurus()"
+                                                class="px-5 py-2.5 text-xs font-medium text-slate-700 bg-[#f4f4f4] hover:bg-slate-200 border border-[#d2d6de] rounded transition cursor-pointer">
+                                            Kembali
+                                        </button>
                                     </div>
-                                </div>
-                                <span class="text-[11px] text-slate-400">Komite & Pengawas</span>
-                            </div>
-                        </div>
-
-                        <!-- Filter and Search Row -->
-                        <form id="formFilterPengurus" action="{{ route('admin.dashboard') }}" method="GET" class="flex flex-wrap items-center gap-2.5">
-                            <input type="hidden" name="tab" value="pengurus">
-
-                            <!-- Kecamatan Filter -->
-                            <div class="relative min-w-[170px]">
-                                <select name="filter_kec_pengurus" id="filter_kec_pengurus" onchange="onPengurusKecChange(this.value)"
-                                        class="w-full appearance-none pr-8 pl-3.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
-                                    <option value="">-- SEMUA KECAMATAN --</option>
-                                    @foreach($kecamatans as $kec)
-                                        <option value="{{ $kec->id_kopkec }}" {{ (string) request('filter_kec_pengurus') === (string) $kec->id_kopkec ? 'selected' : '' }}>
-                                            {{ strtoupper($kec->name_kopkec) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
+                                </form>
                             </div>
 
-                            <!-- Desa / Kelurahan Filter -->
-                            <div class="relative min-w-[170px]">
-                                <select name="filter_kel_pengurus" id="filter_kel_pengurus" onchange="this.form.submit()"
-                                        class="w-full appearance-none pr-8 pl-3.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
-                                    <option value="">-- DESA/KEL --</option>
-                                    @if(request('filter_kec_pengurus') && ($selectedKecPengurus = $kecamatans->firstWhere('id_kopkec', request('filter_kec_pengurus'))))
-                                        @foreach($selectedKecPengurus->kelurahans as $kel)
-                                            <option value="{{ $kel->id_kopkel }}" {{ (string) request('filter_kel_pengurus') === (string) $kel->id_kopkel ? 'selected' : '' }}>
-                                                {{ strtoupper($kel->name_kopkel) }}
-                                            </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
-                            </div>
-
-                            <!-- Show entries dropdown -->
-                            <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                <span>Show</span>
-                                <div class="relative">
-                                    <select name="per_page_pengurus" onchange="this.form.submit()"
-                                            class="appearance-none pr-7 pl-2.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
-                                        <option value="10" {{ ($perPagePengurus ?? 25) == 10 ? 'selected' : '' }}>10</option>
-                                        <option value="25" {{ ($perPagePengurus ?? 25) == 25 ? 'selected' : '' }}>25</option>
-                                        <option value="50" {{ ($perPagePengurus ?? 25) == 50 ? 'selected' : '' }}>50</option>
-                                        <option value="100" {{ ($perPagePengurus ?? 25) == 100 ? 'selected' : '' }}>100</option>
-                                    </select>
-                                    <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400 pointer-events-none"></i>
-                                </div>
-                            </div>
-
-                            <!-- Search bar -->
-                            <div class="relative flex-1 min-w-[220px]">
-                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                                <input type="text" name="search_pengurus" value="{{ request('search_pengurus') }}"
-                                       placeholder="Search nama / koperasi..."
-                                       class="w-full pl-9 pr-8 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white placeholder-slate-400 shadow-xs">
-                                @if(request('search_pengurus'))
-                                    <a href="{{ route('admin.dashboard', array_merge(request()->except('search_pengurus'), ['tab' => 'pengurus'])) }}"
-                                       class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </a>
-                                @endif
-                            </div>
-
-                            @if(request('filter_kec_pengurus') || request('filter_kel_pengurus') || request('search_pengurus'))
-                                <a href="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}"
-                                   class="px-3 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition">
-                                    Reset
-                                </a>
-                            @endif
-                        </form>
-
-                        <!-- Data Table Pengurus -->
-                        <div class="overflow-x-auto w-full max-w-full rounded-xl border border-slate-100">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-50/70 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
-                                    <tr>
-                                        <th class="py-3 px-3 text-center w-12">#</th>
-                                        <th class="py-3 px-3">
-                                            <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>KOPERASI</span>
-                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
-                                            </div>
-                                        </th>
-                                        <th class="py-3 px-3">
-                                            <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>NAMA PENGURUS</span>
-                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
-                                            </div>
-                                        </th>
-                                        <th class="py-3 px-3">
-                                            <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>JABATAN</span>
-                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
-                                            </div>
-                                        </th>
-                                        <th class="py-3 px-3">
-                                            <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>KATEGORI</span>
-                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
-                                            </div>
-                                        </th>
-                                        <th class="py-3 px-3 text-center w-20">
-                                            <div class="flex items-center justify-center gap-1 cursor-pointer select-none">
-                                                <span>URUTAN</span>
-                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
-                                            </div>
-                                        </th>
-                                        <th class="py-3 px-3">
-                                            <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>KETERANGAN</span>
-                                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
-                                            </div>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 text-slate-700">
-                                    @forelse($penguruses as $sdm)
-                                        @php
-                                            $jab = strtoupper(trim($sdm->jab_kopsdm));
-                                            $jabClass = 'bg-slate-50 text-slate-700 border-slate-200';
-                                            if (str_contains($jab, 'BENDAHARA')) {
-                                                $jabClass = 'bg-[#fefce8] text-[#b45309] border-[#fef08a]';
-                                            } elseif (str_contains($jab, 'WAKIL KETUA')) {
-                                                $jabClass = 'bg-[#f0f9ff] text-[#0284c7] border-[#bae6fd]';
-                                            } elseif (str_contains($jab, 'PENGAWAS')) {
-                                                $jabClass = 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]';
-                                            } elseif ($jab === 'KETUA KOPERASI' || str_contains($jab, 'KETUA')) {
-                                                $jabClass = 'bg-[#eef2ff] text-[#4f46e5] border-[#c7d2fe]';
-                                            } elseif (str_contains($jab, 'SEKRETARIS')) {
-                                                $jabClass = 'bg-[#faf5ff] text-[#9333ea] border-[#f3e8ff]';
-                                            }
-
-                                            $isPengurus = strtoupper($sdm->type_kopsdm) === 'PENGURUS';
-                                        @endphp
-                                        <tr class="hover:bg-slate-50/70 transition">
-                                            <td class="py-3.5 px-3 text-center font-medium text-slate-400">
-                                                {{ $loop->iteration + ($penguruses->currentPage() - 1) * $penguruses->perPage() }}
-                                            </td>
-                                            <td class="py-3.5 px-3">
-                                                <div class="font-extrabold text-slate-900 uppercase text-[11px] leading-snug">
-                                                    {{ $sdm->koperasi?->name_koperasi ?? '-' }}
-                                                </div>
-                                                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mt-0.5">
-                                                    KECAMATAN {{ $sdm->koperasi?->kecamatan?->name_kopkec ?? '-' }}
-                                                </div>
-                                            </td>
-                                            <td class="py-3.5 px-3">
-                                                <span class="font-black text-slate-900 uppercase text-[11px] tracking-tight">
-                                                    {{ $sdm->name_kopsdm }}
-                                                </span>
-                                            </td>
-                                            <td class="py-3.5 px-3">
-                                                <span class="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border {{ $jabClass }}">
-                                                    {{ $sdm->jab_kopsdm }}
-                                                </span>
-                                            </td>
-                                            <td class="py-3.5 px-3">
-                                                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider {{ $isPengurus ? 'bg-[#dbeafe] text-[#1d4ed8]' : 'bg-[#dcfce7] text-[#15803d]' }}">
-                                                    {{ $sdm->type_kopsdm }}
-                                                </span>
-                                            </td>
-                                            <td class="py-3.5 px-3 text-center font-bold text-slate-600 text-xs">
-                                                {{ $sdm->order_kopsdm ?? '-' }}
-                                            </td>
-                                            <td class="py-3.5 px-3 text-slate-500 text-[11px] font-medium uppercase tracking-tight max-w-[160px] truncate" title="{{ $sdm->comt_kopsdm }}">
-                                                {{ ($sdm->comt_kopsdm && $sdm->comt_kopsdm !== '-') ? $sdm->comt_kopsdm : '-' }}
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center py-8 text-slate-400 italic text-xs">
-                                                Data pengurus tidak ditemukan.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pagination Footer matching screenshot -->
-                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-500">
-                            <div>
-                                Menampilkan
-                                <strong class="text-slate-800 font-bold">{{ $penguruses->firstItem() ?? 0 }}</strong>
-                                sampai
-                                <strong class="text-slate-800 font-bold">{{ $penguruses->lastItem() ?? 0 }}</strong>
-                                dari
-                                <strong class="text-slate-800 font-bold">{{ number_format($penguruses->total()) }}</strong>
-                                data pengurus
-                            </div>
-
-                            @if($penguruses->hasPages())
-                                <div>
-                                    {{ $penguruses->links() }}
-                                </div>
-                            @endif
+                            <!-- Hidden Delete Form -->
+                            <form id="formDeletePengurus" method="POST" action="" class="hidden">
+                                @csrf
+                                @method('DELETE')
+                            </form>
                         </div>
                     </div>
 
@@ -1780,14 +2215,34 @@
                             </div>
                         </div>
 
-                        <!-- Peta Persebaran Teritorial Keanggotaan -->
+                        <!-- CARD PEMETAAN GIS KOPERASIDESA MERAH PUTIH -->
                         <div class="rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-xs">
-                            <div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-white text-xs">
-                                <div class="flex items-center gap-2 font-bold text-slate-800 uppercase tracking-wider text-[11px]">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#0284c7]"></span>
-                                    <span>PETA PERSEBARAN TERITORIAL KEANGGOTAAN</span>
+                            <!-- Card Header -->
+                            <div class="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0 shadow-xs">
+                                        <i class="fa-solid fa-map-location-dot text-base"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight uppercase leading-snug">
+                                            PEMETAAN GIS KOPERASIDESA MERAH PUTIH
+                                        </h3>
+                                        <p class="text-xs text-slate-500 mt-0.5">
+                                            @if($isOperator)
+                                                Pemetaan koperasi sesuai wilayah akun operator
+                                            @else
+                                                Sebaran koperasi di seluruh desa/kelurahan Kabupaten Bogor
+                                            @endif
+                                        </p>
+                                    </div>
                                 </div>
-                                <span class="text-slate-400 text-[11px] font-medium">Batas Wilayah Geospasial Kabupaten Bogor</span>
+
+                                <div class="flex items-center space-x-2">
+                                    <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-[11px] font-bold text-slate-700 shadow-xs">
+                                        <i class="fa-solid fa-location-dot text-sky-600 text-xs"></i>
+                                        <span>{{ $gisKoperasis->count() }} Koperasi Terdata</span>
+                                    </span>
+                                </div>
                             </div>
                             <div class="relative w-full h-[460px] bg-slate-100 overflow-hidden isolate z-0">
                                 <div id="map-anggota" class="w-full h-full z-10"></div>
@@ -1881,42 +2336,41 @@
                                 </div>
                             </div>
 
-                            <!-- Row 2: Show, Search, and Action Buttons -->
-                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-1">
-                                <!-- Left: Show Per Page & Search -->
-                                <div class="flex flex-wrap items-center gap-3 flex-1">
-                                    <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                        <span class="text-[11px] font-bold text-slate-400 uppercase">TAMPILKAN</span>
-                                        <div class="relative">
-                                            <select name="per_page_anggota" onchange="this.form.submit()"
-                                                    class="appearance-none pr-7 pl-2.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
-                                                <option value="10" {{ ($perPageAnggota ?? 25) == 10 ? 'selected' : '' }}>10</option>
-                                                <option value="25" {{ ($perPageAnggota ?? 25) == 25 ? 'selected' : '' }}>25</option>
-                                                <option value="50" {{ ($perPageAnggota ?? 25) == 50 ? 'selected' : '' }}>50</option>
-                                                <option value="100" {{ ($perPageAnggota ?? 25) == 100 ? 'selected' : '' }}>100</option>
-                                            </select>
-                                            <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400 pointer-events-none"></i>
-                                        </div>
-                                        <span class="text-xs text-slate-500">baris</span>
-                                    </div>
+                            <!-- Row 2: Show Per Page -->
+                            <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium pt-1">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase">TAMPILKAN</span>
+                                <div class="relative">
+                                    <select name="per_page_anggota" onchange="this.form.submit()"
+                                            class="appearance-none pr-7 pl-2.5 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs">
+                                        <option value="10" {{ ($perPageAnggota ?? 25) == 10 ? 'selected' : '' }}>10</option>
+                                        <option value="25" {{ ($perPageAnggota ?? 25) == 25 ? 'selected' : '' }}>25</option>
+                                        <option value="50" {{ ($perPageAnggota ?? 25) == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="100" {{ ($perPageAnggota ?? 25) == 100 ? 'selected' : '' }}>100</option>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400 pointer-events-none"></i>
+                                </div>
+                                <span class="text-xs text-slate-500">baris</span>
+                            </div>
 
-                                    <div class="relative flex-1 min-w-[240px]">
-                                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                                        <input type="text" name="search_anggota" value="{{ request('search_anggota') }}"
-                                               placeholder="Cari nama, NIK, atau koperasi..."
-                                               class="w-full pl-9 pr-8 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white placeholder-slate-400 shadow-xs">
-                                        @if(request('search_anggota'))
-                                            <a href="{{ route('admin.dashboard', array_merge(request()->except('search_anggota'), ['tab' => 'anggota'])) }}"
-                                               class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
-                                                <i class="fa-solid fa-xmark"></i>
-                                            </a>
-                                        @endif
-                                    </div>
+                            <!-- Row 3: Search Bar on the Left & Action Buttons on the Right (Sejajar) -->
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1">
+                                <!-- Left: Search Bar -->
+                                <div class="relative flex-1 min-w-[240px]">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                    <input type="text" name="search_anggota" value="{{ request('search_anggota') }}"
+                                           placeholder="Cari nama, NIK, atau koperasi..."
+                                           class="w-full pl-9 pr-8 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white placeholder-slate-400 shadow-xs">
+                                    @if(request('search_anggota'))
+                                        <a href="{{ route('admin.dashboard', array_merge(request()->except('search_anggota'), ['tab' => 'anggota'])) }}"
+                                           class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </a>
+                                    @endif
                                 </div>
 
-                                <!-- Right: Action Buttons matching screenshot -->
-                                <div class="flex items-center flex-wrap gap-2">
-                                    <button type="button" onclick="document.getElementById('modalTambahAnggota').classList.remove('hidden')"
+                                <!-- Right: Action Buttons (Sejajar horizontal dengan Search Bar) -->
+                                <div class="flex items-center flex-wrap gap-2 shrink-0">
+                                    <button type="button" onclick="openTambahAnggotaModal()"
                                             class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0284c7] hover:bg-[#0369a1] text-white transition shadow-xs cursor-pointer">
                                         <i class="fa-solid fa-plus text-xs"></i>
                                         <span>Tambah Anggota</span>
@@ -2112,7 +2566,7 @@
                                                             <i class="fa-solid fa-arrows-rotate text-slate-500"></i>
                                                             <span>Sinkronisasi Ulang</span>
                                                         </button>
-                                                        <button type="button" onclick="document.getElementById('modalTambahAnggota').classList.remove('hidden')"
+                                                        <button type="button" onclick="openTambahAnggotaModal()"
                                                                 class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0284c7] hover:bg-[#0369a1] text-white transition shadow-sm cursor-pointer">
                                                             <i class="fa-solid fa-plus text-xs"></i>
                                                             <span>Tambah Anggota Baru</span>
@@ -2587,87 +3041,151 @@
         </div>
     </div>
 
-    <!-- Modal Tambah Anggota -->
-    <div id="modalTambahAnggota" class="fixed inset-0 z-[1050] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
-                        <i class="fa-solid fa-user-plus text-sm"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-black text-slate-900">Tambah Anggota Koperasi Baru</h3>
-                        <p class="text-xs text-slate-500">Input data anggota dan usaha binaan</p>
-                    </div>
+    <!-- Modal Tambah Anggota (Sesuai Referensi Sistem Asli) -->
+    <div id="modalTambahAnggota" class="fixed inset-0 z-[1050] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full max-h-[88vh] flex flex-col overflow-hidden my-auto transform transition-all animate-in fade-in zoom-in-95 duration-200">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-user-plus text-base text-sky-200"></i>
+                    <h3 class="text-base font-extrabold tracking-wide uppercase">TAMBAH DATA ANGGOTA</h3>
                 </div>
-                <button type="button" onclick="document.getElementById('modalTambahAnggota').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <button type="button" onclick="closeTambahAnggotaModal()" class="text-white/80 hover:text-white cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <form onsubmit="alert('Data anggota berhasil disimpan dalam antrean konsolidasi SIMKOP daerah.'); document.getElementById('modalTambahAnggota').classList.add('hidden'); return false;" class="space-y-3.5 text-xs">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Pilih Unit Koperasi <span class="text-rose-500">*</span></label>
-                    <select required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
-                        <option value="">-- Pilih Koperasi --</option>
-                        @foreach($allKoperasis ?? [] as $kop)
-                            <option value="{{ $kop->id_koperasi }}">{{ $kop->name_koperasi }}</option>
-                        @endforeach
-                    </select>
+            <form action="{{ route('admin.anggota.store') }}" method="POST" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                @csrf
+                <input type="hidden" name="redirect_tab" value="anggota">
+
+                <!-- Scrollable Body -->
+                <div class="p-6 space-y-4 overflow-y-auto flex-1 min-h-0 text-xs">
+
+                    <!-- SECTION 1: IDENTITAS -->
+                    <div class="w-full py-2 px-3 bg-slate-100 text-slate-700 font-extrabold text-center text-xs tracking-wider rounded-lg uppercase">
+                        IDENTITAS
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">Kecamatan</label>
+                            <select name="id_kec" id="anggota_id_kec" onchange="updateAnggotaKecamatan(this.value)"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                                <option value="">--- PILIH ---</option>
+                                @foreach($kecamatans as $kec)
+                                    <option value="{{ $kec->id_kopkec }}">{{ $kec->name_kopkec }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">Desa / Kelurahan</label>
+                            <select name="id_kel" id="anggota_id_kel" onchange="updateAnggotaKelurahan(this.value)"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                                <option value="">--- PILIH ---</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">Nama Koperasi <span class="text-rose-500">*</span></label>
+                            <select name="id_koperasi" id="anggota_id_koperasi" required onchange="onSelectAnggotaKoperasi(this.value)"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                                <option value="">--- PILIH ---</option>
+                                @foreach($allKoperasis ?? [] as $kop)
+                                    <option value="{{ $kop->id_koperasi }}" data-kec="{{ $kop->id_kec }}" data-kel="{{ $kop->id_kel }}" data-lat="{{ $kop->gps_lat }}" data-long="{{ $kop->gps_long }}">
+                                        {{ $kop->name_koperasi }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">Nama Anggota <span class="text-rose-500">*</span></label>
+                            <input type="text" name="name_kopang" id="anggota_name_kopang" required placeholder="Nama Anggota"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">Jenis Anggota</label>
+                            <select name="id_kopangtype" id="anggota_id_kopangtype"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                                <option value="">--- PILIH ---</option>
+                                @foreach($koperasiTypes ?? [] as $t)
+                                    <option value="{{ $t->id_kopangtype }}">{{ $t->name_kopangtype }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">Nama Usaha</label>
+                            <input type="text" name="kopang_usaha" id="anggota_kopang_usaha" placeholder="Nama Usaha"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">Alamat</label>
+                            <input type="text" name="kopang_addr" id="anggota_kopang_addr" placeholder="Alamat"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">Telpon</label>
+                            <input type="text" name="kopang_telp" id="anggota_kopang_telp" placeholder="Telpon"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block font-bold text-slate-700">Keterangan</label>
+                        <input type="text" name="comt_kopang" id="anggota_comt_kopang" placeholder="Keterangan"
+                               class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+
+                    <!-- SECTION 2: KOORDINAT -->
+                    <div class="w-full py-2 px-3 bg-slate-100 text-slate-700 font-extrabold text-center text-xs tracking-wider rounded-lg uppercase mt-2">
+                        KOORDINAT
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 items-end">
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">GPS-Lat</label>
+                            <input type="text" name="gps_lat" id="anggota_gps_lat" value="0" placeholder="0"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-700">GPS-Long</label>
+                            <input type="text" name="gps_long" id="anggota_gps_long" value="0" placeholder="0"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                        </div>
+
+                        <div>
+                            <button type="button" onclick="cekKoordinatAnggota()"
+                                    class="w-full px-3.5 py-2.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-extrabold rounded-xl shadow-xs transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                                <i class="fa-solid fa-location-crosshairs text-xs"></i>
+                                <span>Cek Koordinat!</span>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Nama Lengkap Anggota <span class="text-rose-500">*</span></label>
-                        <input type="text" required placeholder="Nama sesuai KTP" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">NIK (16 Digit) <span class="text-rose-500">*</span></label>
-                        <input type="text" required maxlength="16" placeholder="3201xxxxxxxxxxxx" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Nomor Telepon / WhatsApp</label>
-                        <input type="text" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Tipe Anggota</label>
-                        <select class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
-                            <option value="BIASA">ANGGOTA BIASA</option>
-                            <option value="LUAR_BIASA">ANGGOTA LUAR BIASA</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Kategori Usaha</label>
-                        <select class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
-                            <option value="UMKM">Pelaku UMKM / Usaha Mikro</option>
-                            <option value="PETANI">Petani / Peternak</option>
-                            <option value="PEDAGANG">Pedagang</option>
-                            <option value="NON_UMKM">Non-UMKM / Perorangan</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Nama Usaha / Komoditas</label>
-                        <input type="text" placeholder="Contoh: Keripik Singkong" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Alamat Domisili Anggota</label>
-                    <textarea rows="2" placeholder="Alamat lengkap tempat tinggal" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
-                </div>
-
-                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="document.getElementById('modalTambahAnggota').classList.add('hidden')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 font-bold transition cursor-pointer">
-                        Batal
+                <!-- Pinned Footer Buttons -->
+                <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center space-x-2 shrink-0">
+                    <button type="submit"
+                            class="px-6 py-2 bg-[#10b981] hover:bg-[#059669] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition transform active:scale-95 cursor-pointer">
+                        SIMPAN
                     </button>
-                    <button type="submit" class="px-5 py-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl font-bold transition shadow-sm cursor-pointer">
-                        Simpan Anggota
+                    <button type="button" onclick="closeTambahAnggotaModal()"
+                            class="px-5 py-2 border border-slate-200 text-slate-600 bg-white hover:bg-slate-100 rounded-xl font-bold transition cursor-pointer text-xs">
+                        Kembali
                     </button>
                 </div>
             </form>
@@ -2790,6 +3308,139 @@
 
     function closeTambahModal() {
         document.getElementById('modalTambahData')?.classList.add('hidden');
+    }
+
+    // Modal Tambah Anggota Functions
+    const allKoperasisList = @json($allKoperasis ?? []);
+
+    function openTambahAnggotaModal() {
+        document.getElementById('modalTambahAnggota')?.classList.remove('hidden');
+    }
+
+    function closeTambahAnggotaModal() {
+        document.getElementById('modalTambahAnggota')?.classList.add('hidden');
+    }
+
+    function updateAnggotaKecamatan(kecId) {
+        const select = document.getElementById('anggota_id_kel');
+        if (select) {
+            select.innerHTML = '<option value="">--- PILIH ---</option>';
+            if (kecId) {
+                const kec = kecamatansData.find(k => String(k.id_kopkec) === String(kecId));
+                if (kec && kec.kelurahans) {
+                    kec.kelurahans.forEach(kel => {
+                        const opt = document.createElement('option');
+                        opt.value = kel.id_kopkel;
+                        opt.textContent = kel.name_kopkel;
+                        select.appendChild(opt);
+                    });
+                }
+            }
+        }
+        filterAnggotaKoperasiDropdown(kecId, '');
+    }
+
+    function updateAnggotaKelurahan(kelId) {
+        const kecId = document.getElementById('anggota_id_kec')?.value || '';
+        filterAnggotaKoperasiDropdown(kecId, kelId);
+    }
+
+    function filterAnggotaKoperasiDropdown(kecId, kelId) {
+        const select = document.getElementById('anggota_id_koperasi');
+        if (!select) return;
+
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">--- PILIH ---</option>';
+
+        let filtered = allKoperasisList;
+        if (kecId) {
+            filtered = filtered.filter(k => String(k.id_kec) === String(kecId));
+        }
+        if (kelId) {
+            filtered = filtered.filter(k => String(k.id_kel) === String(kelId));
+        }
+
+        filtered.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k.id_koperasi;
+            opt.textContent = k.name_koperasi;
+            opt.dataset.kec = k.id_kec || '';
+            opt.dataset.kel = k.id_kel || '';
+            opt.dataset.lat = k.gps_lat || '';
+            opt.dataset.long = k.gps_long || '';
+            if (currentVal && String(currentVal) === String(k.id_koperasi)) {
+                opt.selected = true;
+            }
+            select.appendChild(opt);
+        });
+    }
+
+    function onSelectAnggotaKoperasi(kopId) {
+        if (!kopId) return;
+        const kop = allKoperasisList.find(k => String(k.id_koperasi) === String(kopId));
+        if (!kop) return;
+
+        const kecSelect = document.getElementById('anggota_id_kec');
+        const kelSelect = document.getElementById('anggota_id_kel');
+
+        if (kop.id_kec && kecSelect && !kecSelect.value) {
+            kecSelect.value = kop.id_kec;
+            const selectKel = document.getElementById('anggota_id_kel');
+            if (selectKel) {
+                selectKel.innerHTML = '<option value="">--- PILIH ---</option>';
+                const kec = kecamatansData.find(k => String(k.id_kopkec) === String(kop.id_kec));
+                if (kec && kec.kelurahans) {
+                    kec.kelurahans.forEach(kel => {
+                        const opt = document.createElement('option');
+                        opt.value = kel.id_kopkel;
+                        opt.textContent = kel.name_kopkel;
+                        if (String(kel.id_kopkel) === String(kop.id_kel)) {
+                            opt.selected = true;
+                        }
+                        selectKel.appendChild(opt);
+                    });
+                }
+            }
+        } else if (kop.id_kel && kelSelect && !kelSelect.value) {
+            kelSelect.value = kop.id_kel;
+        }
+
+        const latInput = document.getElementById('anggota_gps_lat');
+        const longInput = document.getElementById('anggota_gps_long');
+        if (latInput && (latInput.value === '0' || !latInput.value) && kop.gps_lat) {
+            latInput.value = kop.gps_lat;
+        }
+        if (longInput && (longInput.value === '0' || !longInput.value) && kop.gps_long) {
+            longInput.value = kop.gps_long;
+        }
+    }
+
+    function cekKoordinatAnggota() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const long = position.coords.longitude.toFixed(6);
+                    document.getElementById('anggota_gps_lat').value = lat;
+                    document.getElementById('anggota_gps_long').value = long;
+                    alert(`Koordinat GPS terdeteksi:\nLat: ${lat}\nLong: ${long}`);
+                },
+                (error) => {
+                    const kopId = document.getElementById('anggota_id_koperasi')?.value;
+                    const kop = allKoperasisList.find(k => String(k.id_koperasi) === String(kopId));
+                    if (kop && kop.gps_lat && kop.gps_long) {
+                        document.getElementById('anggota_gps_lat').value = kop.gps_lat;
+                        document.getElementById('anggota_gps_long').value = kop.gps_long;
+                        alert(`Menggunakan koordinat Koperasi ${kop.name_koperasi}:\nLat: ${kop.gps_lat}\nLong: ${kop.gps_long}`);
+                    } else {
+                        alert('Tidak dapat mendeteksi koordinat perangkat secara otomatis. Silakan masukkan nilai koordinat atau pilih Nama Koperasi.');
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+            );
+        } else {
+            alert('Fitur geolokasi browser tidak didukung.');
+        }
     }
 
     // Toggle Collapsible Detail Row (Matching Foto Kedua)
@@ -3519,9 +4170,143 @@
         }
     }
 
+    const allPengurusKoperasisList = @json($allKoperasis->map(fn($k) => ['id' => $k->id_koperasi, 'name' => $k->name_koperasi, 'id_kec' => $k->id_kec]));
+
     function onPengurusKecChange(kecId) {
         updateDesaDropdown(kecId, 'filter_kel_pengurus', '');
         document.getElementById('formFilterPengurus').submit();
+    }
+
+    function onEditPengurusKecChange(kecId, selectedKoperasiId = null) {
+        const kopSelect = document.getElementById('edit_pengurus_koperasi');
+        if (!kopSelect) return;
+        kopSelect.innerHTML = '<option value="">--- PILIH ---</option>';
+
+        const filtered = kecId
+            ? allPengurusKoperasisList.filter(k => String(k.id_kec) === String(kecId))
+            : allPengurusKoperasisList;
+
+        filtered.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k.id;
+            opt.textContent = k.name;
+            if (selectedKoperasiId && String(k.id) === String(selectedKoperasiId)) {
+                opt.selected = true;
+            }
+            kopSelect.appendChild(opt);
+        });
+    }
+
+    function onTambahPengurusKecChange(kecId, selectedKoperasiId = null) {
+        const kopSelect = document.getElementById('tambah_pengurus_koperasi');
+        if (!kopSelect) return;
+        kopSelect.innerHTML = '<option value="">--- PILIH ---</option>';
+
+        const filtered = kecId
+            ? allPengurusKoperasisList.filter(k => String(k.id_kec) === String(kecId))
+            : allPengurusKoperasisList;
+
+        filtered.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k.id;
+            opt.textContent = k.name;
+            if (selectedKoperasiId && String(k.id) === String(selectedKoperasiId)) {
+                opt.selected = true;
+            }
+            kopSelect.appendChild(opt);
+        });
+    }
+
+    function openEditPengurus(data) {
+        const tableView = document.getElementById('pengurusTableView');
+        const editView = document.getElementById('pengurusEditView');
+        const tambahView = document.getElementById('pengurusTambahView');
+
+        if (tableView) tableView.classList.add('hidden');
+        if (tambahView) tambahView.classList.add('hidden');
+        if (editView) editView.classList.remove('hidden');
+
+        const form = document.getElementById('formEditPengurus');
+        if (form) {
+            form.action = '/admin/pengurus/' + data.id_kopsdm;
+        }
+
+        const kecSelect = document.getElementById('edit_pengurus_kec');
+        if (kecSelect) {
+            kecSelect.value = data.id_kec || '';
+        }
+        onEditPengurusKecChange(data.id_kec, data.id_koperasi);
+
+        const nameInput = document.getElementById('edit_pengurus_name');
+        if (nameInput) nameInput.value = data.name_kopsdm || '';
+
+        const jabSelect = document.getElementById('edit_pengurus_jab');
+        if (jabSelect) jabSelect.value = data.jab_kopsdm || 'KETUA KOPERASI';
+
+        const typeSelect = document.getElementById('edit_pengurus_type');
+        if (typeSelect) typeSelect.value = data.type_kopsdm || 'PENGURUS';
+
+        const comtInput = document.getElementById('edit_pengurus_comt');
+        if (comtInput) comtInput.value = data.comt_kopsdm || '-';
+
+        const orderInput = document.getElementById('edit_pengurus_order');
+        if (orderInput) orderInput.value = data.order_kopsdm || '1';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeEditPengurus() {
+        const tableView = document.getElementById('pengurusTableView');
+        const editView = document.getElementById('pengurusEditView');
+        const tambahView = document.getElementById('pengurusTambahView');
+
+        if (editView) editView.classList.add('hidden');
+        if (tambahView) tambahView.classList.add('hidden');
+        if (tableView) tableView.classList.remove('hidden');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openTambahPengurus() {
+        const tableView = document.getElementById('pengurusTableView');
+        const editView = document.getElementById('pengurusEditView');
+        const tambahView = document.getElementById('pengurusTambahView');
+
+        if (tableView) tableView.classList.add('hidden');
+        if (editView) editView.classList.add('hidden');
+        if (tambahView) {
+            tambahView.classList.remove('hidden');
+            const form = document.getElementById('formTambahPengurus');
+            if (form) {
+                form.reset();
+            }
+            const defaultKec = document.getElementById('tambah_pengurus_kec')?.value;
+            onTambahPengurusKecChange(defaultKec || '');
+        } else {
+            document.getElementById('modalTambahPengurus')?.classList.remove('hidden');
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeTambahPengurus() {
+        const tableView = document.getElementById('pengurusTableView');
+        const editView = document.getElementById('pengurusEditView');
+        const tambahView = document.getElementById('pengurusTambahView');
+
+        if (tambahView) tambahView.classList.add('hidden');
+        if (editView) editView.classList.add('hidden');
+        if (tableView) tableView.classList.remove('hidden');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function confirmDeletePengurus(id, name) {
+        if (confirm('Apakah Anda yakin ingin menghapus data pengurus ' + name + '?')) {
+            const form = document.getElementById('formDeletePengurus');
+            form.action = '/admin/pengurus/' + id;
+            form.submit();
+        }
     }
 
     let mapAnggotaInstance = null;
@@ -3547,6 +4332,7 @@
             zoom: 11,
             minZoom: 9,
             maxZoom: 18,
+            scrollWheelZoom: false,
             maxBounds: [
                 [-7.1000, 106.2000],
                 [-6.1000, 107.4500]
@@ -4151,6 +4937,366 @@
         document.getElementById('modalEditLampiran')?.classList.add('hidden');
     }
 
+    // Rekapitulasi Data & Logic
+    const rawRekapData = @json($activeTab === 'informasi' ? (in_array($rekapSubtab ?? 'info', ['rekap_kop_kec', 'rekap_ang_kec']) ? ($rekapKecamatanData ?? []) : ($rekapDesaData ?? [])) : []);
+    const rekapMode = @json($rekapSubtab ?? 'info');
+
+    let currentRekapPage = 1;
+    let rekapPageSize = 25;
+    let rekapSearchQuery = '';
+    let rekapSortCol = 'name';
+    let rekapSortDir = 'asc';
+    let filteredRekapData = [];
+
+    let mapRekapInstance = null;
+    let rekapGeoJsonLayer = null;
+
+    function getRekapColor(val) {
+        if (val > 60) return '#660000';
+        if (val > 50) return '#990000';
+        if (val > 25) return '#cc4c02';
+        if (val > 20) return '#ec7014';
+        if (val > 15) return '#fe9929';
+        if (val > 10) return '#fec44f';
+        if (val > 5) return '#fee391';
+        return '#fff7bc';
+    }
+
+    function initMapRekap() {
+        const mapEl = document.getElementById('map-rekap');
+        if (!mapEl || mapRekapInstance || typeof L === 'undefined') return;
+
+        const bogorCenter = [-6.5700, 106.8200];
+        const bogorBounds = [
+            [-6.8000, 106.4000],
+            [-6.3000, 107.2500]
+        ];
+
+        mapRekapInstance = L.map('map-rekap', {
+            center: bogorCenter,
+            zoom: 11,
+            minZoom: 9,
+            maxZoom: 18,
+            scrollWheelZoom: false,
+            maxBounds: [
+                [-7.1000, 106.2000],
+                [-6.1000, 107.4500]
+            ],
+            maxBoundsViscosity: 0.8
+        });
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(mapRekapInstance);
+
+        if (window.BOGOR_KECAMATAN_GEOJSON) {
+            const kecCountMap = {};
+            const isAnggota = rekapMode.startsWith('rekap_ang_');
+            if (rawRekapData && rawRekapData.length) {
+                rawRekapData.forEach(item => {
+                    const kecName = (item.nama_kecamatan || '').toUpperCase().trim();
+                    const val = isAnggota ? (item.jum_anggota || 0) : (item.jum_koperasi || 0);
+                    kecCountMap[kecName] = (kecCountMap[kecName] || 0) + val;
+                });
+            }
+
+            rekapGeoJsonLayer = L.geoJSON(window.BOGOR_KECAMATAN_GEOJSON, {
+                style: function (feature) {
+                    const name = (feature.properties?.name || '').toUpperCase().trim();
+                    const val = kecCountMap[name] || 1;
+                    return {
+                        fillColor: getRekapColor(val),
+                        weight: 1.5,
+                        opacity: 1,
+                        color: '#ffffff',
+                        dashArray: '',
+                        fillOpacity: 0.85
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+                    const name = feature.properties ? (feature.properties.fullName || feature.properties.name) : 'Kecamatan';
+                    const cleanName = (feature.properties?.name || '').toUpperCase().trim();
+                    const val = kecCountMap[cleanName] || 1;
+                    const label = isAnggota ? `${val} Anggota` : `${val} Koperasi`;
+
+                    layer.bindTooltip(`<strong>${name}</strong><br>${label}`, {
+                        sticky: true,
+                        direction: 'top'
+                    });
+
+                    layer.on({
+                        mouseover: function (e) {
+                            const l = e.target;
+                            l.setStyle({
+                                weight: 3,
+                                color: '#0284c7',
+                                fillOpacity: 0.95
+                            });
+                            l.bringToFront();
+                        },
+                        mouseout: function (e) {
+                            rekapGeoJsonLayer.resetStyle(e.target);
+                        },
+                        click: function () {
+                            const searchInput = document.getElementById('rekapSearchInput');
+                            if (searchInput) {
+                                searchInput.value = cleanName;
+                                onRekapSearch(cleanName);
+                                document.getElementById('rekapTable')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }
+                    });
+                }
+            }).addTo(mapRekapInstance);
+
+            mapRekapInstance.fitBounds(bogorBounds);
+        }
+    }
+
+    function renderRekapTable() {
+        const tbody = document.getElementById('rekapTableBody');
+        const infoEl = document.getElementById('rekapTableInfo');
+        const pagEl = document.getElementById('rekapPagination');
+        if (!tbody) return;
+
+        // Filter
+        const q = rekapSearchQuery.toLowerCase().trim();
+        filteredRekapData = rawRekapData.filter(item => {
+            if (!q) return true;
+            const desa = (item.nama_desa || '').toLowerCase();
+            const kec = (item.nama_kecamatan || '').toLowerCase();
+            const kop = (item.koperasi_nama || '').toLowerCase();
+            return desa.includes(q) || kec.includes(q) || kop.includes(q);
+        });
+
+        // Sort
+        filteredRekapData.sort((a, b) => {
+            let valA, valB;
+            if (rekapSortCol === 'name') {
+                valA = (a.nama_desa || a.nama_kecamatan || '').toLowerCase();
+                valB = (b.nama_desa || b.nama_kecamatan || '').toLowerCase();
+            } else if (rekapSortCol === 'jum') {
+                valA = rekapMode.startsWith('rekap_ang_') ? a.jum_anggota : a.jum_koperasi;
+                valB = rekapMode.startsWith('rekap_ang_') ? b.jum_anggota : b.jum_koperasi;
+            } else if (rekapSortCol === 'sudah_ops') {
+                valA = a.sudah_ops;
+                valB = b.sudah_ops;
+            } else if (rekapSortCol === 'belum_ops') {
+                valA = a.belum_ops;
+                valB = b.belum_ops;
+            } else if (rekapSortCol === 'sudah_sertifikat') {
+                valA = a.sudah_sertifikat;
+                valB = b.sudah_sertifikat;
+            }
+            if (valA < valB) return rekapSortDir === 'asc' ? -1 : 1;
+            if (valA > valB) return rekapSortDir === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        const total = filteredRekapData.length;
+        const totalPages = Math.ceil(total / rekapPageSize) || 1;
+        if (currentRekapPage > totalPages) currentRekapPage = totalPages;
+        if (currentRekapPage < 1) currentRekapPage = 1;
+
+        const startIdx = (currentRekapPage - 1) * rekapPageSize;
+        const endIdx = Math.min(startIdx + rekapPageSize, total);
+        const pageData = filteredRekapData.slice(startIdx, endIdx);
+
+        tbody.innerHTML = '';
+        if (pageData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 font-bold">Data wilayah tidak ditemukan</td></tr>`;
+        } else {
+            pageData.forEach((row, i) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition-colors';
+
+                const isKecView = ['rekap_kop_kec', 'rekap_ang_kec'].includes(rekapMode);
+                const jumVal = rekapMode.startsWith('rekap_ang_') ? Number(row.jum_anggota).toLocaleString() : row.jum_koperasi;
+
+                let col1Html = '';
+                if (isKecView) {
+                    col1Html = `
+                        <div class="py-1">
+                            <span class="font-bold text-slate-900 uppercase">${row.nama_kecamatan}</span>
+                            <div class="text-[11px] text-slate-400 font-medium">${row.jum_desa || 0} Desa/Kelurahan</div>
+                        </div>
+                    `;
+                } else {
+                    col1Html = `
+                        <div class="flex items-start gap-2 py-0.5">
+                            <button type="button" onclick="toggleRekapChildRow(${row.id_kopkel})"
+                                    class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-600 text-white flex items-center justify-center shrink-0 mt-0.5 cursor-pointer shadow-xs transition">
+                                <i class="fa-solid fa-plus text-[8px]" id="rekap-icon-${row.id_kopkel}"></i>
+                            </button>
+                            <div>
+                                <span class="font-extrabold text-slate-900 uppercase">${row.nama_desa}</span>
+                                <div class="text-[11px] font-bold text-sky-600">#${row.nama_kecamatan}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3">${col1Html}</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-800">${jumVal}</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-800">${row.sudah_ops}</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-800">${row.belum_ops}</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-800">${row.sudah_sertifikat}</td>
+                `;
+                tbody.appendChild(tr);
+
+                if (!isKecView) {
+                    const childTr = document.createElement('tr');
+                    childTr.id = `rekap-child-${row.id_kopkel}`;
+                    childTr.className = 'hidden bg-sky-50/50';
+                    childTr.innerHTML = `
+                        <td colspan="5" class="py-2.5 px-6 text-xs text-slate-700 border-l-4 border-sky-400">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                                <div><strong class="text-slate-900">Nama Koperasi:</strong> ${row.koperasi_nama || '-'}</div>
+                                <div><strong class="text-slate-900">Status Operasional:</strong> <span class="${row.sudah_ops ? 'text-emerald-600 font-bold' : 'text-slate-500'}">${row.sudah_ops ? 'SUDAH' : 'BELUM'}</span></div>
+                                <div><strong class="text-slate-900">No AHU:</strong> ${row.no_ahu || '-'}</div>
+                                <div><strong class="text-slate-900">Status Sertifikat:</strong> <span class="${row.sudah_sertifikat ? 'text-emerald-600 font-bold' : 'text-slate-500'}">${row.sudah_sertifikat ? 'SUDAH' : 'BELUM'}</span></div>
+                                <div><strong class="text-slate-900">No INKOP:</strong> ${row.no_inkop || '-'}</div>
+                                <div><strong class="text-slate-900">Jumlah Anggota:</strong> ${Number(row.jum_anggota || 0).toLocaleString()} orang</div>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(childTr);
+                }
+            });
+        }
+
+        // Info text matching screenshot: "Showing 1 to 25 of 435 entries"
+        if (infoEl) {
+            if (total === 0) {
+                infoEl.textContent = 'Showing 0 to 0 of 0 entries';
+            } else {
+                infoEl.textContent = `Showing ${startIdx + 1} to ${endIdx} of ${total} entries`;
+            }
+        }
+
+        // Pagination buttons
+        if (pagEl) {
+            pagEl.innerHTML = '';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.type = 'button';
+            prevBtn.textContent = 'Previous';
+            prevBtn.className = `px-2.5 py-1 rounded text-xs transition ${currentRekapPage === 1 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-700 hover:bg-slate-100 cursor-pointer'}`;
+            prevBtn.disabled = currentRekapPage === 1;
+            prevBtn.onclick = () => { if (currentRekapPage > 1) { currentRekapPage--; renderRekapTable(); } };
+            pagEl.appendChild(prevBtn);
+
+            // Render page numbers (with ellipsis if large)
+            let pagesToShow = [];
+            if (totalPages <= 7) {
+                for (let p = 1; p <= totalPages; p++) pagesToShow.push(p);
+            } else {
+                pagesToShow.push(1);
+                if (currentRekapPage > 3) pagesToShow.push('...');
+                let start = Math.max(2, currentRekapPage - 1);
+                let end = Math.min(totalPages - 1, currentRekapPage + 1);
+                for (let p = start; p <= end; p++) pagesToShow.push(p);
+                if (currentRekapPage < totalPages - 2) pagesToShow.push('...');
+                pagesToShow.push(totalPages);
+            }
+
+            pagesToShow.forEach(p => {
+                if (p === '...') {
+                    const span = document.createElement('span');
+                    span.className = 'px-1.5 py-1 text-slate-400 text-xs';
+                    span.textContent = '...';
+                    pagEl.appendChild(span);
+                } else {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = p;
+                    btn.className = `px-2.5 py-1 rounded text-xs transition cursor-pointer ${p === currentRekapPage ? 'bg-sky-600 text-white font-bold shadow-xs' : 'text-slate-700 hover:bg-slate-100'}`;
+                    btn.onclick = () => { currentRekapPage = p; renderRekapTable(); };
+                    pagEl.appendChild(btn);
+                }
+            });
+
+            const nextBtn = document.createElement('button');
+            nextBtn.type = 'button';
+            nextBtn.textContent = 'Next';
+            nextBtn.className = `px-2.5 py-1 rounded text-xs transition ${currentRekapPage === totalPages ? 'text-slate-300 cursor-not-allowed' : 'text-slate-700 hover:bg-slate-100 cursor-pointer'}`;
+            nextBtn.disabled = currentRekapPage === totalPages;
+            nextBtn.onclick = () => { if (currentRekapPage < totalPages) { currentRekapPage++; renderRekapTable(); } };
+            pagEl.appendChild(nextBtn);
+        }
+    }
+
+    function toggleRekapChildRow(id) {
+        const row = document.getElementById(`rekap-child-${id}`);
+        const icon = document.getElementById(`rekap-icon-${id}`);
+        if (!row) return;
+        const isHidden = row.classList.contains('hidden');
+        if (isHidden) {
+            row.classList.remove('hidden');
+            if (icon) {
+                icon.classList.remove('fa-plus');
+                icon.classList.add('fa-minus');
+            }
+        } else {
+            row.classList.add('hidden');
+            if (icon) {
+                icon.classList.remove('fa-minus');
+                icon.classList.add('fa-plus');
+            }
+        }
+    }
+
+    function onRekapSearch(val) {
+        rekapSearchQuery = val;
+        currentRekapPage = 1;
+        renderRekapTable();
+    }
+
+    function changeRekapPageSize(size) {
+        rekapPageSize = parseInt(size, 10) || 25;
+        currentRekapPage = 1;
+        renderRekapTable();
+    }
+
+    function sortRekap(col) {
+        if (rekapSortCol === col) {
+            rekapSortDir = rekapSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            rekapSortCol = col;
+            rekapSortDir = 'asc';
+        }
+        renderRekapTable();
+    }
+
+    function exportRekapExcel() {
+        if (typeof XLSX === 'undefined') {
+            alert('Pustaka SheetJS belum selesai dimuat.');
+            return;
+        }
+        const dataToExport = filteredRekapData.map((item, idx) => {
+            const isKec = ['rekap_kop_kec', 'rekap_ang_kec'].includes(rekapMode);
+            return {
+                'No': idx + 1,
+                'Wilayah': isKec ? item.nama_kecamatan : `${item.nama_desa} (#${item.nama_kecamatan})`,
+                'Jumlah': rekapMode.startsWith('rekap_ang_') ? item.jum_anggota : item.jum_koperasi,
+                'Sudah Operasional': item.sudah_ops,
+                'Belum Operasional': item.belum_ops,
+                'Sudah Sertifikat': item.sudah_sertifikat,
+                'Nama Koperasi': item.koperasi_nama || '-'
+            };
+        });
+        const ws = XLSX.utils.json_to_sheet(dataToExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Rekapitulasi");
+        XLSX.writeFile(wb, `Rekapitulasi_${rekapMode}.xlsx`);
+    }
+
+    function printRekapTable() {
+        window.print();
+    }
+
     // Auto-init on page load
     document.addEventListener('DOMContentLoaded', function () {
         if (selectedKecId) {
@@ -4169,9 +5315,12 @@
             updateDesaDropdown(selectedAnggotaKecId, 'filter_kel_anggota', selectedAnggotaKelId);
         }
 
-        // Initialize GIS map and layer switchers after DOM settles
+        // Initialize GIS map, Anggota map, and Rekap map after DOM settles
         setTimeout(initGisMap, 200);
         setTimeout(initMapAnggota, 250);
+        setTimeout(initMapRekap, 300);
+        renderRekapTable();
+
         setTimeout(() => {
             updateAdminKoperasiLayerGlider(activeLayerKey);
             updateAdminAnggotaLayerGlider(activeLayerAnggotaKey);

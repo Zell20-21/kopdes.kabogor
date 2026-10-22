@@ -240,6 +240,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::delete('/lampiran/{lampiran}', [AdminController::class, 'destroyLampiran'])->name('admin.lampiran.destroy');
 
     Route::post('/pengurus', [AdminController::class, 'storePengurus'])->name('admin.pengurus.store');
+    Route::put('/pengurus/{pengurus}', [AdminController::class, 'updatePengurus'])->name('admin.pengurus.update');
+    Route::delete('/pengurus/{pengurus}', [AdminController::class, 'destroyPengurus'])->name('admin.pengurus.destroy');
     Route::post('/pengurus/{pengurus}/foto', [AdminController::class, 'uploadFotoPengurus'])->name('admin.pengurus.foto');
     Route::post('/pengurus/foto', [AdminController::class, 'uploadFotoPengurusOperator'])->name('admin.pengurus.foto.operator');
     Route::post('/anggota', [AdminController::class, 'storeAnggota'])->name('admin.anggota.store');

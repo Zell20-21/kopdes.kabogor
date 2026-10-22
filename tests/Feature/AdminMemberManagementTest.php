@@ -111,6 +111,49 @@ class AdminMemberManagementTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_update_manager(): void
+    {
+        $cooperative = $this->createCooperative(9950, 2);
+        $manager = $this->createManager(9950, $cooperative->id_koperasi);
+        $admin = User::firstOrFail();
+
+        $response = $this->actingAs($admin)->put(route('admin.pengurus.update', $manager), [
+            'id_koperasi' => $cooperative->id_koperasi,
+            'name_kopsdm' => 'SUSHI HARIANTO WIDIASTUTI',
+            'jab_kopsdm' => 'BENDAHARA KOPERASI',
+            'type_kopsdm' => 'PENGURUS',
+            'order_kopsdm' => '4',
+            'comt_kopsdm' => '-',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard', ['tab' => 'pengurus']));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('app_md_kopsdm', [
+            'id_kopsdm' => $manager->id_kopsdm,
+            'name_kopsdm' => 'SUSHI HARIANTO WIDIASTUTI',
+            'jab_kopsdm' => 'BENDAHARA KOPERASI',
+            'order_kopsdm' => '4',
+        ]);
+    }
+
+    public function test_admin_can_delete_manager(): void
+    {
+        $cooperative = $this->createCooperative(9951, 2);
+        $manager = $this->createManager(9951, $cooperative->id_koperasi);
+        $admin = User::firstOrFail();
+
+        $response = $this->actingAs($admin)->delete(route('admin.pengurus.destroy', $manager));
+
+        $response->assertRedirect(route('admin.dashboard', ['tab' => 'pengurus']));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('app_md_kopsdm', [
+            'id_kopsdm' => $manager->id_kopsdm,
+            'flag_del' => 1,
+        ]);
+    }
+
     public function test_admin_can_add_an_individual_member_and_member_nik_is_encrypted(): void
     {
         $cooperative = $this->createCooperative(9902, 4);
