@@ -5,8 +5,8 @@
 @section('content')
 <div class="min-h-screen bg-slate-50 flex flex-col justify-between">
 
-    <!-- Top Navigation Header -->
-    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-[100]">
+    <!-- Top Navigation Header (Stay / Fixed di atas saat di-scroll) -->
+    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md fixed top-0 left-0 right-0 z-[100] w-full">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-14 sm:h-16">
                 <div class="flex items-center space-x-2 sm:space-x-3.5 min-w-0 pr-1">
@@ -46,13 +46,8 @@
                     </a>
                 </nav>
 
-                <!-- Actions: TA & Login (Clean & Compact on Mobile) -->
+                <!-- Actions: Login (Clean & Compact on Mobile) -->
                 <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
-                    <div class="hidden sm:flex items-center space-x-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-black/25 text-red-100 border border-white/10">
-                        <i class="fa-regular fa-calendar-check text-red-300"></i>
-                        <span>TA 2025/2026</span>
-                    </div>
-
                     <!-- Clean & Compact Login Button on Mobile -->
                     <button type="button" onclick="openLoginModal()" class="flex items-center space-x-1 sm:space-x-1.5 bg-white text-red-700 hover:bg-red-50 px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm transition-all duration-200 hover:shadow-md transform active:scale-95 cursor-pointer shrink-0">
                         <i class="fa-solid fa-arrow-right-to-bracket text-[11px] sm:text-xs"></i>
@@ -64,10 +59,10 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="flex-grow pb-12">
+    <main class="flex-grow pb-12 pt-14 sm:pt-16">
 
         <!-- Hero Welcome Banner -->
-        <section id="beranda" class="pt-8 pb-6 bg-gradient-to-b from-red-50/80 via-red-50/30 to-slate-50 border-b border-red-100/60">
+        <section id="beranda" class="pt-8 pb-6 bg-gradient-to-b from-red-50/80 via-red-50/30 to-slate-50 border-b border-red-100/60 scroll-mt-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#991b1b] tracking-tight uppercase">
                     KOPERASI DESA MERAH PUTIH
@@ -112,12 +107,9 @@
                     <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
                         <div>
                             <div class="flex items-center pb-3 border-b border-slate-100">
-                                <div class="flex items-center space-x-2.5">
-                                    <span class="w-3 h-3 rounded-full bg-red-600 animate-pulse"></span>
-                                    <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
-                                        Koperasi Merah Putih
-                                    </h3>
-                                </div>
+                                <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
+                                    Koperasi Merah Putih
+                                </h3>
                             </div>
 
                             <p class="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
@@ -146,21 +138,7 @@
                     </div>
 
                     <!-- Kolom Kanan: Timeline Slider Foto Kegiatan & Pembangunan KDKMP -->
-                    <div class="lg:col-span-5 flex flex-col">
-                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
-                            <div class="flex items-center space-x-2">
-                                <i class="fa-solid fa-timeline text-red-600"></i>
-                                <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">
-                                    Timeline Foto KDKMP
-                                </span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span id="slideCounter" class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-extrabold">
-                                    1 / {{ count($timelineSlides) }}
-                                </span>
-                            </div>
-                        </div>
-
+                    <div class="lg:col-span-5 flex flex-col justify-center">
                         <!-- Slider Frame with Aspect Ratio -->
                         <div
                             id="timelineSliderContainer"
@@ -174,21 +152,13 @@
                                     <img src="{{ $slide['foto'] }}" alt="{{ $slide['judul'] }}" class="w-full h-full object-cover">
                                     <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
 
-                                    <!-- Top Badges -->
-                                    <div class="absolute top-3 left-3 flex items-center space-x-2">
-                                        <span class="px-2.5 py-1 rounded-full bg-red-600 text-white text-[10px] font-black tracking-wider uppercase shadow-sm">
-                                            {{ $slide['fase'] }}
-                                        </span>
-                                        <span class="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-xs text-red-100 text-[10px] font-semibold border border-white/20">
-                                            {{ $slide['tanggal'] }}
-                                        </span>
-                                    </div>
-
                                     <!-- Bottom Info -->
                                     <div class="absolute bottom-3 left-3 right-3 text-white space-y-1">
                                         <div class="flex items-center space-x-1.5 text-[11px] text-red-300 font-bold">
                                             <i class="fa-solid fa-location-dot text-red-400 text-xs"></i>
                                             <span class="truncate">{{ $slide['lokasi'] }}</span>
+                                            <span class="text-slate-400 font-normal">&bull;</span>
+                                            <span class="text-slate-300 font-medium">{{ $slide['tanggal'] }}</span>
                                         </div>
                                         <h4 class="text-sm font-extrabold text-white leading-tight drop-shadow-xs">
                                             {{ $slide['judul'] }}
@@ -1072,86 +1042,62 @@
     <!-- Footer Berdasarkan Referensi RAPID Pemerintah Kabupaten Bogor (Warna Senada Navbar) -->
     <footer class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-red-100 pt-12 pb-8 border-t border-red-950/40 shadow-inner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
-                <!-- Col 1: Brand & Narasi RAPID / KMP -->
-                <div class="space-y-4">
-                    <div class="flex items-center space-x-3">
-                        <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-11 sm:h-12 w-auto object-contain drop-shadow shrink-0">
-                        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white p-1.5 flex items-center justify-center shadow-lg shrink-0 border border-white/50 overflow-hidden">
-                            <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="w-full h-full object-contain">
-                        </div>
-                        <div>
-                            <h4 class="text-base font-extrabold text-white tracking-wide uppercase">
-                                KMP BOGOR
-                            </h4>
-                            <p class="text-[10px] text-red-200 font-semibold uppercase tracking-wider leading-none">
-                                Koperasi Merah Putih Terpadu
-                            </p>
-                        </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 mb-10">
+                <!-- Col 1: Brand & Narasi RAPID / KMP (5 cols) -->
+                <div class="md:col-span-5 space-y-4">
+                    <div>
+                        <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-14 sm:h-16 w-auto object-contain drop-shadow-md">
                     </div>
-                    <p class="text-xs text-red-100/90 leading-relaxed text-justify">
+                    <p class="text-xs text-red-100/90 leading-relaxed text-justify max-w-md">
                         Memfasilitasi pemberdayaan dan kemandirian ekonomi desa/kelurahan di Kabupaten Bogor melalui penguatan kelembagaan koperasi gotong royong yang berdaya saing, modern, dan terintegrasi.
                     </p>
                     <div class="flex items-center space-x-3 pt-1">
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-instagram text-sm"></i>
                         </a>
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-facebook-f text-xs"></i>
                         </a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-youtube text-xs"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Col 2: Layanan -->
-                <div class="space-y-3">
-                    <h5 class="text-sm font-bold text-white tracking-wider">Layanan</h5>
-                    <ul class="space-y-2 text-xs text-red-200/90">
+                <!-- Col 2: Tautan Cepat (3 cols) -->
+                <div class="md:col-span-3 space-y-3.5">
+                    <h5 class="text-sm font-bold text-white tracking-wider uppercase">Tautan</h5>
+                    <ul class="space-y-2.5 text-xs text-red-200/90">
                         <li>
-                            <a href="#sebaran" class="hover:text-white transition flex items-center space-x-2">
-                                <span>Pendaftaran Akun Koperasi</span>
+                            <a href="#beranda" class="hover:text-white transition flex items-center gap-2 group">
+                                <i class="fa-solid fa-chevron-right text-[9px] text-red-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Beranda</span>
                             </a>
                         </li>
                         <li>
-                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-white transition flex items-center space-x-2">
-                                <span>Formulir Pengaduan</span>
+                            <a href="#informasi" class="hover:text-white transition flex items-center gap-2 group">
+                                <i class="fa-solid fa-chevron-right text-[9px] text-red-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Informasi Program</span>
                             </a>
                         </li>
                         <li>
-                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-white transition flex items-center space-x-2">
-                                <span>Helpdesk & Konsultasi 24/7</span>
+                            <a href="#sebaran" class="hover:text-white transition flex items-center gap-2 group">
+                                <i class="fa-solid fa-chevron-right text-[9px] text-red-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Sebaran Data 40 Kecamatan</span>
                             </a>
+                        </li>
+                        <li>
+                            <button type="button" onclick="openRegulasiModal()" class="hover:text-white transition flex items-center gap-2 group text-left cursor-pointer">
+                                <i class="fa-solid fa-chevron-right text-[9px] text-red-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Dokumen Regulasi (UU / SK)</span>
+                            </button>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Col 3: Tautan -->
-                <div class="space-y-3">
-                    <h5 class="text-sm font-bold text-white tracking-wider">Tautan</h5>
-                    <ul class="space-y-2 text-xs text-red-200/90">
-                        <li>
-                            <a href="#beranda" class="hover:text-white transition">Beranda</a>
-                        </li>
-                        <li>
-                            <a href="#informasi" class="hover:text-white transition">Informasi Program</a>
-                        </li>
-                        <li>
-                            <a href="#sebaran" class="hover:text-white transition">Sebaran Data 40 Kecamatan</a>
-                        </li>
-                        <li>
-                            <button type="button" onclick="openRegulasiModal()" class="hover:text-white transition text-left cursor-pointer">Dokumen Regulasi (UU / SK)</button>
-                        </li>
-                        <li>
-                            <a href="{{ route('export.rekapitulasi') }}" class="hover:text-white transition">Ekspor Rekapitulasi Data</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Kontak Kami -->
-                <div class="space-y-3">
-                    <h5 class="text-sm font-bold text-white tracking-wider">Kontak Kami</h5>
+                <!-- Col 3: Kontak Kami (4 cols) -->
+                <div class="md:col-span-4 space-y-3.5">
+                    <h5 class="text-sm font-bold text-white tracking-wider uppercase">Kontak Kami</h5>
                     <div class="space-y-3 text-xs text-red-100/90">
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white mt-0.5">
@@ -1178,13 +1124,13 @@
             </div>
 
             <!-- Bottom Divider, Copyright & Button Login Admin -->
-            <div class="pt-6 border-t border-white/15 flex flex-col items-center justify-center space-y-3 text-center">
+            <div class="pt-6 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
                 <p class="text-xs text-red-200/90">
                     &copy; 2026 KMP - Pemerintah Kabupaten Bogor. Hak cipta dilindungi.
                 </p>
-                <button type="button" onclick="openLoginModal()" class="px-5 py-2 rounded-full bg-white text-red-800 hover:bg-red-50 text-xs font-bold shadow-md transition flex items-center space-x-2 cursor-pointer">
+                <button type="button" onclick="openLoginModal()" class="px-5 py-2 rounded-full bg-white text-red-800 hover:bg-red-50 text-xs font-bold shadow-md transition flex items-center space-x-2 cursor-pointer active:scale-95">
                     <i class="fa-solid fa-lock text-[11px] text-red-700"></i>
-                    <span>Login Admin</span>
+                    <span>Login Petugas & Admin</span>
                 </button>
             </div>
         </div>
@@ -1237,36 +1183,208 @@
 
 <!-- Modal: Regulasi & Dokumen Hukum -->
 <div id="regulasiModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-            <div class="flex items-center space-x-2 text-red-700 font-bold">
-                <i class="fa-solid fa-scale-balanced text-lg"></i>
-                <h4 class="text-base font-bold text-slate-800">Landasan Hukum & Regulasi KMP</h4>
+    <div class="bg-white rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-slate-100 flex flex-col max-h-[90vh]">
+        <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 shrink-0">
+            <div class="flex items-center space-x-2.5 text-red-700 font-bold">
+                <span class="w-9 h-9 rounded-xl bg-red-50 text-red-700 flex items-center justify-center shadow-2xs">
+                    <i class="fa-solid fa-scale-balanced text-base"></i>
+                </span>
+                <div>
+                    <h4 class="text-base font-extrabold text-slate-900 leading-tight">Landasan Hukum & Regulasi KMP</h4>
+                    <p class="text-[11px] text-slate-500 font-normal">Klik peraturan untuk membuka rincian teks & pemahaman</p>
+                </div>
             </div>
-            <button type="button" onclick="closeRegulasiModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+            <button type="button" onclick="closeRegulasiModal()" aria-label="Tutup Modal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 flex items-center justify-center transition cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="mt-4 space-y-3 text-xs text-slate-600 max-h-80 overflow-y-auto pr-1">
-            <div class="p-3 bg-red-50/60 rounded-xl border border-red-100">
-                <strong class="text-red-900 block font-bold text-sm">1. Undang-Undang Dasar 1945 Pasal 33 Ayat (1)</strong>
-                <p class="mt-1 text-slate-700">"Perekonomian disusun sebagai usaha bersama berdasar atas asas kekeluargaan." Koperasi adalah bangun usaha yang paling sesuai dengan amanat konstitusi.</p>
+        <div class="mt-4 space-y-3 text-xs text-slate-600 overflow-y-auto pr-1 flex-1">
+            <!-- 1. UUD 1945 Pasal 33 Ayat 1 (Merah) -->
+            <div id="card-regulasi-accordion-uud-1945" class="rounded-2xl border border-red-400 bg-red-50/80 shadow-md ring-2 ring-red-200/60 overflow-hidden transition-all duration-300">
+                <button
+                    type="button"
+                    onclick="toggleRegulasiAccordion('accordion-uud-1945')"
+                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer"
+                >
+                    <div class="flex items-start gap-2.5">
+                        <span id="badge-regulasi-accordion-uud-1945" class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white font-black text-xs shadow-xs transition-colors">
+                            1
+                        </span>
+                        <div>
+                            <strong id="title-regulasi-accordion-uud-1945" class="text-red-950 font-black text-sm block transition-colors">Undang-Undang Dasar 1945 Pasal 33 Ayat (1)</strong>
+                            <p class="mt-0.5 text-slate-600 text-[11px] leading-snug">"Perekonomian disusun sebagai usaha bersama berdasar atas asas kekeluargaan."</p>
+                        </div>
+                    </div>
+                    <div id="label-regulasi-accordion-uud-1945" class="flex items-center gap-1.5 shrink-0 text-red-700 text-xs font-bold transition-colors">
+                        <span class="hidden sm:inline text-[11px]">Keterangan</span>
+                        <i id="accordion-icon-accordion-uud-1945" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+                    </div>
+                </button>
+                <div id="accordion-uud-1945" class="px-3.5 sm:px-4 pb-4 pt-1 border-t border-red-100/90 space-y-2.5 text-slate-700 text-xs">
+                    <div class="p-3 rounded-xl bg-white/95 border border-red-100 space-y-1.5 shadow-2xs">
+                        <span class="font-bold text-red-900 block text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-quote-left text-red-500"></i> Bunyi & Amanat Konstitusi
+                        </span>
+                        <blockquote class="italic text-slate-800 font-medium pl-2.5 border-l-2 border-red-500 text-[11px]">
+                            "Perekonomian disusun sebagai usaha bersama berdasar atas asas kekeluargaan."
+                        </blockquote>
+                        <p class="text-[10px] text-slate-400">UUD 1945 Bab XIV: Perekonomian Nasional dan Kesejahteraan Sosial</p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/95 border border-red-100 space-y-1 shadow-2xs">
+                        <span class="font-bold text-slate-900 block text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-book-open-reader text-red-600"></i> Pemahaman & Filosofi Demokrasi Ekonomi
+                        </span>
+                        <p class="leading-relaxed text-slate-600 text-[11px]">
+                            Pasal 33 dirumuskan oleh para pendiri bangsa (khususnya Drs. Mohammad Hatta) dengan tujuan menegakkan demokrasi ekonomi. Perekonomian nasional tidak boleh dibangun atas persaingan bebas yang mematikan atau penguasaan modal segelintir korporasi, melainkan ditujukan untuk kemakmuran bersama seluruh rakyat secara adil dan bergotong royong.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/95 border border-red-100 space-y-1 shadow-2xs">
+                        <span class="font-bold text-slate-900 block text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-hands-holding-circle text-red-600"></i> Koperasi Sebagai Bangun Usaha Konstitusional
+                        </span>
+                        <p class="leading-relaxed text-slate-600 text-[11px]">
+                            Koperasi adalah bangun usaha yang paling tepat dan diamanatkan konstitusi. Berbeda dengan korporasi modal di mana suara ditentukan oleh besaran modal uang, di dalam koperasi setiap anggota adalah pemilik sekaligus pengguna jasa dengan kedudukan setara (<em>one member, one vote</em>).
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-red-100/70 border border-red-200 text-[11px] text-red-950 space-y-1">
+                        <span class="font-bold block text-red-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check text-red-600"></i> Relevansi dengan KMP Kabupaten Bogor
+                        </span>
+                        <p class="leading-relaxed text-slate-700">
+                            Program Koperasi Merah Putih (KMP) di 435 Desa & Kelurahan mewujudkan amanat Pasal 33 ini hingga ke tingkat desa: memotong mata rantai tengkulak, membangun gerai kebutuhan pokok warga, dan mengembalikan keuntungan usaha ke masyarakat melalui Sisa Hasil Usaha (SHU).
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <strong class="text-slate-900 block font-bold text-sm">2. Undang-Undang No. 25 Tahun 1992 tentang Perkoperasian</strong>
-                <p class="mt-1 text-slate-700">Pengaturan mengenai pembentukan, kepengurusan, permodalan, serta pembinaan koperasi primer dan sekunder.</p>
+            <!-- 2. UU No. 25 Tahun 1992 (Biru) -->
+            <div id="card-regulasi-accordion-uu-25-1992" class="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300">
+                <button
+                    type="button"
+                    onclick="toggleRegulasiAccordion('accordion-uu-25-1992')"
+                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer"
+                >
+                    <div class="flex items-start gap-2.5">
+                        <span id="badge-regulasi-accordion-uu-25-1992" class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors">
+                            2
+                        </span>
+                        <div>
+                            <strong id="title-regulasi-accordion-uu-25-1992" class="text-slate-800 font-bold text-sm block transition-colors">Undang-Undang No. 25 Tahun 1992 tentang Perkoperasian</strong>
+                            <p class="mt-0.5 text-slate-600 text-[11px] leading-snug">Tata kelola kelembagaan, permodalan, dan legalitas badan hukum koperasi nasional.</p>
+                        </div>
+                    </div>
+                    <div id="label-regulasi-accordion-uu-25-1992" class="flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors">
+                        <span class="hidden sm:inline text-[11px]">Keterangan</span>
+                        <i id="accordion-icon-accordion-uu-25-1992" class="fa-solid fa-chevron-down text-xs transition-transform duration-300 -rotate-90"></i>
+                    </div>
+                </button>
+                <div id="accordion-uu-25-1992" class="hidden px-3.5 sm:px-4 pb-4 pt-1 border-t border-blue-100/90 space-y-2.5 text-slate-700 text-xs">
+                    <div class="p-3 rounded-xl bg-white/95 border border-blue-100 space-y-1 shadow-2xs">
+                        <span class="font-bold text-blue-900 block text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-gavel text-blue-600"></i> Dasar Hukum Badan Usaha & AD/ART
+                        </span>
+                        <p class="leading-relaxed text-slate-600 text-[11px]">
+                            UU No. 25 Tahun 1992 mengatur syarat pendirian, pengesahan akta notaris, anggaran dasar (AD/ART), keanggotaan sukarela terbuka, serta pengawasan operasional oleh dinas koperasi.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/95 border border-blue-100 space-y-1 shadow-2xs">
+                        <span class="font-bold text-blue-900 block text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-users-gear text-blue-600"></i> Rapat Anggota Tahunan (RAT)
+                        </span>
+                        <p class="leading-relaxed text-slate-600 text-[11px]">
+                            Menegaskan Rapat Anggota sebagai pemegang kekuasaan tertinggi dalam koperasi untuk menetapkan kebijakan, memilih pengurus dan pengawas, serta mengesahkan pertanggungjawaban keuangan tahunan.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/95 border border-blue-100 space-y-1 shadow-2xs">
+                        <span class="font-bold text-blue-900 block text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-coins text-blue-600"></i> Permodalan & Pembagian SHU
+                        </span>
+                        <p class="leading-relaxed text-slate-600 text-[11px]">
+                            Modal bersumber dari simpanan pokok, simpanan wajib, dana cadangan, dan hibah. Keuntungan atau Sisa Hasil Usaha (SHU) dibagikan secara adil sebanding dengan keaktifan dan partisipasi transaksi anggota.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-blue-100/70 border border-blue-200 text-[11px] text-blue-950 space-y-1">
+                        <span class="font-bold block text-blue-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-blue-600"></i> Kepastian Hukum Aset Anggota
+                        </span>
+                        <p class="leading-relaxed text-slate-700">
+                            Setiap unit KMP di Kabupaten Bogor didaftarkan secara sah berbadan hukum notaris Kemenkumham, melindungi hak kepemilikan modal dan simpanan seluruh anggota warga desa.
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <strong class="text-slate-900 block font-bold text-sm">3. Keputusan Terpadu KMP Kabupaten Bogor TA 2025/2026</strong>
-                <p class="mt-1 text-slate-700">Implementasi program percepatan pembentukan 435 unit Koperasi Desa & Kelurahan Merah Putih di 40 Kecamatan se-Kabupaten Bogor.</p>
+            <!-- 3. Keputusan Terpadu KMP Bogor (Hijau / Emerald) -->
+            <div id="card-regulasi-accordion-kmp-bogor" class="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300">
+                <button
+                    type="button"
+                    onclick="toggleRegulasiAccordion('accordion-kmp-bogor')"
+                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer"
+                >
+                    <div class="flex items-start gap-2.5">
+                        <span id="badge-regulasi-accordion-kmp-bogor" class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors">
+                            3
+                        </span>
+                        <div>
+                            <strong id="title-regulasi-accordion-kmp-bogor" class="text-slate-800 font-bold text-sm block transition-colors">Keputusan Terpadu KMP Kabupaten Bogor TA 2025/2026</strong>
+                            <p class="mt-0.5 text-slate-600 text-[11px] leading-snug">Implementasi percepatan pembentukan 435 unit Koperasi Desa & Kelurahan se-Kabupaten Bogor.</p>
+                        </div>
+                    </div>
+                    <div id="label-regulasi-accordion-kmp-bogor" class="flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors">
+                        <span class="hidden sm:inline text-[11px]">Keterangan</span>
+                        <i id="accordion-icon-accordion-kmp-bogor" class="fa-solid fa-chevron-down text-xs transition-transform duration-300 -rotate-90"></i>
+                    </div>
+                </button>
+                <div id="accordion-kmp-bogor" class="hidden px-3.5 sm:px-4 pb-4 pt-1 border-t border-emerald-100/90 space-y-2.5 text-slate-700 text-xs">
+                    <div class="p-3 rounded-xl bg-white/95 border border-emerald-100 space-y-1 shadow-2xs">
+                        <span class="font-bold text-emerald-900 block text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-bullseye text-emerald-600"></i> Target Percepatan 435 Unit Koperasi
+                        </span>
+                        <p class="leading-relaxed text-slate-600 text-[11px]">
+                            Menginstruksikan percepatan pendirian dan legalisasi Koperasi Desa & Kelurahan Merah Putih di seluruh 416 Desa dan 19 Kelurahan di 40 Kecamatan se-Kabupaten Bogor.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/95 border border-emerald-100 space-y-1 shadow-2xs">
+                        <span class="font-bold text-emerald-900 block text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-laptop-code text-emerald-600"></i> Digitalisasi SIMKOP & Pelatihan SDM
+                        </span>
+                        <p class="leading-relaxed text-slate-600 text-[11px]">
+                            Penyediaan platform Sistem Informasi Manajemen Koperasi (SIMKOP) untuk pelaporan terpadu, verifikasi anggota, dan pelatihan kapasitas manajerial pengurus koperasi di lapangan.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/95 border border-emerald-100 space-y-1 shadow-2xs">
+                        <span class="font-bold text-emerald-900 block text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-store text-emerald-600"></i> Fasilitasi Gerai & Rantai Pasok Pangan
+                        </span>
+                        <p class="leading-relaxed text-slate-600 text-[11px]">
+                            Kolaborasi lintas instansi untuk penyediaan pasokan komoditas pangan pokok murah, fasilitas gerai fisik, dan akses permodalan usaha bagi koperasi desa.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-emerald-100/70 border border-emerald-200 text-[11px] text-emerald-950 space-y-1">
+                        <span class="font-bold block text-emerald-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-wheat-awn text-emerald-600"></i> Dampak Langsung Kesejahteraan Warga
+                        </span>
+                        <p class="leading-relaxed text-slate-700">
+                            Menjamin ketersediaan sembako berkualitas dengan harga wajar di pelosok desa, menyerap hasil komoditas petani lokal, dan menggerakkan roda ekonomi desa.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="mt-6 pt-3 border-t border-slate-100 flex justify-end">
-            <button type="button" onclick="closeRegulasiModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold">
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between shrink-0">
+            <span class="text-[11px] text-slate-400">Pusat Informasi Regulasi & KDKMP</span>
+            <button type="button" onclick="closeRegulasiModal()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold cursor-pointer shadow-xs transition active:scale-95">
                 Mengerti
             </button>
         </div>
@@ -2125,7 +2243,79 @@
         modal.classList.remove('flex');
     }
 
-    // Modal Handler for Regulasi
+    // Modal Handler for Regulasi & Dynamic Interactive Accordion Color Themes
+    const regulasiThemes = {
+        'accordion-uud-1945': {
+            cardId: 'card-regulasi-accordion-uud-1945',
+            badgeId: 'badge-regulasi-accordion-uud-1945',
+            titleId: 'title-regulasi-accordion-uud-1945',
+            labelId: 'label-regulasi-accordion-uud-1945',
+            active: {
+                card: 'rounded-2xl border border-red-400 bg-red-50/80 shadow-md ring-2 ring-red-200/60 overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white font-black text-xs shadow-xs transition-colors',
+                title: 'text-red-950 font-black text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 text-red-700 text-xs font-bold transition-colors'
+            },
+            inactive: {
+                card: 'rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors',
+                title: 'text-slate-800 font-bold text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors'
+            }
+        },
+        'accordion-uu-25-1992': {
+            cardId: 'card-regulasi-accordion-uu-25-1992',
+            badgeId: 'badge-regulasi-accordion-uu-25-1992',
+            titleId: 'title-regulasi-accordion-uu-25-1992',
+            labelId: 'label-regulasi-accordion-uu-25-1992',
+            active: {
+                card: 'rounded-2xl border border-blue-400 bg-blue-50/80 shadow-md ring-2 ring-blue-200/60 overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white font-black text-xs shadow-xs transition-colors',
+                title: 'text-blue-950 font-black text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 text-blue-700 text-xs font-bold transition-colors'
+            },
+            inactive: {
+                card: 'rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors',
+                title: 'text-slate-800 font-bold text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors'
+            }
+        },
+        'accordion-kmp-bogor': {
+            cardId: 'card-regulasi-accordion-kmp-bogor',
+            badgeId: 'badge-regulasi-accordion-kmp-bogor',
+            titleId: 'title-regulasi-accordion-kmp-bogor',
+            labelId: 'label-regulasi-accordion-kmp-bogor',
+            active: {
+                card: 'rounded-2xl border border-emerald-400 bg-emerald-50/80 shadow-md ring-2 ring-emerald-200/60 overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white font-black text-xs shadow-xs transition-colors',
+                title: 'text-emerald-950 font-black text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 text-emerald-700 text-xs font-bold transition-colors'
+            },
+            inactive: {
+                card: 'rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors',
+                title: 'text-slate-800 font-bold text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors'
+            }
+        }
+    };
+
+    function setRegulasiTheme(id, isActive) {
+        const theme = regulasiThemes[id];
+        if (!theme) return;
+        const card = document.getElementById(theme.cardId);
+        const badge = document.getElementById(theme.badgeId);
+        const title = document.getElementById(theme.titleId);
+        const label = document.getElementById(theme.labelId);
+        const state = isActive ? theme.active : theme.inactive;
+
+        if (card) card.className = state.card;
+        if (badge) badge.className = state.badge;
+        if (title) title.className = state.title;
+        if (label) label.className = state.label;
+    }
+
     function openRegulasiModal() {
         const modal = document.getElementById('regulasiModal');
         modal.classList.remove('hidden');
@@ -2136,6 +2326,36 @@
         const modal = document.getElementById('regulasiModal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+    }
+
+    function toggleRegulasiAccordion(id) {
+        const targetContent = document.getElementById(id);
+        const targetIcon = document.getElementById('accordion-icon-' + id);
+        if (!targetContent) return;
+
+        const isCurrentlyHidden = targetContent.classList.contains('hidden');
+
+        // Tutup item lainnya dan ubah styling ke netral
+        Object.keys(regulasiThemes).forEach(otherId => {
+            const content = document.getElementById(otherId);
+            const icon = document.getElementById('accordion-icon-' + otherId);
+            if (content) content.classList.add('hidden');
+            if (icon) {
+                icon.classList.add('-rotate-90');
+                icon.classList.remove('rotate-0');
+            }
+            setRegulasiTheme(otherId, false);
+        });
+
+        // Jika sebelumnya tertutup, buka dan nyalakan warna temanya (Merah / Biru / Hijau)
+        if (isCurrentlyHidden) {
+            targetContent.classList.remove('hidden');
+            if (targetIcon) {
+                targetIcon.classList.remove('-rotate-90');
+                targetIcon.classList.add('rotate-0');
+            }
+            setRegulasiTheme(id, true);
+        }
     }
 
     // Filter table live search

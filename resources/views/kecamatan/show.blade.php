@@ -110,11 +110,11 @@
                     </p>
                 </div>
 
-                <!-- Right Column: Interactive Table with Live Search -->
+                <!-- Right Column: Interactive Table with Simple Pagination (Max 5 Kelurahan per slide) -->
                 <div class="lg:col-span-7 flex flex-col">
                     
                     <!-- Search & Filter Controls -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-3">
                         <!-- Search Box -->
                         <div class="relative flex-grow">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
@@ -140,8 +140,32 @@
                         </div>
                     </div>
 
-                    <!-- Table Container -->
-                    <div class="overflow-x-auto rounded-2xl border-2 border-slate-200 shadow-sm bg-white">
+                    <!-- Simple Pagination Bar: Panah Kiri, Angka di Tengah, Panah Kanan -->
+                    <div class="flex items-center justify-between mb-3 px-1 text-xs">
+                        <div class="text-slate-600 font-semibold">
+                            Menampilkan <span id="visibleRange" class="font-black text-slate-950">1 - 5</span> dari <span id="visibleCount" class="font-black text-slate-950">{{ $koperasis->count() }}</span> Koperasi
+                        </div>
+
+                        <div class="flex items-center space-x-1.5">
+                            <!-- Panah Kiri -->
+                            <button type="button" id="btnSlidePrev" class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95" title="Sebelumnya">
+                                <i class="fa-solid fa-chevron-left text-xs"></i>
+                            </button>
+
+                            <!-- Angka di Tengah (Menandakan Halaman Berapa) -->
+                            <span id="pageIndicator" class="px-2.5 py-1 font-black text-xs text-slate-900 bg-slate-100 border border-slate-300 rounded-lg min-w-[52px] text-center select-none">
+                                1 / 3
+                            </span>
+
+                            <!-- Panah Kanan -->
+                            <button type="button" id="btnSlideNext" class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95" title="Berikutnya">
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Container (Supports Touch Swipe & Mouse Drag Slide) -->
+                    <div id="tableContainer" class="overflow-x-auto rounded-2xl border-2 border-slate-200 shadow-sm bg-white cursor-grab active:cursor-grabbing transition-all">
                         <table class="w-full text-left text-sm" id="tableKoperasi">
                             <thead class="bg-slate-100 text-slate-950 font-black text-xs uppercase tracking-wider border-b-2 border-slate-300">
                                 <tr>
@@ -209,17 +233,12 @@
                     </div>
 
                     <!-- No Results Match State -->
-                    <div id="noResults" class="hidden py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-2">
+                    <div id="noResults" class="hidden py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-3">
                         <i class="fa-solid fa-circle-exclamation text-amber-500 text-2xl mb-1"></i>
                         <p class="text-xs font-semibold text-slate-700">Tidak ada koperasi yang cocok dengan pencarian.</p>
                         <button type="button" onclick="resetSearchFilter()" class="mt-2 text-xs font-bold text-red-600 hover:underline">
                             Reset Pencarian
                         </button>
-                    </div>
-
-                    <!-- Result Counter Footer -->
-                    <div class="mt-3 text-right text-xs text-slate-500 font-medium">
-                        Menampilkan <span id="visibleCount" class="font-bold text-slate-800">{{ $koperasis->count() }}</span> dari {{ $koperasis->count() }} Koperasi
                     </div>
 
                 </div>
@@ -268,6 +287,32 @@
         background-color: #eff6ff !important;
         box-shadow: inset 4px 0 0 #2563eb;
     }
+    @keyframes slideInFromRight {
+        from {
+            opacity: 0.35;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0.35;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    .slide-in-right {
+        animation: slideInFromRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .slide-in-left {
+        animation: slideInFromLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 </style>
 @endpush
 
@@ -279,10 +324,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('koperasiSearch');
     const clearBtn = document.getElementById('clearSearch');
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const rows = document.querySelectorAll('.koperasi-row');
+    const rows = Array.from(document.querySelectorAll('.koperasi-row'));
     const noResults = document.getElementById('noResults');
+    const visibleRange = document.getElementById('visibleRange');
     const visibleCount = document.getElementById('visibleCount');
     const btnResetMap = document.getElementById('btnResetMap');
+    const tableContainer = document.getElementById('tableContainer');
+    const tableBody = document.getElementById('tableBody');
+    const btnSlidePrev = document.getElementById('btnSlidePrev');
+    const btnSlideNext = document.getElementById('btnSlideNext');
+    const pageIndicator = document.getElementById('pageIndicator');
+
+    // Pagination / Slide constants (Max 5 kelurahan per page)
+    const PAGE_SIZE = 5;
+    let currentSlide = 0;
+    let currentFilter = 'all';
+    let matchedRows = [...rows];
 
     // Default center Kabupaten Bogor
     let defaultLat = -6.4828;
@@ -341,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 markersMap[p.id] = marker;
 
-                // When user clicks marker, highlight and scroll to row in table
+                // When user clicks marker, highlight and slide to that row
                 marker.on('click', function () {
                     highlightRow(p.id);
                 });
@@ -377,7 +434,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         row.addEventListener('click', function (e) {
-            // If clicked directly on the anchor link, allow normal navigation
             if (e.target.closest('a')) return;
 
             const marker = markersMap[id];
@@ -386,31 +442,169 @@ document.addEventListener('DOMContentLoaded', function () {
                 marker.openPopup();
                 highlightRow(id);
             } else {
-                // Navigate to koperasi profile if no coords on map
                 window.location.href = '/koperasi/' + id;
             }
         });
     });
 
-    function highlightRow(id) {
-        rows.forEach(r => r.classList.remove('highlight-row'));
-        const targetRow = document.getElementById('koperasi-row-' + id);
-        if (targetRow) {
-            targetRow.classList.add('highlight-row');
-            targetRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Slide Pagination Rendering Logic (Max 5 items per slide)
+    function renderSlide(direction = 'none') {
+        const totalMatched = matchedRows.length;
+        const totalSlides = Math.ceil(totalMatched / PAGE_SIZE) || 1;
+
+        if (currentSlide >= totalSlides) {
+            currentSlide = Math.max(0, totalSlides - 1);
+        }
+        if (currentSlide < 0) {
+            currentSlide = 0;
+        }
+
+        const startIndex = currentSlide * PAGE_SIZE;
+        const endIndex = Math.min(startIndex + PAGE_SIZE, totalMatched);
+
+        // Hide all rows first
+        rows.forEach(r => r.style.display = 'none');
+
+        // Show only the 5 rows of the current slide
+        for (let i = startIndex; i < endIndex; i++) {
+            matchedRows[i].style.display = '';
+        }
+
+        // Apply slide animation
+        if (tableBody && direction !== 'none') {
+            tableBody.classList.remove('slide-in-right', 'slide-in-left');
+            void tableBody.offsetWidth;
+            tableBody.classList.add(direction === 'next' ? 'slide-in-right' : 'slide-in-left');
+        }
+
+        // Update range & counter info
+        if (visibleRange) {
+            visibleRange.textContent = totalMatched === 0 ? '0' : `${startIndex + 1} - ${endIndex}`;
+        }
+
+        if (visibleCount) {
+            visibleCount.textContent = totalMatched;
+        }
+
+        // Update Page Indicator (Angka di tengah menandakan page berapa)
+        if (pageIndicator) {
+            pageIndicator.textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        // Update Prev / Next button states
+        if (btnSlidePrev) {
+            btnSlidePrev.disabled = (currentSlide === 0);
+        }
+        if (btnSlideNext) {
+            btnSlideNext.disabled = (currentSlide >= totalSlides - 1);
+        }
+
+        if (noResults) {
+            noResults.classList.toggle('hidden', totalMatched > 0);
         }
     }
 
-    // Live Instant Search & Filter Logic
-    let currentFilter = 'all';
+    // Slide Next / Prev click listeners
+    if (btnSlidePrev) {
+        btnSlidePrev.addEventListener('click', function () {
+            if (currentSlide > 0) {
+                currentSlide--;
+                renderSlide('prev');
+            }
+        });
+    }
 
-    function applySearchAndFilter() {
+    if (btnSlideNext) {
+        btnSlideNext.addEventListener('click', function () {
+            const totalSlides = Math.ceil(matchedRows.length / PAGE_SIZE) || 1;
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                renderSlide('next');
+            }
+        });
+    }
+
+    // Touch Swipe & Mouse Drag on Table to Slide Right / Left
+    if (tableContainer) {
+        let touchStartX = 0;
+
+        tableContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].clientX;
+        }, { passive: true });
+
+        tableContainer.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 45) {
+                if (diff > 0) {
+                    if (btnSlideNext && !btnSlideNext.disabled) btnSlideNext.click();
+                } else {
+                    if (btnSlidePrev && !btnSlidePrev.disabled) btnSlidePrev.click();
+                }
+            }
+        }, { passive: true });
+
+        let isDragging = false;
+        let dragStartX = 0;
+
+        tableContainer.addEventListener('mousedown', e => {
+            if (e.target.closest('a') || e.target.closest('button')) return;
+            isDragging = true;
+            dragStartX = e.clientX;
+        });
+
+        tableContainer.addEventListener('mouseup', e => {
+            if (!isDragging) return;
+            isDragging = false;
+            const diff = dragStartX - e.clientX;
+            if (Math.abs(diff) > 45) {
+                if (diff > 0) {
+                    if (btnSlideNext && !btnSlideNext.disabled) btnSlideNext.click();
+                } else {
+                    if (btnSlidePrev && !btnSlidePrev.disabled) btnSlidePrev.click();
+                }
+            }
+        });
+
+        tableContainer.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+    }
+
+    // Highlight row and ensure it is on the active slide
+    function highlightRow(id) {
+        const targetRow = document.getElementById('koperasi-row-' + id);
+        if (!targetRow) return;
+
+        let index = matchedRows.indexOf(targetRow);
+        if (index === -1) {
+            resetSearchFilter();
+            index = matchedRows.indexOf(targetRow);
+        }
+
+        if (index !== -1) {
+            const targetSlide = Math.floor(index / PAGE_SIZE);
+            if (targetSlide !== currentSlide) {
+                const dir = targetSlide > currentSlide ? 'next' : 'prev';
+                currentSlide = targetSlide;
+                renderSlide(dir);
+            }
+        }
+
+        rows.forEach(r => r.classList.remove('highlight-row'));
+        targetRow.classList.add('highlight-row');
+        targetRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Live Instant Search & Filter Logic
+    function applySearchAndFilter(resetSlide = true) {
         const query = (searchInput.value || '').trim().toLowerCase();
-        let matched = 0;
 
         if (clearBtn) {
             clearBtn.classList.toggle('hidden', query.length === 0);
         }
+
+        matchedRows = [];
 
         rows.forEach(row => {
             const name = row.getAttribute('data-name') || '';
@@ -428,54 +622,64 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (matchesQuery && matchesFilter) {
-                row.style.display = '';
-                matched++;
-            } else {
-                row.style.display = 'none';
+                matchedRows.push(row);
             }
         });
 
-        if (visibleCount) visibleCount.textContent = matched;
-        if (noResults) {
-            noResults.classList.toggle('hidden', matched > 0);
+        if (resetSlide) {
+            currentSlide = 0;
         }
+
+        renderSlide('none');
     }
 
     if (searchInput) {
-        searchInput.addEventListener('input', applySearchAndFilter);
+        searchInput.addEventListener('input', () => applySearchAndFilter(true));
     }
 
     if (clearBtn) {
         clearBtn.addEventListener('click', function () {
             searchInput.value = '';
-            applySearchAndFilter();
+            applySearchAndFilter(true);
             searchInput.focus();
         });
     }
 
+    // Filter status pills (Semua, Operasional, Ber-AHU)
     filterBtns.forEach(btn => {
         btn.addEventListener('click', function () {
-            filterBtns.forEach(b => b.classList.remove('active', 'bg-red-600', 'text-white'));
-            filterBtns.forEach(b => b.classList.add('bg-slate-100', 'text-slate-600'));
+            filterBtns.forEach(b => {
+                b.classList.remove('active', 'bg-slate-950', 'text-white');
+                b.classList.add('bg-slate-100', 'text-slate-900');
+            });
             
-            this.classList.add('active', 'bg-red-600', 'text-white');
-            this.classList.remove('bg-slate-100', 'text-slate-600');
+            this.classList.add('active', 'bg-slate-950', 'text-white');
+            this.classList.remove('bg-slate-100', 'text-slate-900');
 
             currentFilter = this.getAttribute('data-filter');
-            applySearchAndFilter();
+            applySearchAndFilter(true);
         });
     });
 
     window.resetSearchFilter = function () {
         if (searchInput) searchInput.value = '';
         currentFilter = 'all';
+
         filterBtns.forEach(b => {
             if (b.getAttribute('data-filter') === 'all') {
-                b.click();
+                b.classList.add('active', 'bg-slate-950', 'text-white');
+                b.classList.remove('bg-slate-100', 'text-slate-900');
+            } else {
+                b.classList.remove('active', 'bg-slate-950', 'text-white');
+                b.classList.add('bg-slate-100', 'text-slate-900');
             }
         });
-        applySearchAndFilter();
+
+        applySearchAndFilter(true);
     };
+
+    // Initial render
+    renderSlide('none');
 
     if (loadingElem) {
         loadingElem.style.opacity = '0';

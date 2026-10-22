@@ -27,27 +27,27 @@
     <header class="fixed top-0 inset-x-0 w-full bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md z-[100]">
         <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Desain Referensi) -->
-                <div class="flex items-center space-x-2.5 sm:space-x-3.5">
+                <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Bagian Publik) -->
+                <div class="flex items-center space-x-2 sm:space-x-3.5 min-w-0 pr-1">
                     <!-- Lambang Kabupaten Bogor (Tegar Beriman) -->
-                    <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-11 sm:h-13 w-auto object-contain drop-shadow shrink-0">
+                    <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-8 sm:h-11 w-auto object-contain drop-shadow shrink-0">
 
-                    <!-- Logo KOPDES Bulat (Di-gedein dan bulat sesuai gambar referensi) -->
-                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white flex items-center justify-center p-1.5 shadow-md shrink-0 border border-white/50 overflow-hidden">
+                    <!-- Logo KOPDES Bulat (Sesuai Desain Asli) -->
+                    <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center p-1 sm:p-1.5 shadow-md shrink-0 border border-white/50 overflow-hidden">
                         <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain">
                     </div>
 
-                    <div class="flex flex-col justify-center">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
+                    <div class="flex flex-col justify-center min-w-0">
+                        <div class="flex items-baseline space-x-1 sm:space-x-1.5">
+                            <span class="text-base sm:text-2xl font-bold tracking-tight text-white leading-tight">
                                 Dashboard
                             </span>
-                            <span class="hidden sm:inline text-sm font-black tracking-wide text-red-100 uppercase">
-                                KOPERASI MERAH PUTIH
+                            <span class="hidden sm:inline text-sm sm:text-base font-semibold text-red-100">
+                                KMP Kab. Bogor
                             </span>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-red-200 font-medium leading-none mt-0.5">
-                            Pemerintah Kabupaten Bogor &bull; Dinas Koperasi & UKM
+                        <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
+                            Pemerintah Daerah Kabupaten Bogor
                         </p>
                     </div>
                 </div>
@@ -122,60 +122,35 @@
                         <!-- 1. INFORMASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'informasi']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'informasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-solid fa-circle-info text-sm"></i>
-                                </span>
-                                <span>Informasi</span>
-                            </div>
+                            <span>Informasi</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'informasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 2. DATABASE KOPERASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'koperasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-regular fa-building text-sm"></i>
-                                </span>
-                                <span>Database Koperasi</span>
-                            </div>
+                            <span>Database Koperasi</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'koperasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 3. DATABASE PENGURUS -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'pengurus' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-solid fa-user-tie text-sm"></i>
-                                </span>
-                                <span>Database Pengurus</span>
-                            </div>
+                            <span>Database Pengurus</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'pengurus' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 4. DATABASE ANGGOTA -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'anggota']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'anggota' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-solid fa-users text-sm"></i>
-                                </span>
-                                <span>Database Anggota</span>
-                            </div>
+                            <span>Database Anggota</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'anggota' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 5. LAMPIRAN INFORMASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'lampiran']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'lampiran' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-solid fa-paperclip text-sm"></i>
-                                </span>
-                                <span>Lampiran Informasi</span>
-                            </div>
+                            <span>Lampiran Informasi</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'lampiran' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
                     </nav>
@@ -183,14 +158,11 @@
                     <!-- REKAPITULASI WILAYAH Widget -->
                     <div class="pt-3 border-t border-slate-100 space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-1.5">
-                                <span class="w-2 h-2 rounded-full {{ $activeTab === 'anggota' ? 'bg-emerald-600' : 'bg-red-600' }}"></span>
-                                <span class="text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">
-                                    {{ $activeTab === 'anggota' ? 'REKAPITULASI KABUPATEN' : 'REKAPITULASI WILAYAH' }}
-                                </span>
-                            </div>
+                            <span class="text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">
+                                {{ $activeTab === 'anggota' ? 'REKAPITULASI KABUPATEN' : 'REKAPITULASI WILAYAH' }}
+                            </span>
                             @if($activeTab === 'anggota')
-                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     Live Data
                                 </span>
                             @else
@@ -202,15 +174,7 @@
 
                         <!-- Card 1: Jumlah Koperasi -->
                         <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-xs relative overflow-hidden">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">JUMLAH KOPERASI</span>
-                                </div>
-                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                    100% Terdaftar
-                                </span>
-                            </div>
+                            <div class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">JUMLAH KOPERASI</div>
                             <div class="text-2xl font-black text-slate-900 mt-1.5 leading-none">
                                 {{ $totalKoperasi }}
                             </div>
@@ -218,15 +182,7 @@
 
                         <!-- Card 2: Anggota Koperasi -->
                         <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-xs relative overflow-hidden">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">ANGGOTA KOPERASI</span>
-                                </div>
-                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
-                                    Tahap Verifikasi
-                                </span>
-                            </div>
+                            <div class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">ANGGOTA KOPERASI</div>
                             <div class="text-2xl font-black text-slate-900 mt-1.5 leading-none">
                                 {{ number_format($totalAnggota) }}
                             </div>
@@ -234,15 +190,6 @@
                                 Sinkronisasi NIK anggota koperasi desa sedang dalam integrasi lapangan.
                             </p>
                         </div>
-                    </div>
-
-                    <!-- Sidebar Footer Info -->
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <div class="flex items-center space-x-1.5 text-emerald-600 font-bold text-[11px]">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span>Sistem Aktif</span>
-                        </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200">v2.4.0</span>
                     </div>
 
                 </div>
@@ -893,6 +840,18 @@
                                                             <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">ANGGOTA</span>
                                                             <span class="font-bold text-slate-800">{{ $kop->jum_anggota ?? 0 }}</span>
                                                         </div>
+                                                        <div class="flex items-center justify-between py-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">SIMPANAN POKOK</span>
+                                                            <span class="font-bold text-slate-800">Rp {{ number_format($kop->jum_sim_pokok ?? 0, 0, ',', '.') }}</span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between py-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">SIMPANAN WAJIB</span>
+                                                            <span class="font-bold text-slate-800">Rp {{ number_format($kop->jum_sim_wajib ?? 0, 0, ',', '.') }}</span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between py-1.5">
+                                                            <span class="font-black text-slate-700 tracking-wider uppercase text-[11px]">WEBSITE</span>
+                                                            <span class="font-bold text-sky-600 truncate max-w-[200px]">{{ $kop->kop_web ?: '-' }}</span>
+                                                        </div>
                                                         <div class="flex flex-wrap items-center gap-2 pt-3">
                                                             <span class="font-black text-slate-700 tracking-wider uppercase text-[11px] mr-2">PROSES</span>
                                                             <button type="button"
@@ -1094,7 +1053,7 @@
 
                     <!-- MODAL: EDIT / UPDATE DATA KOPERASI -->
                     <div id="modalEditKoperasi" class="fixed inset-0 z-[1050] hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+                        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
                             <!-- Modal Header -->
                             <div class="px-6 py-4 bg-gradient-to-r from-sky-700 to-sky-800 text-white flex items-center justify-between shrink-0">
                                 <div class="flex items-center space-x-2">
@@ -1107,139 +1066,263 @@
                             </div>
 
                             <!-- Modal Body / Form -->
-                            <form id="formEditKoperasi" method="POST" class="p-6 space-y-4 overflow-y-auto">
+                            <form id="formEditKoperasi" method="POST" class="p-6 space-y-5 overflow-y-auto">
                                 @csrf
                                 @method('PUT')
+                                <input type="hidden" name="has_types_input" value="1">
 
-                                <div class="space-y-1">
-                                    <label class="text-xs font-bold text-slate-700">Nama Lengkap Koperasi <span class="text-red-500">*</span></label>
-                                    <input type="text" name="name_koperasi" id="edit_name_koperasi" required
-                                           class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Kecamatan <span class="text-red-500">*</span></label>
-                                        <select name="id_kec" id="edit_id_kec" required onchange="updateEditDesaDropdown(this.value)"
-                                                class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                            <option value="">Pilih Kecamatan...</option>
-                                            @foreach($kecamatans as $kec)
-                                                <option value="{{ $kec->id_kopkec }}">{{ $kec->name_kopkec }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                <!-- SECTION 1: IDENTITAS & WILAYAH -->
+                                <div class="space-y-3 pb-3 border-b border-slate-100">
+                                    <h4 class="text-xs font-bold text-slate-700">Identitas & Wilayah Koperasi</h4>
 
                                     <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Desa / Kelurahan <span class="text-red-500">*</span></label>
-                                        <select name="id_kel" id="edit_id_kel" required
-                                                class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                            <option value="">Pilih Desa / Kelurahan...</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">NI-KOP</label>
-                                        <input type="text" name="no_inkop" id="edit_no_inkop" placeholder="Contoh: 3201140020005"
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
-                                    </div>
-
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Nomor AHU</label>
-                                        <input type="text" name="no_ahu" id="edit_no_ahu" placeholder="AHU-0011857.AH.01.29.TAHUN 2025"
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
-                                    </div>
-
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Tanggal AHU</label>
-                                        <input type="date" name="tgl_ahu" id="edit_tgl_ahu"
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Status Operasional</label>
-                                        <select name="st_ops" id="edit_st_ops" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                            <option value="SUDAH">SUDAH</option>
-                                            <option value="BELUM">BELUM</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Pelatihan</label>
-                                        <select name="st_latih" id="edit_st_latih" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                            <option value="BELUM">BELUM</option>
-                                            <option value="SUDAH">SUDAH</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Sertifikat</label>
-                                        <select name="st_sertifikat" id="edit_st_sertifikat" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                            <option value="SUDAH">SUDAH</option>
-                                            <option value="BELUM">BELUM</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Jumlah Anggota</label>
-                                        <input type="number" name="jum_anggota" id="edit_jum_anggota" min="0"
+                                        <label class="text-xs font-bold text-slate-700">Nama Lengkap Koperasi <span class="text-red-500">*</span></label>
+                                        <input type="text" name="name_koperasi" id="edit_name_koperasi" required
                                                class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
                                     </div>
 
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Jumlah Pengurus</label>
-                                        <input type="number" name="jum_pengurus" id="edit_jum_pengurus" min="0"
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Kecamatan <span class="text-red-500">*</span></label>
+                                            <select name="id_kec" id="edit_id_kec" required onchange="updateEditDesaDropdown(this.value)"
+                                                    class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                                <option value="">Pilih Kecamatan...</option>
+                                                @foreach($kecamatans as $kec)
+                                                    <option value="{{ $kec->id_kopkec }}">{{ $kec->name_kopkec }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Desa / Kelurahan <span class="text-red-500">*</span></label>
+                                            <select name="id_kel" id="edit_id_kel" required
+                                                    class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                                <option value="">Pilih Desa / Kelurahan...</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Jumlah Pengawas</label>
-                                        <input type="number" name="jum_pengawas" id="edit_jum_pengawas" min="0"
+                                        <label class="text-xs font-bold text-slate-700">Alamat Kantor Koperasi</label>
+                                        <input type="text" name="kop_addr" id="edit_kop_addr" placeholder="Alamat lengkap kantor..."
                                                class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    </div>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Kategori Koperasi</label>
+                                            <input type="text" name="cat_koperasi" id="edit_cat_koperasi" placeholder="KOPERASI DESA"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Latitude GPS</label>
+                                            <input type="text" name="gps_lat" id="edit_gps_lat" placeholder="-6.xxxxx"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Longitude GPS</label>
+                                            <input type="text" name="gps_long" id="edit_gps_long" placeholder="106.xxxxx"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="space-y-1">
-                                    <label class="text-xs font-bold text-slate-700">Alamat Kantor Koperasi</label>
-                                    <input type="text" name="kop_addr" id="edit_kop_addr" placeholder="Alamat lengkap..."
-                                           class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <!-- SECTION 2: LEGALITAS & STATUS -->
+                                <div class="space-y-3 pb-3 border-b border-slate-100">
+                                    <h4 class="text-xs font-bold text-slate-700">Legalitas & Status Operasional</h4>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">NI-KOP</label>
+                                            <input type="text" name="no_inkop" id="edit_no_inkop" placeholder="Contoh: 3201140020005"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Nomor AHU</label>
+                                            <input type="text" name="no_ahu" id="edit_no_ahu" placeholder="AHU-0011857.AH.01.29.TAHUN 2025"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Tanggal AHU</label>
+                                            <input type="date" name="tgl_ahu" id="edit_tgl_ahu"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Status Operasional</label>
+                                            <select name="st_ops" id="edit_st_ops" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                                <option value="SUDAH">SUDAH</option>
+                                                <option value="BELUM">BELUM</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Pelatihan</label>
+                                            <select name="st_latih" id="edit_st_latih" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                                <option value="BELUM">BELUM</option>
+                                                <option value="SUDAH">SUDAH</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Sertifikat</label>
+                                            <select name="st_sertifikat" id="edit_st_sertifikat" class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                                <option value="SUDAH">SUDAH</option>
+                                                <option value="BELUM">BELUM</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">No. Telp / WA</label>
-                                        <input type="text" name="kop_telp" id="edit_kop_telp" placeholder="08..."
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <!-- SECTION 3: KELEMBAGAAN & FINANSIAL -->
+                                <div class="space-y-3 pb-3 border-b border-slate-100">
+                                    <h4 class="text-xs font-bold text-slate-700">Kelembagaan & Finansial (Simpanan)</h4>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Jumlah Anggota</label>
+                                            <input type="number" name="jum_anggota" id="edit_jum_anggota" min="0"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Jumlah Pengurus</label>
+                                            <input type="number" name="jum_pengurus" id="edit_jum_pengurus" min="0"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Jumlah Pengawas</label>
+                                            <input type="number" name="jum_pengawas" id="edit_jum_pengawas" min="0"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
                                     </div>
 
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Email Koperasi</label>
-                                        <input type="email" name="kop_mail" id="edit_kop_mail" placeholder="koperasi@..."
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Simpanan Pokok (Rp)</label>
+                                            <input type="number" name="jum_sim_pokok" id="edit_jum_sim_pokok" min="0" step="1000" placeholder="Contoh: 50000"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono">
+                                        </div>
 
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Kategori Koperasi</label>
-                                        <input type="text" name="cat_koperasi" id="edit_cat_koperasi" placeholder="KOPERASI DESA"
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Simpanan Wajib (Rp)</label>
+                                            <input type="number" name="jum_sim_wajib" id="edit_jum_sim_wajib" min="0" step="1000" placeholder="Contoh: 10000"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono">
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Latitude GPS</label>
-                                        <input type="text" name="gps_lat" id="edit_gps_lat" placeholder="-6.xxxxx"
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+                                <!-- SECTION 4: KONTAK, WEBSITE & MEDIA SOSIAL -->
+                                <div class="space-y-3 pb-3 border-b border-slate-100">
+                                    <h4 class="text-xs font-bold text-slate-700">Kontak, Website & Media Sosial</h4>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">No. Telp / WA</label>
+                                            <input type="text" name="kop_telp" id="edit_kop_telp" placeholder="08..."
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Email Koperasi</label>
+                                            <input type="email" name="kop_mail" id="edit_kop_mail" placeholder="koperasi@..."
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-xs font-bold text-slate-700">Website Resmi</label>
+                                            <input type="text" name="kop_web" id="edit_kop_web" placeholder="namadesa.kop.id"
+                                                   class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
                                     </div>
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-bold text-slate-700">Longitude GPS</label>
-                                        <input type="text" name="gps_long" id="edit_gps_long" placeholder="106.xxxxx"
-                                               class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+
+                                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                        <div class="space-y-1">
+                                            <label class="text-[11px] font-bold text-slate-600 flex items-center space-x-1">
+                                                <i class="fa-brands fa-facebook text-blue-600"></i>
+                                                <span>Facebook</span>
+                                            </label>
+                                            <input type="text" name="media_fb" id="edit_media_fb" placeholder="Username/Link"
+                                                   class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-[11px] font-bold text-slate-600 flex items-center space-x-1">
+                                                <i class="fa-brands fa-instagram text-pink-600"></i>
+                                                <span>Instagram</span>
+                                            </label>
+                                            <input type="text" name="media_ig" id="edit_media_ig" placeholder="@username"
+                                                   class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-[11px] font-bold text-slate-600 flex items-center space-x-1">
+                                                <i class="fa-brands fa-youtube text-red-600"></i>
+                                                <span>YouTube</span>
+                                            </label>
+                                            <input type="text" name="media_yt" id="edit_media_yt" placeholder="Channel"
+                                                   class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+
+                                        <div class="space-y-1">
+                                            <label class="text-[11px] font-bold text-slate-600 flex items-center space-x-1">
+                                                <i class="fa-brands fa-x-twitter text-slate-800"></i>
+                                                <span>Twitter / X</span>
+                                            </label>
+                                            <input type="text" name="media_x" id="edit_media_x" placeholder="@username"
+                                                   class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+
+                                        <div class="space-y-1 col-span-2 sm:col-span-1">
+                                            <label class="text-[11px] font-bold text-slate-600 flex items-center space-x-1">
+                                                <i class="fa-brands fa-tiktok text-slate-900"></i>
+                                                <span>TikTok</span>
+                                            </label>
+                                            <input type="text" name="media_tiktok" id="edit_media_tiktok" placeholder="@username"
+                                                   class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SECTION 5: 13 GERAI / UNIT USAHA TERDAFTAR -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-xs font-bold text-slate-700">13 Gerai / Unit Usaha Terdaftar</h4>
+                                        <span class="text-[11px] text-slate-400 font-medium">Centang usaha yang aktif</span>
+                                    </div>
+
+                                    @php
+                                        $daftarGerai13 = [
+                                            1 => ['nama' => 'Gerai Sembako', 'icon' => 'fa-store'],
+                                            2 => ['nama' => 'Gerai Apotek Desa', 'icon' => 'fa-prescription-bottle-medical'],
+                                            3 => ['nama' => 'Gerai Kantor Koperasi', 'icon' => 'fa-building-columns'],
+                                            4 => ['nama' => 'Unit Usaha Simpan Pinjam', 'icon' => 'fa-hand-holding-dollar'],
+                                            5 => ['nama' => 'Gerai Klinik Desa', 'icon' => 'fa-kit-medical'],
+                                            6 => ['nama' => 'Gerai Cold Storage', 'icon' => 'fa-snowflake'],
+                                            7 => ['nama' => 'Gerai Logistik (Distribusi)', 'icon' => 'fa-truck-ramp-box'],
+                                            8 => ['nama' => 'Gerai Usaha Lainnya (KBLI)', 'icon' => 'fa-boxes-stacked'],
+                                            9 => ['nama' => 'Gerai Kios Pupuk', 'icon' => 'fa-seedling'],
+                                            10 => ['nama' => 'Gerai Pangkalan LPG', 'icon' => 'fa-fire-flame-simple'],
+                                            11 => ['nama' => 'Gerai Agen Pos Indonesia', 'icon' => 'fa-envelope-open-text'],
+                                            12 => ['nama' => 'Gerai Agen Laku Pandai', 'icon' => 'fa-wallet'],
+                                            13 => ['nama' => 'Akun Microsite', 'icon' => 'fa-globe'],
+                                        ];
+                                    @endphp
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 p-3 bg-slate-50/80 rounded-xl border border-slate-200">
+                                        @foreach($daftarGerai13 as $nomor => $g)
+                                            <label class="flex items-center space-x-2 p-2 rounded-lg bg-white border border-slate-200/80 hover:border-sky-300 hover:bg-sky-50/40 transition cursor-pointer select-none text-xs">
+                                                <input type="checkbox" name="id_koperasitype{{ $nomor }}" id="edit_id_koperasitype{{ $nomor }}" value="Yes"
+                                                       class="w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500 cursor-pointer">
+                                                <i class="fa-solid {{ $g['icon'] }} text-slate-500 text-[11px] w-4 text-center"></i>
+                                                <span class="text-[11px] font-bold text-slate-700 truncate">{{ $g['nama'] }}</span>
+                                            </label>
+                                        @endforeach
                                     </div>
                                 </div>
 
@@ -2766,6 +2849,27 @@
         document.getElementById('edit_cat_koperasi').value = kop.cat_koperasi || 'KOPERASI DESA';
         document.getElementById('edit_gps_lat').value = kop.gps_lat || '';
         document.getElementById('edit_gps_long').value = kop.gps_long || '';
+
+        // Finansial
+        document.getElementById('edit_jum_sim_pokok').value = kop.jum_sim_pokok ?? 0;
+        document.getElementById('edit_jum_sim_wajib').value = kop.jum_sim_wajib ?? 0;
+
+        // Website & Media Sosial
+        document.getElementById('edit_kop_web').value = kop.kop_web || '';
+        document.getElementById('edit_media_fb').value = (kop.media_fb && kop.media_fb !== '-') ? kop.media_fb : '';
+        document.getElementById('edit_media_ig').value = (kop.media_ig && kop.media_ig !== '-') ? kop.media_ig : '';
+        document.getElementById('edit_media_yt').value = (kop.media_yt && kop.media_yt !== '-') ? kop.media_yt : '';
+        document.getElementById('edit_media_x').value = (kop.media_x && kop.media_x !== '-') ? kop.media_x : '';
+        document.getElementById('edit_media_tiktok').value = (kop.media_tiktok && kop.media_tiktok !== '-') ? kop.media_tiktok : '';
+
+        // 13 Jenis Usaha / Gerai
+        for (let i = 1; i <= 13; i++) {
+            const cb = document.getElementById(`edit_id_koperasitype${i}`);
+            if (cb) {
+                const val = String(kop[`id_koperasitype${i}`] || '').toLowerCase();
+                cb.checked = (val === 'yes' || val === '1' || val === 'true');
+            }
+        }
 
         document.getElementById('modalEditKoperasi')?.classList.remove('hidden');
     }
