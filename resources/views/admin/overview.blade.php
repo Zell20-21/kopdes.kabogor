@@ -66,12 +66,12 @@
             </div>
         @endif
 
-        @if(request()->query('page') === 'database-anggota')
+        @if(request()->query('page') === 'database-anggota' || request()->query('tab') === 'anggota')
             <div class="grid min-w-0 gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-8">
                 @include('admin.partials.operator-database-sidebar')
                 @include('admin.operator.database-anggota')
             </div>
-        @elseif(request()->query('page') === 'database-pengurus')
+        @elseif(request()->query('page') === 'database-pengurus' || request()->query('tab') === 'pengurus')
             <div class="grid min-w-0 gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-8">
                 @include('admin.partials.operator-database-sidebar')
                 @include('admin.operator.database-pengurus')

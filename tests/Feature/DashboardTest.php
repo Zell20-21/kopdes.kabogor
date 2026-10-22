@@ -168,7 +168,7 @@ class DashboardTest extends TestCase
         $response->assertDontSee('KOPERASI DESA LAIN');
         $response->assertSee('Portal Koperasi Desa');
         $response->assertDontSee('id="map-members"', false);
-        $response->assertDontSee('<aside', false);
+        $response->assertDontSee('id="sidebar"', false);
     }
 
     public function test_each_operator_desa_sees_only_its_assigned_cooperative_and_village_filter(): void
