@@ -1050,9 +1050,9 @@
     <!-- Footer Berdasarkan Referensi RAPID Pemerintah Kabupaten Bogor (Warna Senada Navbar) -->
     <footer class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-red-100 pt-12 pb-8 border-t border-red-950/40 shadow-inner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
-                <!-- Col 1: Brand & Narasi RAPID / KMP -->
-                <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 mb-10">
+                <!-- Col 1: Brand & Narasi RAPID / KMP (5 cols) -->
+                <div class="md:col-span-5 space-y-4">
                     <div class="flex items-center space-x-3">
                         <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-11 sm:h-12 w-auto object-contain drop-shadow shrink-0">
                         <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white p-1.5 flex items-center justify-center shadow-lg shrink-0 border border-white/50 overflow-hidden">
@@ -1067,69 +1067,56 @@
                             </p>
                         </div>
                     </div>
-                    <p class="text-xs text-red-100/90 leading-relaxed text-justify">
+                    <p class="text-xs text-red-100/90 leading-relaxed text-justify max-w-md">
                         Memfasilitasi pemberdayaan dan kemandirian ekonomi desa/kelurahan di Kabupaten Bogor melalui penguatan kelembagaan koperasi gotong royong yang berdaya saing, modern, dan terintegrasi.
                     </p>
                     <div class="flex items-center space-x-3 pt-1">
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-instagram text-sm"></i>
                         </a>
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-facebook-f text-xs"></i>
                         </a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-red-100 hover:text-white hover:bg-white/20 transition">
                             <i class="fa-brands fa-youtube text-xs"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Col 2: Layanan -->
-                <div class="space-y-3">
-                    <h5 class="text-sm font-bold text-white tracking-wider">Layanan</h5>
-                    <ul class="space-y-2 text-xs text-red-200/90">
+                <!-- Col 2: Tautan Cepat (3 cols) -->
+                <div class="md:col-span-3 space-y-3.5">
+                    <h5 class="text-sm font-bold text-white tracking-wider uppercase">Tautan</h5>
+                    <ul class="space-y-2.5 text-xs text-red-200/90">
                         <li>
-                            <a href="#sebaran" class="hover:text-white transition flex items-center space-x-2">
-                                <span>Pendaftaran Akun Koperasi</span>
+                            <a href="#beranda" class="hover:text-white transition flex items-center gap-2 group">
+                                <i class="fa-solid fa-chevron-right text-[9px] text-red-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Beranda</span>
                             </a>
                         </li>
                         <li>
-                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-white transition flex items-center space-x-2">
-                                <span>Formulir Pengaduan</span>
+                            <a href="#informasi" class="hover:text-white transition flex items-center gap-2 group">
+                                <i class="fa-solid fa-chevron-right text-[9px] text-red-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Informasi Program</span>
                             </a>
                         </li>
                         <li>
-                            <a href="https://wa.me/628111111111" target="_blank" rel="noopener noreferrer" class="hover:text-white transition flex items-center space-x-2">
-                                <span>Helpdesk & Konsultasi 24/7</span>
+                            <a href="#sebaran" class="hover:text-white transition flex items-center gap-2 group">
+                                <i class="fa-solid fa-chevron-right text-[9px] text-red-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Sebaran Data 40 Kecamatan</span>
                             </a>
+                        </li>
+                        <li>
+                            <button type="button" onclick="openRegulasiModal()" class="hover:text-white transition flex items-center gap-2 group text-left cursor-pointer">
+                                <i class="fa-solid fa-chevron-right text-[9px] text-red-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Dokumen Regulasi (UU / SK)</span>
+                            </button>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Col 3: Tautan -->
-                <div class="space-y-3">
-                    <h5 class="text-sm font-bold text-white tracking-wider">Tautan</h5>
-                    <ul class="space-y-2 text-xs text-red-200/90">
-                        <li>
-                            <a href="#beranda" class="hover:text-white transition">Beranda</a>
-                        </li>
-                        <li>
-                            <a href="#informasi" class="hover:text-white transition">Informasi Program</a>
-                        </li>
-                        <li>
-                            <a href="#sebaran" class="hover:text-white transition">Sebaran Data 40 Kecamatan</a>
-                        </li>
-                        <li>
-                            <button type="button" onclick="openRegulasiModal()" class="hover:text-white transition text-left cursor-pointer">Dokumen Regulasi (UU / SK)</button>
-                        </li>
-                        <li>
-                            <a href="{{ route('export.rekapitulasi') }}" class="hover:text-white transition">Ekspor Rekapitulasi Data</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Kontak Kami -->
-                <div class="space-y-3">
-                    <h5 class="text-sm font-bold text-white tracking-wider">Kontak Kami</h5>
+                <!-- Col 3: Kontak Kami (4 cols) -->
+                <div class="md:col-span-4 space-y-3.5">
+                    <h5 class="text-sm font-bold text-white tracking-wider uppercase">Kontak Kami</h5>
                     <div class="space-y-3 text-xs text-red-100/90">
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white mt-0.5">
@@ -1156,13 +1143,13 @@
             </div>
 
             <!-- Bottom Divider, Copyright & Button Login Admin -->
-            <div class="pt-6 border-t border-white/15 flex flex-col items-center justify-center space-y-3 text-center">
+            <div class="pt-6 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
                 <p class="text-xs text-red-200/90">
                     &copy; 2026 KMP - Pemerintah Kabupaten Bogor. Hak cipta dilindungi.
                 </p>
-                <button type="button" onclick="openLoginModal()" class="px-5 py-2 rounded-full bg-white text-red-800 hover:bg-red-50 text-xs font-bold shadow-md transition flex items-center space-x-2 cursor-pointer">
+                <button type="button" onclick="openLoginModal()" class="px-5 py-2 rounded-full bg-white text-red-800 hover:bg-red-50 text-xs font-bold shadow-md transition flex items-center space-x-2 cursor-pointer active:scale-95">
                     <i class="fa-solid fa-lock text-[11px] text-red-700"></i>
-                    <span>Login Admin</span>
+                    <span>Login Petugas & Admin</span>
                 </button>
             </div>
         </div>
