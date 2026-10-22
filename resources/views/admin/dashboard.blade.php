@@ -43,7 +43,7 @@
                                 Dashboard
                             </span>
                             <span class="hidden sm:inline text-sm sm:text-base font-semibold text-red-100">
-                                KMP Kab. Bogor
+                                KOPERASI MERAH PUTIH
                             </span>
                         </div>
                         <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
