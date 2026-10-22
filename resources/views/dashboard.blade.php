@@ -46,13 +46,8 @@
                     </a>
                 </nav>
 
-                <!-- Actions: TA & Login (Clean & Compact on Mobile) -->
+                <!-- Actions: Login (Clean & Compact on Mobile) -->
                 <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
-                    <div class="hidden sm:flex items-center space-x-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-black/25 text-red-100 border border-white/10">
-                        <i class="fa-regular fa-calendar-check text-red-300"></i>
-                        <span>TA 2025/2026</span>
-                    </div>
-
                     <!-- Clean & Compact Login Button on Mobile -->
                     <button type="button" onclick="openLoginModal()" class="flex items-center space-x-1 sm:space-x-1.5 bg-white text-red-700 hover:bg-red-50 px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm transition-all duration-200 hover:shadow-md transform active:scale-95 cursor-pointer shrink-0">
                         <i class="fa-solid fa-arrow-right-to-bracket text-[11px] sm:text-xs"></i>
@@ -112,12 +107,9 @@
                     <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
                         <div>
                             <div class="flex items-center pb-3 border-b border-slate-100">
-                                <div class="flex items-center space-x-2.5">
-                                    <span class="w-3 h-3 rounded-full bg-red-600 animate-pulse"></span>
-                                    <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
-                                        Koperasi Merah Putih
-                                    </h3>
-                                </div>
+                                <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
+                                    Koperasi Merah Putih
+                                </h3>
                             </div>
 
                             <p class="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">

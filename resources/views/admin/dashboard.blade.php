@@ -122,60 +122,35 @@
                         <!-- 1. INFORMASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'informasi']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'informasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-solid fa-circle-info text-sm"></i>
-                                </span>
-                                <span>Informasi</span>
-                            </div>
+                            <span>Informasi</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'informasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 2. DATABASE KOPERASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'koperasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-regular fa-building text-sm"></i>
-                                </span>
-                                <span>Database Koperasi</span>
-                            </div>
+                            <span>Database Koperasi</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'koperasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 3. DATABASE PENGURUS -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'pengurus' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-solid fa-user-tie text-sm"></i>
-                                </span>
-                                <span>Database Pengurus</span>
-                            </div>
+                            <span>Database Pengurus</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'pengurus' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 4. DATABASE ANGGOTA -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'anggota']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'anggota' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-solid fa-users text-sm"></i>
-                                </span>
-                                <span>Database Anggota</span>
-                            </div>
+                            <span>Database Anggota</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'anggota' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 5. LAMPIRAN INFORMASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'lampiran']) }}"
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'lampiran' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
-                                    <i class="fa-solid fa-paperclip text-sm"></i>
-                                </span>
-                                <span>Lampiran Informasi</span>
-                            </div>
+                            <span>Lampiran Informasi</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'lampiran' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
                     </nav>
@@ -183,14 +158,11 @@
                     <!-- REKAPITULASI WILAYAH Widget -->
                     <div class="pt-3 border-t border-slate-100 space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-1.5">
-                                <span class="w-2 h-2 rounded-full {{ $activeTab === 'anggota' ? 'bg-emerald-600' : 'bg-red-600' }}"></span>
-                                <span class="text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">
-                                    {{ $activeTab === 'anggota' ? 'REKAPITULASI KABUPATEN' : 'REKAPITULASI WILAYAH' }}
-                                </span>
-                            </div>
+                            <span class="text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">
+                                {{ $activeTab === 'anggota' ? 'REKAPITULASI KABUPATEN' : 'REKAPITULASI WILAYAH' }}
+                            </span>
                             @if($activeTab === 'anggota')
-                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     Live Data
                                 </span>
                             @else
@@ -202,15 +174,7 @@
 
                         <!-- Card 1: Jumlah Koperasi -->
                         <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-xs relative overflow-hidden">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">JUMLAH KOPERASI</span>
-                                </div>
-                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                    100% Terdaftar
-                                </span>
-                            </div>
+                            <div class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">JUMLAH KOPERASI</div>
                             <div class="text-2xl font-black text-slate-900 mt-1.5 leading-none">
                                 {{ $totalKoperasi }}
                             </div>
@@ -218,15 +182,7 @@
 
                         <!-- Card 2: Anggota Koperasi -->
                         <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-xs relative overflow-hidden">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">ANGGOTA KOPERASI</span>
-                                </div>
-                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
-                                    Tahap Verifikasi
-                                </span>
-                            </div>
+                            <div class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">ANGGOTA KOPERASI</div>
                             <div class="text-2xl font-black text-slate-900 mt-1.5 leading-none">
                                 {{ number_format($totalAnggota) }}
                             </div>
@@ -234,15 +190,6 @@
                                 Sinkronisasi NIK anggota koperasi desa sedang dalam integrasi lapangan.
                             </p>
                         </div>
-                    </div>
-
-                    <!-- Sidebar Footer Info -->
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <div class="flex items-center space-x-1.5 text-emerald-600 font-bold text-[11px]">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span>Sistem Aktif</span>
-                        </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200">v2.4.0</span>
                     </div>
 
                 </div>
