@@ -27,6 +27,9 @@ class AdminController extends Controller
         $user = $request->user();
         $isOperator = $user->isOperatorDesa() || $user->isOperatorKecamatan();
         $activeTab = $request->get('tab', 'informasi');
+        if ($user->isOperatorKecamatan() && $activeTab === 'lampiran') {
+            $activeTab = 'informasi';
+        }
 
         // Scoping based on user role
         $baseQuery = Koperasi::query()->where('flag_del', 0);

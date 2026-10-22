@@ -228,13 +228,34 @@ class DashboardTest extends TestCase
             && array_column($data[0]['kelurahans'], 'id_kopkel') === [9102, 9101]);
         $response->assertSee('KOPERASI NAMBO');
         $response->assertSee('KLAPANUNGGAL');
-        $response->assertSee('KOPERASI MERAH PUTIH');
+        $response->assertSee('KMP Kab. Bogor');
+        $response->assertSee('data-dashboard-shell="operator-kecamatan"', false);
+        $response->assertSee('max-w-7xl', false);
+        $response->assertSee('Keluar');
+        $response->assertDontSee('fixed top-0 inset-x-0', false);
         $response->assertDontSee('id="map-members"', false);
         $response->assertDontSee('KOPERASI LUAR WILAYAH');
         $response->assertDontSee('KECAMATAN LAIN');
         $response->assertDontSee('DESA LUAR WILAYAH');
         $response->assertDontSee('-- SEMUA KECAMATAN (40) --');
         $response->assertDontSee('Ciawi & Megamendung (19, 45)');
+    }
+
+    public function test_operator_kecamatan_does_not_see_lampiran_informasi_section(): void
+    {
+        $this->createKecamatan(9001, 'KLAPANUNGGAL');
+        $operator = $this->createOperatorKecamatan(9001);
+
+        $this->actingAs($operator)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Lampiran Informasi');
+
+        $this->get(route('admin.dashboard', ['tab' => 'lampiran']))
+            ->assertOk()
+            ->assertSee('INFORMASI KOPERASI')
+            ->assertDontSee('LAMPIRAN INFORMASI')
+            ->assertDontSee('Upload File Lampiran Baru');
     }
 
     public function test_operator_kecamatan_cannot_expand_dashboard_data_with_other_region_filters(): void

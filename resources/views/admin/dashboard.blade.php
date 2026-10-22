@@ -21,12 +21,15 @@
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-[#f8fafc] flex flex-col justify-between text-slate-800 w-full max-w-full">
+@php
+    $isOperatorKecamatan = $user->isOperatorKecamatan();
+@endphp
+<div data-dashboard-shell="{{ $isOperatorKecamatan ? 'operator-kecamatan' : 'default' }}" class="min-h-screen {{ $isOperatorKecamatan ? 'bg-slate-50' : 'bg-[#f8fafc]' }} flex flex-col justify-between text-slate-800 w-full max-w-full">
 
-    <!-- Top Navigation Header GovTech KOP (Fixed at top when scrolling) -->
-    <header class="fixed top-0 inset-x-0 w-full bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md z-[100]">
-        <div class="w-full px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+    <!-- Top Navigation Header GovTech KOP -->
+    <header class="{{ $isOperatorKecamatan ? 'bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] shadow-lg' : 'fixed top-0 inset-x-0 w-full bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] shadow-md z-[100]' }} text-white">
+        <div class="{{ $isOperatorKecamatan ? 'mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8' : 'w-full px-4 sm:px-6 lg:px-8' }}">
+            <div class="{{ $isOperatorKecamatan ? 'flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-4' : 'flex items-center justify-between h-16' }}">
                 <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Bagian Publik) -->
                 <div class="flex items-center space-x-2 sm:space-x-3.5 min-w-0 pr-1">
                     <!-- Lambang Kabupaten Bogor (Tegar Beriman) -->
@@ -43,7 +46,7 @@
                                 Dashboard
                             </span>
                             <span class="hidden sm:inline text-sm sm:text-base font-semibold text-red-100">
-                                KOPERASI MERAH PUTIH
+                                {{ $isOperatorKecamatan ? 'KMP Kab. Bogor' : 'KOPERASI MERAH PUTIH' }}
                             </span>
                         </div>
                         <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
@@ -57,8 +60,8 @@
 
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="flex items-center space-x-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 border border-white/20 text-white px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm transition-all duration-200 hover:shadow transform active:scale-95 cursor-pointer">
-                            <span>Log Out</span>
+                        <button type="submit" class="{{ $isOperatorKecamatan ? 'inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 px-3 py-2 text-sm font-bold transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70 sm:px-4' : 'flex items-center space-x-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 border border-white/20 text-white px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm transition-all duration-200 hover:shadow transform active:scale-95 cursor-pointer' }}">
+                            <span>{{ $isOperatorKecamatan ? 'Keluar' : 'Log Out' }}</span>
                             <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                         </button>
                     </form>
@@ -68,7 +71,7 @@
     </header>
 
     <!-- Main Content Container with Sidebar -->
-    <main class="flex-grow w-full max-w-full px-4 sm:px-6 lg:px-8 pt-20 pb-6 relative z-0 isolate min-w-0">
+    <main class="{{ $isOperatorKecamatan ? 'mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8' : 'flex-grow w-full max-w-full px-4 sm:px-6 lg:px-8 pt-20 pb-6' }} relative z-0 isolate min-w-0">
 
         <!-- Flash Notice if any -->
         @if(session('success'))
@@ -83,11 +86,11 @@
             </div>
         @endif
 
-        <div class="flex flex-col lg:flex-row gap-6 w-full min-w-0">
+        <div class="{{ $isOperatorKecamatan ? 'grid min-w-0 gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-8' : 'flex flex-col lg:flex-row gap-6 w-full min-w-0' }}">
 
             <!-- Left Sidebar Navigation Card -->
-            <aside class="w-full lg:w-64 shrink-0">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 space-y-4 sticky top-20">
+            <aside class="{{ $isOperatorKecamatan ? 'min-w-0' : 'w-full lg:w-64 shrink-0' }}">
+                <div class="bg-white rounded-2xl border border-slate-200/80 {{ $isOperatorKecamatan ? 'p-3 shadow-xs lg:sticky lg:top-6' : 'p-4 shadow-sm sticky top-20' }} space-y-4">
                     
                     <!-- Profile Header Box -->
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center space-x-3">
@@ -121,38 +124,40 @@
                     <nav class="space-y-1.5 text-xs font-bold">
                         <!-- 1. INFORMASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'informasi']) }}"
-                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'informasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'informasi' ? ($isOperatorKecamatan ? 'bg-rose-800 text-white shadow-rose-900/20' : 'bg-[#0284c7] text-white shadow-sky-600/20') : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <span>Informasi</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'informasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 2. DATABASE KOPERASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}"
-                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'koperasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'koperasi' ? ($isOperatorKecamatan ? 'bg-rose-800 text-white shadow-rose-900/20' : 'bg-[#0284c7] text-white shadow-sky-600/20') : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <span>Database Koperasi</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'koperasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 3. DATABASE PENGURUS -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}"
-                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'pengurus' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'pengurus' ? ($isOperatorKecamatan ? 'bg-rose-800 text-white shadow-rose-900/20' : 'bg-[#0284c7] text-white shadow-sky-600/20') : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <span>Database Pengurus</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'pengurus' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 4. DATABASE ANGGOTA -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'anggota']) }}"
-                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'anggota' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'anggota' ? ($isOperatorKecamatan ? 'bg-rose-800 text-white shadow-rose-900/20' : 'bg-[#0284c7] text-white shadow-sky-600/20') : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <span>Database Anggota</span>
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'anggota' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
-                        <!-- 5. LAMPIRAN INFORMASI -->
-                        <a href="{{ route('admin.dashboard', ['tab' => 'lampiran']) }}"
-                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'lampiran' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <span>Lampiran Informasi</span>
-                            <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'lampiran' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
-                        </a>
+                        @unless($user->isOperatorKecamatan())
+                            <!-- 5. LAMPIRAN INFORMASI -->
+                            <a href="{{ route('admin.dashboard', ['tab' => 'lampiran']) }}"
+                               class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'lampiran' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                                <span>Lampiran Informasi</span>
+                                <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'lampiran' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
+                            </a>
+                        @endunless
                     </nav>
 
                     <!-- REKAPITULASI WILAYAH Widget -->
