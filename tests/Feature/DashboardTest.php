@@ -26,7 +26,7 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Dashboard KMP Kabupaten Bogor');
-        $response->assertSee('435 Koperasi Terbentuk');
+        $response->assertSee('Capaian Agregat Kabupaten Bogor');
         $response->assertSee('CISARUA');
         $response->assertSee('CIBINONG');
         $response->assertSee('Rekapitulasi Sebaran Per Kecamatan');
