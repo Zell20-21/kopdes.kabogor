@@ -65,6 +65,9 @@
     </div>
 
     <!-- Main Content Container -->
+    @php
+        $uniqueKelurahans = $koperasis->map(fn($k) => $k->kelurahan?->name_kopkel)->filter()->unique()->values();
+    @endphp
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 w-full flex-grow">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-6 lg:p-7">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -110,11 +113,36 @@
                     </p>
                 </div>
 
-                <!-- Right Column: Interactive Table with Live Search -->
+                <!-- Right Column: Interactive Table with Slide Pagination (Max 5 Kelurahan per slide) -->
                 <div class="lg:col-span-7 flex flex-col">
+
+                    <!-- Quick Kelurahan Filter Chips (if multiple kelurahans exist) -->
+                    @if($uniqueKelurahans->count() > 1)
+                        <div class="mb-3.5 bg-slate-50/80 p-2.5 rounded-2xl border border-slate-200">
+                            <div class="flex items-center justify-between mb-1.5 px-1">
+                                <span class="text-xs font-black text-slate-900 flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-city text-red-600"></i>
+                                    <span>Pilih Kelurahan / Desa:</span>
+                                </span>
+                                <span class="text-[11px] font-extrabold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                                    Maksimal 5 Kelurahan / Slide
+                                </span>
+                            </div>
+                            <div class="flex items-center space-x-1.5 overflow-x-auto pb-1" style="scrollbar-width: thin;">
+                                <button type="button" class="kelurahan-chip active shrink-0 px-3 py-1.5 rounded-xl text-xs font-black bg-slate-950 text-white border border-slate-900 transition-all shadow-sm" data-desa="all">
+                                    Semua ({{ $koperasis->count() }})
+                                </button>
+                                @foreach($uniqueKelurahans as $desaName)
+                                    <button type="button" class="kelurahan-chip shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition-all shadow-sm" data-desa="{{ strtolower($desaName) }}">
+                                        {{ $desaName }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                     
                     <!-- Search & Filter Controls -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-3">
                         <!-- Search Box -->
                         <div class="relative flex-grow">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
@@ -140,8 +168,46 @@
                         </div>
                     </div>
 
-                    <!-- Table Container -->
-                    <div class="overflow-x-auto rounded-2xl border-2 border-slate-200 shadow-sm bg-white">
+                    <!-- Slide Controller Bar (Top) -->
+                    <div id="slideBarTop" class="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 mb-3 bg-gradient-to-r from-slate-50 via-red-50/40 to-slate-50 border-2 border-slate-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center space-x-2.5">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-red-600 text-white font-black text-xs shadow-sm shrink-0">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </span>
+                            <div>
+                                <div class="text-xs font-black text-slate-950 flex items-center space-x-1.5">
+                                    <span>Tabel Koperasi Kelurahan</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-extrabold uppercase tracking-wide">
+                                        Maks 5 / Slide
+                                    </span>
+                                </div>
+                                <div class="text-[11px] text-slate-600 font-bold" id="slideRangeInfo">
+                                    Menampilkan 1 - 5 dari {{ $koperasis->count() }} Kelurahan
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide Navigation Buttons (Slide Kiri & Slide Kanan) -->
+                        <div class="flex items-center space-x-1.5">
+                            <!-- Slide Kiri -->
+                            <button type="button" id="btnSlidePrev" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 disabled:opacity-35 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95" title="Slide Kiri (Sebelumnya)">
+                                <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                                <span class="hidden sm:inline">Slide Kiri</span>
+                            </button>
+
+                            <!-- Slide Number Badges / Dots -->
+                            <div class="flex items-center space-x-1" id="slideDotsTop"></div>
+
+                            <!-- Slide Kanan (Highlighted CTA) -->
+                            <button type="button" id="btnSlideNext" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white disabled:opacity-35 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95 group" title="Slide Kanan (Berikutnya)">
+                                <span>Slide Kanan</span>
+                                <i class="fa-solid fa-chevron-right text-[10px] transition-transform group-hover:translate-x-0.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Container (Supports Touch Swipe & Mouse Drag Slide) -->
+                    <div id="tableContainer" class="overflow-x-auto rounded-2xl border-2 border-slate-200 shadow-sm bg-white cursor-grab active:cursor-grabbing transition-all">
                         <table class="w-full text-left text-sm" id="tableKoperasi">
                             <thead class="bg-slate-100 text-slate-950 font-black text-xs uppercase tracking-wider border-b-2 border-slate-300">
                                 <tr>
@@ -208,6 +274,21 @@
                         </table>
                     </div>
 
+                    <!-- Slide Companion Footer with Swipe Hint & Indicators -->
+                    <div class="mt-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
+                        <div class="flex items-center space-x-2 text-slate-600 font-bold text-[11px]">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 text-red-600 text-[10px]">
+                                <i class="fa-solid fa-arrows-left-right"></i>
+                            </span>
+                            <span>Bisa klik <strong>"Slide Kanan"</strong> atau <strong>geser / drag tabel</strong> untuk melihat kelurahan berikutnya</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2 shrink-0">
+                            <span class="text-slate-600 font-black" id="slideCounterBottom">Slide 1 dari 1</span>
+                            <div class="flex items-center space-x-1" id="slideDotsBottom"></div>
+                        </div>
+                    </div>
+
                     <!-- No Results Match State -->
                     <div id="noResults" class="hidden py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-2">
                         <i class="fa-solid fa-circle-exclamation text-amber-500 text-2xl mb-1"></i>
@@ -218,7 +299,7 @@
                     </div>
 
                     <!-- Result Counter Footer -->
-                    <div class="mt-3 text-right text-xs text-slate-500 font-medium">
+                    <div class="mt-2 text-right text-xs text-slate-500 font-medium">
                         Menampilkan <span id="visibleCount" class="font-bold text-slate-800">{{ $koperasis->count() }}</span> dari {{ $koperasis->count() }} Koperasi
                     </div>
 
@@ -268,6 +349,32 @@
         background-color: #eff6ff !important;
         box-shadow: inset 4px 0 0 #2563eb;
     }
+    @keyframes slideInFromRight {
+        from {
+            opacity: 0.35;
+            transform: translateX(24px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0.35;
+            transform: translateX(-24px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    .slide-in-right {
+        animation: slideInFromRight 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .slide-in-left {
+        animation: slideInFromLeft 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 </style>
 @endpush
 
@@ -279,10 +386,26 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('koperasiSearch');
     const clearBtn = document.getElementById('clearSearch');
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const rows = document.querySelectorAll('.koperasi-row');
+    const kelurahanChips = document.querySelectorAll('.kelurahan-chip');
+    const rows = Array.from(document.querySelectorAll('.koperasi-row'));
     const noResults = document.getElementById('noResults');
     const visibleCount = document.getElementById('visibleCount');
     const btnResetMap = document.getElementById('btnResetMap');
+    const tableContainer = document.getElementById('tableContainer');
+    const tableBody = document.getElementById('tableBody');
+    const btnSlidePrev = document.getElementById('btnSlidePrev');
+    const btnSlideNext = document.getElementById('btnSlideNext');
+    const slideRangeInfo = document.getElementById('slideRangeInfo');
+    const slideCounterBottom = document.getElementById('slideCounterBottom');
+    const slideDotsTop = document.getElementById('slideDotsTop');
+    const slideDotsBottom = document.getElementById('slideDotsBottom');
+
+    // Pagination / Slide constants
+    const PAGE_SIZE = 5;
+    let currentSlide = 0;
+    let currentFilter = 'all';
+    let currentDesaFilter = 'all';
+    let matchedRows = [...rows];
 
     // Default center Kabupaten Bogor
     let defaultLat = -6.4828;
@@ -341,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 markersMap[p.id] = marker;
 
-                // When user clicks marker, highlight and scroll to row in table
+                // When user clicks marker, highlight and slide to that row
                 marker.on('click', function () {
                     highlightRow(p.id);
                 });
@@ -392,25 +515,200 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    function highlightRow(id) {
-        rows.forEach(r => r.classList.remove('highlight-row'));
-        const targetRow = document.getElementById('koperasi-row-' + id);
-        if (targetRow) {
-            targetRow.classList.add('highlight-row');
-            targetRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Slide Pagination Rendering Logic (Max 5 items per slide)
+    function renderSlide(direction = 'none') {
+        const totalMatched = matchedRows.length;
+        const totalSlides = Math.ceil(totalMatched / PAGE_SIZE) || 1;
+
+        if (currentSlide >= totalSlides) {
+            currentSlide = Math.max(0, totalSlides - 1);
+        }
+        if (currentSlide < 0) {
+            currentSlide = 0;
+        }
+
+        const startIndex = currentSlide * PAGE_SIZE;
+        const endIndex = Math.min(startIndex + PAGE_SIZE, totalMatched);
+
+        // Hide all rows first
+        rows.forEach(r => r.style.display = 'none');
+
+        // Show only the 5 rows of the current slide
+        for (let i = startIndex; i < endIndex; i++) {
+            matchedRows[i].style.display = '';
+        }
+
+        // Apply slide animation
+        if (tableBody && direction !== 'none') {
+            tableBody.classList.remove('slide-in-right', 'slide-in-left');
+            void tableBody.offsetWidth; // trigger reflow
+            tableBody.classList.add(direction === 'next' ? 'slide-in-right' : 'slide-in-left');
+        }
+
+        // Update range info text
+        if (slideRangeInfo) {
+            if (totalMatched === 0) {
+                slideRangeInfo.textContent = 'Tidak ada kelurahan yang cocok';
+            } else {
+                slideRangeInfo.textContent = `Menampilkan ${startIndex + 1} - ${endIndex} dari ${totalMatched} Kelurahan • Slide ${currentSlide + 1} / ${totalSlides}`;
+            }
+        }
+
+        if (slideCounterBottom) {
+            slideCounterBottom.textContent = `Slide ${currentSlide + 1} dari ${totalSlides}`;
+        }
+
+        if (visibleCount) {
+            visibleCount.textContent = totalMatched;
+        }
+
+        // Update Prev / Next button states
+        if (btnSlidePrev) {
+            btnSlidePrev.disabled = (currentSlide === 0);
+        }
+        if (btnSlideNext) {
+            btnSlideNext.disabled = (currentSlide >= totalSlides - 1);
+        }
+
+        // Render slide indicators / dots
+        renderDots(totalSlides);
+
+        if (noResults) {
+            noResults.classList.toggle('hidden', totalMatched > 0);
         }
     }
 
-    // Live Instant Search & Filter Logic
-    let currentFilter = 'all';
+    function renderDots(totalSlides) {
+        const targets = [slideDotsTop, slideDotsBottom];
 
-    function applySearchAndFilter() {
+        targets.forEach(target => {
+            if (!target) return;
+            target.innerHTML = '';
+
+            if (totalSlides <= 1) return;
+
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = (i === currentSlide)
+                    ? 'w-6 h-6 rounded-lg bg-red-600 text-white font-black text-[11px] flex items-center justify-center shadow-sm transition-all'
+                    : 'w-6 h-6 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-[11px] flex items-center justify-center transition-all';
+                dot.textContent = (i + 1);
+                dot.title = `Buka Slide ${i + 1}`;
+                dot.addEventListener('click', () => {
+                    const dir = i > currentSlide ? 'next' : 'prev';
+                    currentSlide = i;
+                    renderSlide(dir);
+                });
+                target.appendChild(dot);
+            }
+        });
+    }
+
+    // Slide Next / Prev click listeners
+    if (btnSlidePrev) {
+        btnSlidePrev.addEventListener('click', function () {
+            if (currentSlide > 0) {
+                currentSlide--;
+                renderSlide('prev');
+            }
+        });
+    }
+
+    if (btnSlideNext) {
+        btnSlideNext.addEventListener('click', function () {
+            const totalSlides = Math.ceil(matchedRows.length / PAGE_SIZE) || 1;
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                renderSlide('next');
+            }
+        });
+    }
+
+    // Touch Swipe & Mouse Drag on Table to Slide Right / Left
+    if (tableContainer) {
+        let touchStartX = 0;
+
+        tableContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].clientX;
+        }, { passive: true });
+
+        tableContainer.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 45) {
+                if (diff > 0) {
+                    // Swiped left -> slide right (next)
+                    if (btnSlideNext && !btnSlideNext.disabled) btnSlideNext.click();
+                } else {
+                    // Swiped right -> slide left (prev)
+                    if (btnSlidePrev && !btnSlidePrev.disabled) btnSlidePrev.click();
+                }
+            }
+        }, { passive: true });
+
+        let isDragging = false;
+        let dragStartX = 0;
+
+        tableContainer.addEventListener('mousedown', e => {
+            if (e.target.closest('a') || e.target.closest('button')) return;
+            isDragging = true;
+            dragStartX = e.clientX;
+        });
+
+        tableContainer.addEventListener('mouseup', e => {
+            if (!isDragging) return;
+            isDragging = false;
+            const diff = dragStartX - e.clientX;
+            if (Math.abs(diff) > 45) {
+                if (diff > 0) {
+                    if (btnSlideNext && !btnSlideNext.disabled) btnSlideNext.click();
+                } else {
+                    if (btnSlidePrev && !btnSlidePrev.disabled) btnSlidePrev.click();
+                }
+            }
+        });
+
+        tableContainer.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+    }
+
+    // Highlight row and ensure it is on the active slide
+    function highlightRow(id) {
+        const targetRow = document.getElementById('koperasi-row-' + id);
+        if (!targetRow) return;
+
+        let index = matchedRows.indexOf(targetRow);
+        if (index === -1) {
+            // If target was filtered out, reset filter to show it
+            resetSearchFilter();
+            index = matchedRows.indexOf(targetRow);
+        }
+
+        if (index !== -1) {
+            const targetSlide = Math.floor(index / PAGE_SIZE);
+            if (targetSlide !== currentSlide) {
+                const dir = targetSlide > currentSlide ? 'next' : 'prev';
+                currentSlide = targetSlide;
+                renderSlide(dir);
+            }
+        }
+
+        rows.forEach(r => r.classList.remove('highlight-row'));
+        targetRow.classList.add('highlight-row');
+        targetRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Live Instant Search & Filter Logic
+    function applySearchAndFilter(resetSlide = true) {
         const query = (searchInput.value || '').trim().toLowerCase();
-        let matched = 0;
 
         if (clearBtn) {
             clearBtn.classList.toggle('hidden', query.length === 0);
         }
+
+        matchedRows = [];
 
         rows.forEach(row => {
             const name = row.getAttribute('data-name') || '';
@@ -427,55 +725,97 @@ document.addEventListener('DOMContentLoaded', function () {
                 matchesFilter = hasAhu;
             }
 
-            if (matchesQuery && matchesFilter) {
-                row.style.display = '';
-                matched++;
-            } else {
-                row.style.display = 'none';
+            let matchesDesa = true;
+            if (currentDesaFilter !== 'all') {
+                matchesDesa = (desa === currentDesaFilter);
+            }
+
+            if (matchesQuery && matchesFilter && matchesDesa) {
+                matchedRows.push(row);
             }
         });
 
-        if (visibleCount) visibleCount.textContent = matched;
-        if (noResults) {
-            noResults.classList.toggle('hidden', matched > 0);
+        if (resetSlide) {
+            currentSlide = 0;
         }
+
+        renderSlide('none');
     }
 
     if (searchInput) {
-        searchInput.addEventListener('input', applySearchAndFilter);
+        searchInput.addEventListener('input', () => applySearchAndFilter(true));
     }
 
     if (clearBtn) {
         clearBtn.addEventListener('click', function () {
             searchInput.value = '';
-            applySearchAndFilter();
+            applySearchAndFilter(true);
             searchInput.focus();
         });
     }
 
+    // Filter status pills (Semua, Operasional, Ber-AHU)
     filterBtns.forEach(btn => {
         btn.addEventListener('click', function () {
-            filterBtns.forEach(b => b.classList.remove('active', 'bg-red-600', 'text-white'));
-            filterBtns.forEach(b => b.classList.add('bg-slate-100', 'text-slate-600'));
+            filterBtns.forEach(b => {
+                b.classList.remove('active', 'bg-slate-950', 'text-white');
+                b.classList.add('bg-slate-100', 'text-slate-900');
+            });
             
-            this.classList.add('active', 'bg-red-600', 'text-white');
-            this.classList.remove('bg-slate-100', 'text-slate-600');
+            this.classList.add('active', 'bg-slate-950', 'text-white');
+            this.classList.remove('bg-slate-100', 'text-slate-900');
 
             currentFilter = this.getAttribute('data-filter');
-            applySearchAndFilter();
+            applySearchAndFilter(true);
+        });
+    });
+
+    // Kelurahan chips filter
+    kelurahanChips.forEach(chip => {
+        chip.addEventListener('click', function () {
+            kelurahanChips.forEach(c => {
+                c.classList.remove('active', 'bg-slate-950', 'text-white', 'border-slate-900');
+                c.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+            });
+
+            this.classList.add('active', 'bg-slate-950', 'text-white', 'border-slate-900');
+            this.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
+
+            currentDesaFilter = this.getAttribute('data-desa') || 'all';
+            applySearchAndFilter(true);
         });
     });
 
     window.resetSearchFilter = function () {
         if (searchInput) searchInput.value = '';
         currentFilter = 'all';
+        currentDesaFilter = 'all';
+
         filterBtns.forEach(b => {
             if (b.getAttribute('data-filter') === 'all') {
-                b.click();
+                b.classList.add('active', 'bg-slate-950', 'text-white');
+                b.classList.remove('bg-slate-100', 'text-slate-900');
+            } else {
+                b.classList.remove('active', 'bg-slate-950', 'text-white');
+                b.classList.add('bg-slate-100', 'text-slate-900');
             }
         });
-        applySearchAndFilter();
+
+        kelurahanChips.forEach(c => {
+            if (c.getAttribute('data-desa') === 'all') {
+                c.classList.add('active', 'bg-slate-950', 'text-white', 'border-slate-900');
+                c.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
+            } else {
+                c.classList.remove('active', 'bg-slate-950', 'text-white', 'border-slate-900');
+                c.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+            }
+        });
+
+        applySearchAndFilter(true);
     };
+
+    // Initial render
+    renderSlide('none');
 
     if (loadingElem) {
         loadingElem.style.opacity = '0';
