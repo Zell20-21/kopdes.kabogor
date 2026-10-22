@@ -65,9 +65,6 @@
     </div>
 
     <!-- Main Content Container -->
-    @php
-        $uniqueKelurahans = $koperasis->map(fn($k) => $k->kelurahan?->name_kopkel)->filter()->unique()->values();
-    @endphp
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 w-full flex-grow">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-6 lg:p-7">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -113,33 +110,8 @@
                     </p>
                 </div>
 
-                <!-- Right Column: Interactive Table with Slide Pagination (Max 5 Kelurahan per slide) -->
+                <!-- Right Column: Interactive Table with Simple Pagination (Max 5 Kelurahan per slide) -->
                 <div class="lg:col-span-7 flex flex-col">
-
-                    <!-- Quick Kelurahan Filter Chips (if multiple kelurahans exist) -->
-                    @if($uniqueKelurahans->count() > 1)
-                        <div class="mb-3.5 bg-slate-50/80 p-2.5 rounded-2xl border border-slate-200">
-                            <div class="flex items-center justify-between mb-1.5 px-1">
-                                <span class="text-xs font-black text-slate-900 flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-city text-red-600"></i>
-                                    <span>Pilih Kelurahan / Desa:</span>
-                                </span>
-                                <span class="text-[11px] font-extrabold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
-                                    Maksimal 5 Kelurahan / Slide
-                                </span>
-                            </div>
-                            <div class="flex items-center space-x-1.5 overflow-x-auto pb-1" style="scrollbar-width: thin;">
-                                <button type="button" class="kelurahan-chip active shrink-0 px-3 py-1.5 rounded-xl text-xs font-black bg-slate-950 text-white border border-slate-900 transition-all shadow-sm" data-desa="all">
-                                    Semua ({{ $koperasis->count() }})
-                                </button>
-                                @foreach($uniqueKelurahans as $desaName)
-                                    <button type="button" class="kelurahan-chip shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition-all shadow-sm" data-desa="{{ strtolower($desaName) }}">
-                                        {{ $desaName }}
-                                    </button>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
                     
                     <!-- Search & Filter Controls -->
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-3">
@@ -168,40 +140,26 @@
                         </div>
                     </div>
 
-                    <!-- Slide Controller Bar (Top) -->
-                    <div id="slideBarTop" class="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 mb-3 bg-gradient-to-r from-slate-50 via-red-50/40 to-slate-50 border-2 border-slate-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center space-x-2.5">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-red-600 text-white font-black text-xs shadow-sm shrink-0">
-                                <i class="fa-solid fa-layer-group"></i>
-                            </span>
-                            <div>
-                                <div class="text-xs font-black text-slate-950 flex items-center space-x-1.5">
-                                    <span>Tabel Koperasi Kelurahan</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-extrabold uppercase tracking-wide">
-                                        Maks 5 / Slide
-                                    </span>
-                                </div>
-                                <div class="text-[11px] text-slate-600 font-bold" id="slideRangeInfo">
-                                    Menampilkan 1 - 5 dari {{ $koperasis->count() }} Kelurahan
-                                </div>
-                            </div>
+                    <!-- Simple Pagination Bar: Panah Kiri, Angka di Tengah, Panah Kanan -->
+                    <div class="flex items-center justify-between mb-3 px-1 text-xs">
+                        <div class="text-slate-600 font-semibold">
+                            Menampilkan <span id="visibleRange" class="font-black text-slate-950">1 - 5</span> dari <span id="visibleCount" class="font-black text-slate-950">{{ $koperasis->count() }}</span> Koperasi
                         </div>
 
-                        <!-- Slide Navigation Buttons (Slide Kiri & Slide Kanan) -->
                         <div class="flex items-center space-x-1.5">
-                            <!-- Slide Kiri -->
-                            <button type="button" id="btnSlidePrev" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 disabled:opacity-35 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95" title="Slide Kiri (Sebelumnya)">
-                                <i class="fa-solid fa-chevron-left text-[10px]"></i>
-                                <span class="hidden sm:inline">Slide Kiri</span>
+                            <!-- Panah Kiri -->
+                            <button type="button" id="btnSlidePrev" class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95" title="Sebelumnya">
+                                <i class="fa-solid fa-chevron-left text-xs"></i>
                             </button>
 
-                            <!-- Slide Number Badges / Dots -->
-                            <div class="flex items-center space-x-1" id="slideDotsTop"></div>
+                            <!-- Angka di Tengah (Menandakan Halaman Berapa) -->
+                            <span id="pageIndicator" class="px-2.5 py-1 font-black text-xs text-slate-900 bg-slate-100 border border-slate-300 rounded-lg min-w-[52px] text-center select-none">
+                                1 / 3
+                            </span>
 
-                            <!-- Slide Kanan (Highlighted CTA) -->
-                            <button type="button" id="btnSlideNext" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white disabled:opacity-35 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95 group" title="Slide Kanan (Berikutnya)">
-                                <span>Slide Kanan</span>
-                                <i class="fa-solid fa-chevron-right text-[10px] transition-transform group-hover:translate-x-0.5"></i>
+                            <!-- Panah Kanan -->
+                            <button type="button" id="btnSlideNext" class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95" title="Berikutnya">
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
                             </button>
                         </div>
                     </div>
@@ -274,33 +232,13 @@
                         </table>
                     </div>
 
-                    <!-- Slide Companion Footer with Swipe Hint & Indicators -->
-                    <div class="mt-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-                        <div class="flex items-center space-x-2 text-slate-600 font-bold text-[11px]">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 text-red-600 text-[10px]">
-                                <i class="fa-solid fa-arrows-left-right"></i>
-                            </span>
-                            <span>Bisa klik <strong>"Slide Kanan"</strong> atau <strong>geser / drag tabel</strong> untuk melihat kelurahan berikutnya</span>
-                        </div>
-                        
-                        <div class="flex items-center space-x-2 shrink-0">
-                            <span class="text-slate-600 font-black" id="slideCounterBottom">Slide 1 dari 1</span>
-                            <div class="flex items-center space-x-1" id="slideDotsBottom"></div>
-                        </div>
-                    </div>
-
                     <!-- No Results Match State -->
-                    <div id="noResults" class="hidden py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-2">
+                    <div id="noResults" class="hidden py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-3">
                         <i class="fa-solid fa-circle-exclamation text-amber-500 text-2xl mb-1"></i>
                         <p class="text-xs font-semibold text-slate-700">Tidak ada koperasi yang cocok dengan pencarian.</p>
                         <button type="button" onclick="resetSearchFilter()" class="mt-2 text-xs font-bold text-red-600 hover:underline">
                             Reset Pencarian
                         </button>
-                    </div>
-
-                    <!-- Result Counter Footer -->
-                    <div class="mt-2 text-right text-xs text-slate-500 font-medium">
-                        Menampilkan <span id="visibleCount" class="font-bold text-slate-800">{{ $koperasis->count() }}</span> dari {{ $koperasis->count() }} Koperasi
                     </div>
 
                 </div>
@@ -352,7 +290,7 @@
     @keyframes slideInFromRight {
         from {
             opacity: 0.35;
-            transform: translateX(24px);
+            transform: translateX(20px);
         }
         to {
             opacity: 1;
@@ -362,7 +300,7 @@
     @keyframes slideInFromLeft {
         from {
             opacity: 0.35;
-            transform: translateX(-24px);
+            transform: translateX(-20px);
         }
         to {
             opacity: 1;
@@ -370,10 +308,10 @@
         }
     }
     .slide-in-right {
-        animation: slideInFromRight 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: slideInFromRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .slide-in-left {
-        animation: slideInFromLeft 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: slideInFromLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 </style>
 @endpush
@@ -386,25 +324,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('koperasiSearch');
     const clearBtn = document.getElementById('clearSearch');
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const kelurahanChips = document.querySelectorAll('.kelurahan-chip');
     const rows = Array.from(document.querySelectorAll('.koperasi-row'));
     const noResults = document.getElementById('noResults');
+    const visibleRange = document.getElementById('visibleRange');
     const visibleCount = document.getElementById('visibleCount');
     const btnResetMap = document.getElementById('btnResetMap');
     const tableContainer = document.getElementById('tableContainer');
     const tableBody = document.getElementById('tableBody');
     const btnSlidePrev = document.getElementById('btnSlidePrev');
     const btnSlideNext = document.getElementById('btnSlideNext');
-    const slideRangeInfo = document.getElementById('slideRangeInfo');
-    const slideCounterBottom = document.getElementById('slideCounterBottom');
-    const slideDotsTop = document.getElementById('slideDotsTop');
-    const slideDotsBottom = document.getElementById('slideDotsBottom');
+    const pageIndicator = document.getElementById('pageIndicator');
 
-    // Pagination / Slide constants
+    // Pagination / Slide constants (Max 5 kelurahan per page)
     const PAGE_SIZE = 5;
     let currentSlide = 0;
     let currentFilter = 'all';
-    let currentDesaFilter = 'all';
     let matchedRows = [...rows];
 
     // Default center Kabupaten Bogor
@@ -500,7 +434,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         row.addEventListener('click', function (e) {
-            // If clicked directly on the anchor link, allow normal navigation
             if (e.target.closest('a')) return;
 
             const marker = markersMap[id];
@@ -509,7 +442,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 marker.openPopup();
                 highlightRow(id);
             } else {
-                // Navigate to koperasi profile if no coords on map
                 window.location.href = '/koperasi/' + id;
             }
         });
@@ -541,25 +473,22 @@ document.addEventListener('DOMContentLoaded', function () {
         // Apply slide animation
         if (tableBody && direction !== 'none') {
             tableBody.classList.remove('slide-in-right', 'slide-in-left');
-            void tableBody.offsetWidth; // trigger reflow
+            void tableBody.offsetWidth;
             tableBody.classList.add(direction === 'next' ? 'slide-in-right' : 'slide-in-left');
         }
 
-        // Update range info text
-        if (slideRangeInfo) {
-            if (totalMatched === 0) {
-                slideRangeInfo.textContent = 'Tidak ada kelurahan yang cocok';
-            } else {
-                slideRangeInfo.textContent = `Menampilkan ${startIndex + 1} - ${endIndex} dari ${totalMatched} Kelurahan • Slide ${currentSlide + 1} / ${totalSlides}`;
-            }
-        }
-
-        if (slideCounterBottom) {
-            slideCounterBottom.textContent = `Slide ${currentSlide + 1} dari ${totalSlides}`;
+        // Update range & counter info
+        if (visibleRange) {
+            visibleRange.textContent = totalMatched === 0 ? '0' : `${startIndex + 1} - ${endIndex}`;
         }
 
         if (visibleCount) {
             visibleCount.textContent = totalMatched;
+        }
+
+        // Update Page Indicator (Angka di tengah menandakan page berapa)
+        if (pageIndicator) {
+            pageIndicator.textContent = `${currentSlide + 1} / ${totalSlides}`;
         }
 
         // Update Prev / Next button states
@@ -570,39 +499,9 @@ document.addEventListener('DOMContentLoaded', function () {
             btnSlideNext.disabled = (currentSlide >= totalSlides - 1);
         }
 
-        // Render slide indicators / dots
-        renderDots(totalSlides);
-
         if (noResults) {
             noResults.classList.toggle('hidden', totalMatched > 0);
         }
-    }
-
-    function renderDots(totalSlides) {
-        const targets = [slideDotsTop, slideDotsBottom];
-
-        targets.forEach(target => {
-            if (!target) return;
-            target.innerHTML = '';
-
-            if (totalSlides <= 1) return;
-
-            for (let i = 0; i < totalSlides; i++) {
-                const dot = document.createElement('button');
-                dot.type = 'button';
-                dot.className = (i === currentSlide)
-                    ? 'w-6 h-6 rounded-lg bg-red-600 text-white font-black text-[11px] flex items-center justify-center shadow-sm transition-all'
-                    : 'w-6 h-6 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-[11px] flex items-center justify-center transition-all';
-                dot.textContent = (i + 1);
-                dot.title = `Buka Slide ${i + 1}`;
-                dot.addEventListener('click', () => {
-                    const dir = i > currentSlide ? 'next' : 'prev';
-                    currentSlide = i;
-                    renderSlide(dir);
-                });
-                target.appendChild(dot);
-            }
-        });
     }
 
     // Slide Next / Prev click listeners
@@ -638,10 +537,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const diff = touchStartX - touchEndX;
             if (Math.abs(diff) > 45) {
                 if (diff > 0) {
-                    // Swiped left -> slide right (next)
                     if (btnSlideNext && !btnSlideNext.disabled) btnSlideNext.click();
                 } else {
-                    // Swiped right -> slide left (prev)
                     if (btnSlidePrev && !btnSlidePrev.disabled) btnSlidePrev.click();
                 }
             }
@@ -681,7 +578,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let index = matchedRows.indexOf(targetRow);
         if (index === -1) {
-            // If target was filtered out, reset filter to show it
             resetSearchFilter();
             index = matchedRows.indexOf(targetRow);
         }
@@ -725,12 +621,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 matchesFilter = hasAhu;
             }
 
-            let matchesDesa = true;
-            if (currentDesaFilter !== 'all') {
-                matchesDesa = (desa === currentDesaFilter);
-            }
-
-            if (matchesQuery && matchesFilter && matchesDesa) {
+            if (matchesQuery && matchesFilter) {
                 matchedRows.push(row);
             }
         });
@@ -770,26 +661,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Kelurahan chips filter
-    kelurahanChips.forEach(chip => {
-        chip.addEventListener('click', function () {
-            kelurahanChips.forEach(c => {
-                c.classList.remove('active', 'bg-slate-950', 'text-white', 'border-slate-900');
-                c.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
-            });
-
-            this.classList.add('active', 'bg-slate-950', 'text-white', 'border-slate-900');
-            this.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
-
-            currentDesaFilter = this.getAttribute('data-desa') || 'all';
-            applySearchAndFilter(true);
-        });
-    });
-
     window.resetSearchFilter = function () {
         if (searchInput) searchInput.value = '';
         currentFilter = 'all';
-        currentDesaFilter = 'all';
 
         filterBtns.forEach(b => {
             if (b.getAttribute('data-filter') === 'all') {
@@ -798,16 +672,6 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 b.classList.remove('active', 'bg-slate-950', 'text-white');
                 b.classList.add('bg-slate-100', 'text-slate-900');
-            }
-        });
-
-        kelurahanChips.forEach(c => {
-            if (c.getAttribute('data-desa') === 'all') {
-                c.classList.add('active', 'bg-slate-950', 'text-white', 'border-slate-900');
-                c.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
-            } else {
-                c.classList.remove('active', 'bg-slate-950', 'text-white', 'border-slate-900');
-                c.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
             }
         });
 
