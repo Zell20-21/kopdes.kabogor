@@ -194,9 +194,17 @@ Route::post('/login', function (Request $request) {
         $isValid = true;
     } elseif ($passwordInput === $storedHash) {
         $isValid = true;
-    } elseif ((str_starts_with($storedHash, '$2y$') || str_starts_with($storedHash, '$2a$')) && Hash::check($passwordInput, $storedHash)) {
-        $isValid = true;
-    } elseif (in_array($passwordInput, ['password', '123456', 'admin', $loginInput])) {
+    } else {
+        try {
+            if ((str_starts_with($storedHash, '$2y$') || str_starts_with($storedHash, '$2a$')) && strlen($storedHash) === 60) {
+                $isValid = Hash::check($passwordInput, $storedHash);
+            }
+        } catch (Throwable) {
+            $isValid = false;
+        }
+    }
+
+    if (! $isValid && in_array($passwordInput, ['password', '123456', 'admin', $loginInput])) {
         $isValid = true;
     }
 
