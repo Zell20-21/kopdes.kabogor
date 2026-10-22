@@ -121,62 +121,62 @@
                     <nav class="space-y-1.5 text-xs font-bold">
                         <!-- 1. INFORMASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'informasi']) }}"
-                           class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'informasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'informasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <div class="flex items-center space-x-3">
-                                <i class="fa-solid fa-circle-info text-sm"></i>
+                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
+                                    <i class="fa-solid fa-circle-info text-sm"></i>
+                                </span>
                                 <span>Informasi</span>
                             </div>
-                            @if($activeTab === 'informasi')
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
-                            @endif
+                            <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'informasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 2. DATABASE KOPERASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}"
-                           class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'koperasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'koperasi' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <div class="flex items-center space-x-3">
-                                <i class="fa-regular fa-building text-sm"></i>
+                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
+                                    <i class="fa-regular fa-building text-sm"></i>
+                                </span>
                                 <span>Database Koperasi</span>
                             </div>
-                            @if($activeTab === 'koperasi')
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
-                            @endif
+                            <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'koperasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 3. DATABASE PENGURUS -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}"
-                           class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'pengurus' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'pengurus' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <div class="flex items-center space-x-3">
-                                <i class="fa-solid fa-user-tie text-sm"></i>
+                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
+                                    <i class="fa-solid fa-user-tie text-sm"></i>
+                                </span>
                                 <span>Database Pengurus</span>
                             </div>
-                            @if($activeTab === 'pengurus')
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
-                            @endif
+                            <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'pengurus' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 4. DATABASE ANGGOTA -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'anggota']) }}"
-                           class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'anggota' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'anggota' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <div class="flex items-center space-x-3">
-                                <i class="fa-solid fa-users text-sm"></i>
+                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
+                                    <i class="fa-solid fa-users text-sm"></i>
+                                </span>
                                 <span>Database Anggota</span>
                             </div>
-                            @if($activeTab === 'anggota')
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
-                            @endif
+                            <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'anggota' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 5. LAMPIRAN INFORMASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'lampiran']) }}"
-                           class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'lampiran' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
+                           class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'lampiran' ? 'bg-[#0284c7] text-white shadow-sky-600/20' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
                             <div class="flex items-center space-x-3">
-                                <i class="fa-solid fa-paperclip text-sm"></i>
+                                <span class="w-5 flex items-center justify-center shrink-0 text-center">
+                                    <i class="fa-solid fa-paperclip text-sm"></i>
+                                </span>
                                 <span>Lampiran Informasi</span>
                             </div>
-                            @if($activeTab === 'lampiran')
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
-                            @endif
+                            <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'lampiran' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
                     </nav>
 
