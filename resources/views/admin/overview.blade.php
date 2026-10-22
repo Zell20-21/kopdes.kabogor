@@ -21,6 +21,7 @@
                 <nav aria-label="Navigasi halaman" class="flex min-w-0 items-center gap-1 overflow-x-auto text-sm font-semibold sm:gap-2">
                     <a href="#anggota" class="shrink-0 rounded-lg px-3 py-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70">Anggota</a>
                     <a href="#pengurus" class="shrink-0 rounded-lg px-3 py-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70">Pengurus</a>
+                    <a href="#lokasi-koperasi" class="shrink-0 rounded-lg px-3 py-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70">Lokasi</a>
                     <a href="#foto-pengurus" class="shrink-0 rounded-lg px-3 py-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70">Foto</a>
                 </nav>
                 <form action="{{ route('logout') }}" method="POST">
@@ -96,6 +97,99 @@
                     </div>
                 </article>
             </div>
+        </section>
+
+        <section id="lokasi-koperasi" aria-labelledby="lokasi-koperasi-heading" class="scroll-mt-6">
+            <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="text-sm font-bold uppercase tracking-[0.16em] text-rose-700">Dokumentasi koperasi</p>
+                    <h2 id="lokasi-koperasi-heading" class="text-2xl font-black tracking-tight text-slate-900">Foto lokasi koperasi</h2>
+                    <p class="mt-1 max-w-2xl text-sm leading-relaxed text-slate-500">Simpan foto tampak depan atau area koperasi untuk melengkapi profil lokasi.</p>
+                </div>
+                <span class="inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm">
+                    <i class="fa-solid fa-building text-rose-600"></i>
+                    {{ $locationPhotoKoperasis->count() }} koperasi
+                </span>
+            </div>
+
+            <div class="grid min-w-0 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                @forelse($locationPhotoKoperasis as $koperasi)
+                    <article data-location-photo-card class="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-lg">
+                        <div class="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-rose-50 via-slate-100 to-orange-50">
+                            @if(filled($koperasi->foto_lokasi))
+                                <img data-location-photo-preview data-saved-src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($koperasi->foto_lokasi) }}" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($koperasi->foto_lokasi) }}" alt="Foto lokasi {{ $koperasi->name_koperasi }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                <div data-location-photo-empty class="hidden h-full w-full flex-col items-center justify-center gap-3 text-slate-400">
+                                    <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-2xl text-rose-400 shadow-sm"><i class="fa-solid fa-camera"></i></span>
+                                    <span class="text-sm font-semibold">Pratinjau foto lokasi</span>
+                                </div>
+                            @else
+                                <img data-location-photo-preview data-saved-src="" alt="Pratinjau foto lokasi {{ $koperasi->name_koperasi }}" class="hidden h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                <div data-location-photo-empty class="flex h-full w-full flex-col items-center justify-center gap-3 text-slate-400">
+                                    <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-2xl text-rose-400 shadow-sm"><i class="fa-solid fa-camera"></i></span>
+                                    <span class="text-sm font-semibold">Belum ada foto lokasi</span>
+                                </div>
+                            @endif
+                            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-transparent"></div>
+                            <span data-location-photo-badge class="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/95 px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm">
+                                <i class="fa-solid {{ filled($koperasi->foto_lokasi) ? 'fa-circle-check text-emerald-600' : 'fa-circle-exclamation text-amber-500' }}"></i>
+                                {{ filled($koperasi->foto_lokasi) ? 'Foto tersimpan' : 'Belum ada foto' }}
+                            </span>
+                            <button type="button" data-location-photo-view @if(!filled($koperasi->foto_lokasi)) hidden @endif aria-label="Perbesar foto lokasi {{ $koperasi->name_koperasi }}" class="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/95 text-slate-700 shadow-sm transition hover:bg-white hover:text-rose-700 focus:outline-none focus:ring-2 focus:ring-white">
+                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                            </button>
+                        </div>
+                        <div class="flex min-w-0 flex-1 flex-col gap-4 p-4 sm:p-5">
+                            <div class="flex min-w-0 items-start gap-3">
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-700"><i class="fa-solid fa-building"></i></span>
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="break-words font-extrabold leading-snug text-slate-900">{{ $koperasi->name_koperasi }}</h3>
+                                    <p data-location-photo-status class="mt-1 text-sm text-slate-500">{{ filled($koperasi->foto_lokasi) ? 'Foto lokasi siap ditampilkan.' : 'Tambahkan foto agar lokasi lebih mudah dikenali.' }}</p>
+                                </div>
+                            </div>
+                            <form data-location-photo-form action="{{ route('admin.koperasi.foto-lokasi', $koperasi->id_koperasi) }}" method="POST" enctype="multipart/form-data" class="mt-auto flex min-w-0 flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 sm:p-4">
+                                @csrf
+                                <label for="foto-lokasi-{{ $koperasi->id_koperasi }}" class="flex min-w-0 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-white px-3 py-3 transition hover:border-rose-300 hover:bg-rose-50/40 focus-within:border-rose-400 focus-within:ring-2 focus-within:ring-rose-100">
+                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-700"><i class="fa-solid fa-arrow-up-from-bracket"></i></span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block text-sm font-bold text-slate-800">Pilih foto</span>
+                                        <span data-location-photo-filename class="block truncate text-xs text-slate-500" aria-live="polite">JPG, PNG, WebP · Maks. 5 MB</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right shrink-0 text-xs text-slate-400"></i>
+                                    <input id="foto-lokasi-{{ $koperasi->id_koperasi }}" data-location-photo-input name="foto_lokasi" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required class="sr-only">
+                                </label>
+                                <div class="flex min-w-0 flex-wrap items-center justify-between gap-2">
+                                    <button type="button" data-location-photo-clear hidden class="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-bold text-slate-500 transition hover:bg-white hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                                        <i class="fa-solid fa-xmark"></i>
+                                        Batalkan pilihan
+                                    </button>
+                                    <button type="submit" data-location-photo-submit disabled class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-rose-700 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-rose-800 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none">
+                                        <i data-location-photo-submit-icon class="fa-solid fa-cloud-arrow-up"></i>
+                                        <span data-location-photo-submit-label>{{ filled($koperasi->foto_lokasi) ? 'Ganti foto lokasi' : 'Unggah foto lokasi' }}</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </article>
+                @empty
+                    <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center sm:col-span-2 xl:col-span-3">
+                        <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-xl text-slate-400"><i class="fa-solid fa-map-location-dot"></i></span>
+                        <p class="mt-3 font-bold text-slate-700">Belum ada koperasi</p>
+                        <p class="mt-1 text-sm text-slate-500">Koperasi yang terdaftar di wilayah desa Anda akan tampil di sini.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <dialog data-location-photo-dialog aria-labelledby="location-photo-dialog-title" class="w-[min(92vw,64rem)] max-w-none rounded-3xl bg-transparent p-0 backdrop:bg-slate-950/80">
+                <div class="overflow-hidden rounded-3xl border border-white/15 bg-slate-950 shadow-2xl">
+                    <div class="flex items-center justify-between gap-4 px-4 py-3 text-white sm:px-5">
+                        <h3 id="location-photo-dialog-title" data-location-photo-dialog-title class="min-w-0 truncate text-sm font-bold sm:text-base">Foto lokasi koperasi</h3>
+                        <button type="button" data-location-photo-dialog-close aria-label="Tutup pratinjau foto" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white/80 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+                    <img data-location-photo-dialog-image alt="" class="max-h-[78vh] w-full bg-black object-contain">
+                </div>
+            </dialog>
         </section>
 
         <section id="anggota" aria-labelledby="anggota-heading" class="scroll-mt-6">
@@ -374,6 +468,126 @@
 @push('scripts')
     <script>
         (() => {
+            document.querySelectorAll('[data-location-photo-card]').forEach((card) => {
+                const input = card.querySelector('[data-location-photo-input]');
+                const image = card.querySelector('[data-location-photo-preview]');
+                const emptyState = card.querySelector('[data-location-photo-empty]');
+                const filename = card.querySelector('[data-location-photo-filename]');
+                const status = card.querySelector('[data-location-photo-status]');
+                const badge = card.querySelector('[data-location-photo-badge]');
+                const viewButton = card.querySelector('[data-location-photo-view]');
+                const clearButton = card.querySelector('[data-location-photo-clear]');
+                const form = card.querySelector('[data-location-photo-form]');
+                const submitButton = card.querySelector('[data-location-photo-submit]');
+                const submitIcon = card.querySelector('[data-location-photo-submit-icon]');
+                const submitLabel = card.querySelector('[data-location-photo-submit-label]');
+                const dialog = document.querySelector('[data-location-photo-dialog]');
+                const dialogImage = dialog?.querySelector('[data-location-photo-dialog-image]');
+                const dialogTitle = dialog?.querySelector('[data-location-photo-dialog-title]');
+                let previewUrl = null;
+
+                if (!input || !image || !emptyState || !filename || !status || !badge || !viewButton || !clearButton || !form || !submitButton || !submitIcon || !submitLabel) {
+                    return;
+                }
+
+                const clearPreviewUrl = () => {
+                    if (previewUrl) {
+                        URL.revokeObjectURL(previewUrl);
+                        previewUrl = null;
+                    }
+                };
+
+                const openPhotoDialog = () => {
+                    if (!dialog || !dialogImage || !image.src) {
+                        return;
+                    }
+
+                    dialogImage.src = image.src;
+                    dialogImage.alt = image.alt;
+                    if (dialogTitle) {
+                        dialogTitle.textContent = card.querySelector('h3')?.textContent?.trim() ?? 'Foto lokasi koperasi';
+                    }
+                    dialog.showModal();
+                };
+
+                viewButton.addEventListener('click', openPhotoDialog);
+
+                input.addEventListener('change', () => {
+                    const file = input.files?.[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+                        input.value = '';
+                        filename.textContent = 'Gunakan JPG, PNG, atau WebP maksimal 5 MB.';
+                        status.textContent = 'File tidak sesuai format atau ukuran yang diizinkan.';
+                        submitButton.disabled = true;
+                        return;
+                    }
+
+                    clearPreviewUrl();
+                    previewUrl = URL.createObjectURL(file);
+                    image.src = previewUrl;
+                    image.classList.remove('hidden');
+                    emptyState.classList.add('hidden');
+                    filename.textContent = file.name;
+                    status.textContent = 'Pratinjau foto baru. Simpan untuk menerapkan perubahan.';
+                    badge.innerHTML = '<i class="fa-solid fa-eye text-sky-600"></i> Pratinjau baru';
+                    viewButton.hidden = false;
+                    clearButton.hidden = false;
+                    submitButton.disabled = false;
+                });
+
+                clearButton.addEventListener('click', () => {
+                    input.value = '';
+                    clearPreviewUrl();
+                    const savedSrc = image.dataset.savedSrc;
+
+                    if (savedSrc) {
+                        image.src = savedSrc;
+                        image.classList.remove('hidden');
+                        emptyState.classList.add('hidden');
+                        viewButton.hidden = false;
+                        status.textContent = 'Foto lokasi siap ditampilkan.';
+                        badge.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> Foto tersimpan';
+                    } else {
+                        image.removeAttribute('src');
+                        image.classList.add('hidden');
+                        emptyState.classList.remove('hidden');
+                        viewButton.hidden = true;
+                        status.textContent = 'Tambahkan foto agar lokasi lebih mudah dikenali.';
+                        badge.innerHTML = '<i class="fa-solid fa-circle-exclamation text-amber-500"></i> Belum ada foto';
+                    }
+
+                    filename.textContent = 'JPG, PNG, WebP · Maks. 5 MB';
+                    clearButton.hidden = true;
+                    submitButton.disabled = true;
+                });
+
+                form.addEventListener('submit', () => {
+                    submitButton.disabled = true;
+                    submitIcon.className = 'fa-solid fa-spinner fa-spin';
+                    submitLabel.textContent = 'Mengunggah foto...';
+                });
+            });
+
+            const locationPhotoDialog = document.querySelector('[data-location-photo-dialog]');
+            const locationPhotoDialogClose = locationPhotoDialog?.querySelector('[data-location-photo-dialog-close]');
+            const locationPhotoDialogImage = locationPhotoDialog?.querySelector('[data-location-photo-dialog-image]');
+
+            locationPhotoDialogClose?.addEventListener('click', () => locationPhotoDialog.close());
+            locationPhotoDialog?.addEventListener('click', (event) => {
+                if (event.target === locationPhotoDialog) {
+                    locationPhotoDialog.close();
+                }
+            });
+            locationPhotoDialog?.addEventListener('close', () => {
+                if (locationPhotoDialogImage) {
+                    locationPhotoDialogImage.removeAttribute('src');
+                }
+            });
+
             const fotoPengurusInput = document.getElementById('pengurus-foto-file');
             const namaFotoPengurus = document.getElementById('pengurus-foto-name');
             const pratinjauFotoPengurus = document.getElementById('pengurus-foto-preview');

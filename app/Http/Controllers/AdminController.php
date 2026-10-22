@@ -200,6 +200,12 @@ class AdminController extends Controller
                 ->orderBy('id_kopsdm')
                 ->get()
             : collect();
+        $locationPhotoKoperasis = $user->isOperatorDesa()
+            ? (clone $baseQuery)
+                ->select(['id_koperasi', 'name_koperasi', 'foto_lokasi'])
+                ->orderBy('name_koperasi')
+                ->get()
+            : collect();
 
         $anggotaQuery = (clone $baseQuery)->with(['kecamatan', 'kelurahan']);
 
@@ -322,6 +328,7 @@ class AdminController extends Controller
             'anggotaRecords',
             'koperasiTypes',
             'pengurusFotoOptions',
+            'locationPhotoKoperasis',
             'perPage',
             'lampirans'
         );
@@ -411,6 +418,28 @@ class AdminController extends Controller
 
         return redirect()->route('admin.dashboard')
             ->with('success', 'Foto pengurus berhasil disimpan.');
+    }
+
+    public function uploadFotoLokasiOperator(Request $request, Koperasi $koperasi): RedirectResponse
+    {
+        abort_unless($request->user()->isOperatorDesa(), 404);
+
+        $koperasi = $this->findVisibleKoperasi($request, (int) $koperasi->id_koperasi);
+        $validated = $request->validate([
+            'foto_lokasi' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $fotoLama = $koperasi->foto_lokasi;
+        $koperasi->foto_lokasi = $validated['foto_lokasi']
+            ->storePublicly("koperasi/lokasi/{$koperasi->id_koperasi}", 'public');
+        $koperasi->save();
+
+        if (filled($fotoLama)) {
+            Storage::disk('public')->delete($fotoLama);
+        }
+
+        return redirect()->to(route('admin.dashboard').'#lokasi-koperasi')
+            ->with('success', 'Foto lokasi koperasi berhasil disimpan.');
     }
 
     private function saveFotoPengurus(Request $request, Kopsdm $pengurus): void

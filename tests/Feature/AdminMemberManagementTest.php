@@ -34,6 +34,7 @@ class AdminMemberManagementTest extends TestCase
         $response->assertSee('INFORMASI KOPERASI');
         $response->assertSee('Database Anggota');
         $response->assertSee('<aside', false);
+        $response->assertDontSee('Foto lokasi koperasi');
         $response->assertDontSee('Tambah pengurus');
         $response->assertDontSee('Unggah foto pengurus');
         $response->assertDontSee('id="map-members"', false);
@@ -61,6 +62,7 @@ class AdminMemberManagementTest extends TestCase
         $response->assertSee('Tambah anggota');
         $response->assertSee('Pengurus koperasi');
         $response->assertSee('Tambah pengurus');
+        $response->assertSee('Foto lokasi koperasi');
         $response->assertSee('Unggah foto pengurus');
         $response->assertDontSee('id="map-members"', false);
         $response->assertDontSee('<aside', false);
@@ -292,6 +294,100 @@ class AdminMemberManagementTest extends TestCase
 
         $response->assertNotFound();
         $this->assertEmpty($manager->fresh()->foto_kopsdm);
+    }
+
+    public function test_operator_desa_can_upload_a_location_photo_for_its_cooperative(): void
+    {
+        Storage::fake('public');
+        $cooperative = $this->createCooperative(9915, 0);
+        $operator = $this->createOperatorDesa(9915, 1);
+
+        $response = $this->actingAs($operator)->post(
+            route('admin.koperasi.foto-lokasi', $cooperative),
+            ['foto_lokasi' => $this->fakePng('lokasi.png')]
+        );
+
+        $response->assertRedirect(route('admin.dashboard').'#lokasi-koperasi');
+        $response->assertSessionHas('success');
+        $cooperative->refresh();
+        $this->assertNotEmpty($cooperative->foto_lokasi);
+        Storage::disk('public')->assertExists($cooperative->foto_lokasi);
+
+        $page = $this->actingAs($operator)->get(route('admin.dashboard'));
+        $page->assertOk();
+        $page->assertSee('Foto lokasi siap ditampilkan.');
+        $page->assertSee('Perbesar foto lokasi', false);
+        $page->assertSee('Batalkan pilihan', false);
+        $page->assertSee(Storage::disk('public')->url($cooperative->foto_lokasi), false);
+    }
+
+    public function test_operator_desa_replacing_a_location_photo_deletes_the_old_file(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('koperasi/lokasi/9916/foto-lama.png', 'foto lama');
+        $cooperative = $this->createCooperative(9916, 0);
+        $cooperative->foto_lokasi = 'koperasi/lokasi/9916/foto-lama.png';
+        $cooperative->save();
+        $operator = $this->createOperatorDesa(9916, 1);
+
+        $response = $this->actingAs($operator)->post(
+            route('admin.koperasi.foto-lokasi', $cooperative),
+            ['foto_lokasi' => $this->fakePng('foto-baru.png')]
+        );
+
+        $response->assertRedirect(route('admin.dashboard').'#lokasi-koperasi');
+        $cooperative->refresh();
+        $this->assertNotSame('koperasi/lokasi/9916/foto-lama.png', $cooperative->foto_lokasi);
+        Storage::disk('public')->assertMissing('koperasi/lokasi/9916/foto-lama.png');
+        Storage::disk('public')->assertExists($cooperative->foto_lokasi);
+    }
+
+    public function test_operator_desa_cannot_upload_a_location_photo_for_another_village(): void
+    {
+        Storage::fake('public');
+        $cooperative = $this->createCooperative(9917, 0, 1, 2);
+        $operator = $this->createOperatorDesa(9917, 1);
+
+        $response = $this->actingAs($operator)->post(
+            route('admin.koperasi.foto-lokasi', $cooperative),
+            ['foto_lokasi' => $this->fakePng('lokasi-terlarang.png')]
+        );
+
+        $response->assertNotFound();
+        $this->assertEmpty($cooperative->fresh()->foto_lokasi);
+        $this->assertSame([], Storage::disk('public')->allFiles());
+    }
+
+    public function test_admin_cannot_upload_a_location_photo_through_the_operator_endpoint(): void
+    {
+        Storage::fake('public');
+        $cooperative = $this->createCooperative(9918, 0);
+        $admin = User::firstOrFail();
+
+        $response = $this->actingAs($admin)->post(
+            route('admin.koperasi.foto-lokasi', $cooperative),
+            ['foto_lokasi' => $this->fakePng('lokasi-admin.png')]
+        );
+
+        $response->assertNotFound();
+        $this->assertEmpty($cooperative->fresh()->foto_lokasi);
+        $this->assertSame([], Storage::disk('public')->allFiles());
+    }
+
+    public function test_operator_desa_must_upload_a_valid_location_image(): void
+    {
+        Storage::fake('public');
+        $cooperative = $this->createCooperative(9919, 0);
+        $operator = $this->createOperatorDesa(9919, 1);
+
+        $response = $this->actingAs($operator)->post(
+            route('admin.koperasi.foto-lokasi', $cooperative),
+            ['foto_lokasi' => UploadedFile::fake()->create('bukan-gambar.txt', 10, 'text/plain')]
+        );
+
+        $response->assertSessionHasErrors('foto_lokasi');
+        $this->assertEmpty($cooperative->fresh()->foto_lokasi);
+        $this->assertSame([], Storage::disk('public')->allFiles());
     }
 
     private function createCooperative(int $id, int $memberCount, int $districtId = 1, int $villageId = 1): Koperasi

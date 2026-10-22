@@ -232,6 +232,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::delete('/koperasi/{koperasi}', [AdminController::class, 'destroyKoperasi'])->name('admin.koperasi.destroy');
     Route::post('/koperasi/{koperasi}/usaha', [AdminController::class, 'updateUsahaKoperasi'])->name('admin.koperasi.usaha');
     Route::post('/koperasi/{koperasi}/foto', [AdminController::class, 'uploadFotoKoperasi'])->name('admin.koperasi.foto');
+    Route::post('/koperasi/{koperasi}/foto-lokasi', [AdminController::class, 'uploadFotoLokasiOperator'])->name('admin.koperasi.foto-lokasi');
     Route::get('/koperasi/export', [AdminController::class, 'exportKoperasi'])->name('admin.koperasi.export');
     // Lampiran Informasi routes
     Route::post('/lampiran', [AdminController::class, 'storeLampiran'])->name('admin.lampiran.store');
