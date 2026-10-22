@@ -504,7 +504,7 @@ class AdminController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah data koperasi kecamatan lain.');
         }
 
-        $validated = $request->validate([
+        $rules = [
             'name_koperasi' => 'required|string|max:255',
             'id_kec' => 'required|integer',
             'id_kel' => 'required|integer',
@@ -523,7 +523,30 @@ class AdminController extends Controller
             'kop_mail' => 'nullable|string|max:100',
             'gps_lat' => 'nullable|string|max:50',
             'gps_long' => 'nullable|string|max:50',
-        ]);
+            // Finansial / Simpanan
+            'jum_sim_pokok' => 'nullable|integer|min:0',
+            'jum_sim_wajib' => 'nullable|integer|min:0',
+            // Website & Media Sosial
+            'kop_web' => 'nullable|string|max:255',
+            'media_fb' => 'nullable|string|max:255',
+            'media_ig' => 'nullable|string|max:255',
+            'media_yt' => 'nullable|string|max:255',
+            'media_x' => 'nullable|string|max:255',
+            'media_tiktok' => 'nullable|string|max:255',
+        ];
+
+        for ($i = 1; $i <= 13; $i++) {
+            $rules["id_koperasitype{$i}"] = 'nullable|string|max:50';
+        }
+
+        $validated = $request->validate($rules);
+
+        if ($request->has('has_types_input')) {
+            for ($i = 1; $i <= 13; $i++) {
+                $key = "id_koperasitype{$i}";
+                $validated[$key] = $request->boolean($key) ? 'Yes' : 'No';
+            }
+        }
 
         $koperasi->update($validated);
 

@@ -6,14 +6,23 @@
 <div class="min-h-screen bg-slate-50 text-slate-800">
     <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-lg">
         <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-4 px-4 py-4 sm:px-6 lg:px-8">
-            <div class="flex min-w-0 items-center gap-2.5 sm:gap-3">
-                <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Kabupaten Bogor" class="h-9 w-auto shrink-0 object-contain sm:h-11">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/40 bg-white p-1 sm:h-12 sm:w-12">
-                    <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Koperasi Merah Putih" class="h-full w-full object-contain">
+            <div class="flex items-center space-x-2 sm:space-x-3.5 min-w-0 pr-1">
+                <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-8 sm:h-11 w-auto object-contain drop-shadow shrink-0">
+                <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center p-1 sm:p-1.5 shadow-md shrink-0 border border-white/50 overflow-hidden">
+                    <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain">
                 </div>
-                <div class="min-w-0">
-                    <p class="truncate text-[10px] font-bold uppercase tracking-[0.12em] text-red-100 sm:text-xs sm:tracking-[0.18em]">Portal Koperasi Desa & Kelurahan</p>
-                    <h1 class="text-base font-extrabold leading-tight sm:text-xl">Kabupaten Bogor</h1>
+                <div class="flex flex-col justify-center min-w-0">
+                    <div class="flex items-baseline space-x-1 sm:space-x-1.5">
+                        <span class="text-base sm:text-2xl font-bold tracking-tight text-white leading-tight">
+                            Dashboard
+                        </span>
+                        <span class="hidden sm:inline text-sm sm:text-base font-semibold text-red-100">
+                            KMP Kab. Bogor
+                        </span>
+                    </div>
+                    <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
+                        Pemerintah Daerah Kabupaten Bogor
+                    </p>
                 </div>
             </div>
 
