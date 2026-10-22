@@ -34,6 +34,7 @@ class AdminMemberManagementTest extends TestCase
         $response->assertSee('INFORMASI KOPERASI');
         $response->assertSee('Database Anggota');
         $response->assertSee('<aside', false);
+        $response->assertDontSee('data-operator-database-sidebar', false);
         $response->assertDontSee('Foto lokasi koperasi');
         $response->assertDontSee('Tambah pengurus');
         $response->assertDontSee('Unggah foto pengurus');
@@ -58,14 +59,60 @@ class AdminMemberManagementTest extends TestCase
         $response = $this->actingAs($operator)->get(route('admin.dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Total anggota');
-        $response->assertSee('Tambah anggota');
-        $response->assertSee('Pengurus koperasi');
-        $response->assertSee('Tambah pengurus');
+        $response->assertSee('Total Anggota');
+        $response->assertSeeInOrder(['Database Pengurus', 'Database Anggota']);
+        $response->assertSee('aria-label="Navigasi halaman"', false);
+        $response->assertSee('Jenis usaha');
+        $response->assertSee('Foto lokasi');
+        $response->assertSee('Foto pengurus');
+        $header = substr($response->getContent(), 0, strpos($response->getContent(), '</header>'));
+        $this->assertStringNotContainsString('Database Anggota', $header);
+        $this->assertStringNotContainsString('Database Pengurus', $header);
+        $response->assertSee('data-operator-database-sidebar', false);
+        $response->assertSee('href="'.route('admin.dashboard', ['page' => 'database-anggota']).'"', false);
+        $response->assertSee('href="'.route('admin.dashboard', ['page' => 'database-pengurus']).'"', false);
+        $response->assertDontSee('Kembali ke dashboard');
+        $response->assertDontSee('Simpan Anggota');
+        $response->assertDontSee('Pengurus dan Pengawas Koperasi');
+        $response->assertSee('Database Pengurus');
+        $response->assertSee('Jenis usaha yang dimiliki atau direncanakan');
         $response->assertSee('Foto lokasi koperasi');
-        $response->assertSee('Unggah foto pengurus');
+        $response->assertDontSee('Unggah foto pengurus');
+        $response->assertDontSee('href="#profil"', false);
+        $response->assertDontSee('Simpanan koperasi');
         $response->assertDontSee('id="map-members"', false);
-        $response->assertDontSee('<aside', false);
+        $response->assertSee('<aside', false);
+    }
+
+    public function test_operator_can_open_and_refresh_the_individual_database_pages(): void
+    {
+        $cooperative = $this->createCooperative(9911, 2, 1, 91191);
+        $this->createManager(9911, $cooperative->id_koperasi)->update(['name_kopsdm' => 'Ketua Halaman']);
+        $this->createManager(9912, $cooperative->id_koperasi, null, 'PENGAWAS')->update([
+            'name_kopsdm' => 'Pengawas Halaman',
+            'jab_kopsdm' => 'ANGGOTA PENGAWAS',
+        ]);
+        $operator = $this->createOperatorDesa(9911, 91191);
+
+        $memberPage = $this->actingAs($operator)->get(route('admin.dashboard', ['page' => 'database-anggota']));
+
+        $memberPage->assertOk();
+        $memberPage->assertSee('Data Anggota Koperasi');
+        $memberPage->assertSee('Simpan Anggota');
+        $memberPage->assertSee('Kembali ke dashboard');
+        $memberPage->assertSee('href="'.route('admin.dashboard', ['page' => 'database-pengurus']).'"', false);
+        $memberPage->assertDontSee('Tambah Pengurus');
+
+        $managerPage = $this->get(route('admin.dashboard', ['page' => 'database-pengurus']));
+
+        $managerPage->assertOk();
+        $managerPage->assertSee('Pengurus dan Pengawas Koperasi');
+        $managerPage->assertSee('Ketua Halaman');
+        $managerPage->assertSee('Pengawas Halaman');
+        $managerPage->assertSee('Simpan Pengurus');
+        $managerPage->assertSee('Kembali ke dashboard');
+        $managerPage->assertSee('href="'.route('admin.dashboard', ['page' => 'database-anggota']).'"', false);
+        $managerPage->assertDontSee('Simpan Anggota');
     }
 
     public function test_operator_desa_metrics_count_members_supervisors_and_officers_only_in_its_village(): void
@@ -98,12 +145,175 @@ class AdminMemberManagementTest extends TestCase
         $response->assertSee('data-dashboard-stat="members" data-value="8"', false);
         $response->assertSee('data-dashboard-stat="supervisors" data-value="1"', false);
         $response->assertSee('data-dashboard-stat="officers" data-value="1"', false);
-        $response->assertSee('Simpanan Pokok');
-        $response->assertSee('data-dashboard-stat="savings-principal" data-value="50000"', false);
-        $response->assertSee('Simpanan Wajib');
-        $response->assertSee('data-dashboard-stat="savings-mandatory" data-value="10000"', false);
-        $response->assertSee('50.000');
-        $response->assertSee('10.000');
+        $response->assertSee('data-dashboard-stat="business-types" data-value="0"', false);
+        $response->assertDontSee('Simpanan Pokok');
+        $response->assertDontSee('Simpanan Wajib');
+    }
+
+    public function test_operator_desa_can_save_multiple_business_types_and_load_the_saved_choices(): void
+    {
+        $cooperative = $this->createCooperative(9925, 0, 1, 92591);
+        $operator = $this->createOperatorDesa(9925, 92591);
+
+        $page = $this->actingAs($operator)->get(route('admin.dashboard'));
+        $page->assertOk();
+        $page->assertSee('GERAI UNIT USAHA SIMPAN PINJAM');
+        $page->assertSee('GERAI COLD STORAGE/COLD CHAIN');
+        $page->assertSee('GERAI USAHA LAINNYA (KBLI 2020)');
+        $page->assertSee('AKUN MICROSITE');
+        $page->assertSee('Akun Microsite merupakan fasilitas digital, bukan gerai fisik.');
+        $page->assertSee('Belum ada jenis usaha yang dipilih.');
+        $page->assertSee('Reset semua pilihan');
+
+        $saved = $this->post(route('admin.koperasi.usaha', $cooperative), [
+            'has_types_input' => '1',
+            'id_koperasitype1' => 'Yes',
+            'id_koperasitype13' => 'Yes',
+        ]);
+
+        $saved->assertRedirect(route('admin.dashboard').'#jenis-usaha');
+        $saved->assertSessionHas('success');
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => $cooperative->id_koperasi,
+            'id_koperasitype1' => 'Yes',
+            'id_koperasitype2' => 'No',
+            'id_koperasitype13' => 'Yes',
+        ]);
+
+        $reloadedPage = $this->get(route('admin.dashboard'));
+        $reloadedPage->assertOk();
+        $reloadedPage->assertSee('data-dashboard-stat="business-types" data-value="2"', false);
+        $reloadedPage->assertSee('Terpilih: GERAI SEMBAKO, AKUN MICROSITE');
+        $this->assertSame(2, substr_count($reloadedPage->getContent(), 'value="Yes" checked'));
+
+        $updated = $this->post(route('admin.koperasi.usaha', $cooperative), [
+            'has_types_input' => '1',
+            'id_koperasitype2' => 'Yes',
+        ]);
+
+        $updated->assertRedirect(route('admin.dashboard').'#jenis-usaha');
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => $cooperative->id_koperasi,
+            'id_koperasitype1' => 'No',
+            'id_koperasitype2' => 'Yes',
+            'id_koperasitype13' => 'No',
+        ]);
+        $this->get(route('admin.dashboard'))
+            ->assertSee('data-dashboard-stat="business-types" data-value="1"', false)
+            ->assertSee('Terpilih: GERAI APOTEK DESA');
+
+        $reset = $this->post(route('admin.koperasi.usaha', $cooperative), [
+            'has_types_input' => '1',
+            'id_koperasitype1' => 'Yes',
+            'id_koperasitype2' => 'Yes',
+            'id_koperasitype3' => 'Yes',
+            'id_koperasitype4' => 'Yes',
+            'id_koperasitype5' => 'Yes',
+            'id_koperasitype6' => 'Yes',
+            'id_koperasitype7' => 'Yes',
+            'id_koperasitype8' => 'Yes',
+            'id_koperasitype9' => 'Yes',
+            'id_koperasitype10' => 'Yes',
+            'id_koperasitype11' => 'Yes',
+            'id_koperasitype12' => 'Yes',
+            'id_koperasitype13' => 'Yes',
+            'reset_types' => '1',
+        ]);
+
+        $reset->assertRedirect(route('admin.dashboard').'#jenis-usaha');
+        $reset->assertSessionHas('success');
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => $cooperative->id_koperasi,
+            'id_koperasitype1' => 'No',
+            'id_koperasitype2' => 'No',
+            'id_koperasitype3' => 'No',
+            'id_koperasitype4' => 'No',
+            'id_koperasitype5' => 'No',
+            'id_koperasitype6' => 'No',
+            'id_koperasitype7' => 'No',
+            'id_koperasitype8' => 'No',
+            'id_koperasitype9' => 'No',
+            'id_koperasitype10' => 'No',
+            'id_koperasitype11' => 'No',
+            'id_koperasitype12' => 'No',
+            'id_koperasitype13' => 'No',
+        ]);
+        $this->get(route('admin.dashboard'))
+            ->assertSee('data-dashboard-stat="business-types" data-value="0"', false)
+            ->assertSee('Belum ada jenis usaha yang dipilih.');
+    }
+
+    public function test_operator_desa_cannot_update_business_types_for_another_village(): void
+    {
+        $cooperative = $this->createCooperative(9926, 0, 1, 92692);
+        $operator = $this->createOperatorDesa(9926, 92691);
+
+        $response = $this->actingAs($operator)->post(route('admin.koperasi.usaha', $cooperative), [
+            'has_types_input' => '1',
+            'id_koperasitype1' => 'Yes',
+        ]);
+
+        $response->assertNotFound();
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => $cooperative->id_koperasi,
+            'id_koperasitype1' => 'No',
+        ]);
+    }
+
+    public function test_operator_desa_cannot_save_an_unrecognized_business_type_value(): void
+    {
+        $cooperative = $this->createCooperative(9928, 0, 1, 92891);
+        $operator = $this->createOperatorDesa(9928, 92891);
+
+        $response = $this->actingAs($operator)->post(route('admin.koperasi.usaha', $cooperative), [
+            'has_types_input' => '1',
+            'id_koperasitype1' => 'Aktif',
+        ]);
+
+        $response->assertSessionHasErrors('id_koperasitype1');
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => $cooperative->id_koperasi,
+            'id_koperasitype1' => 'No',
+        ]);
+    }
+
+    public function test_admin_can_still_update_the_cooperative_category_through_the_existing_business_route(): void
+    {
+        $cooperative = $this->createCooperative(9929, 0);
+        $admin = User::firstOrFail();
+
+        $response = $this->actingAs($admin)->post(route('admin.koperasi.usaha', $cooperative), [
+            'cat_koperasi' => 'KOPERASI DESA',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard', ['tab' => 'koperasi']));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => $cooperative->id_koperasi,
+            'cat_koperasi' => 'KOPERASI DESA',
+        ]);
+    }
+
+    public function test_operator_dashboard_keeps_empty_database_states_on_their_respective_pages(): void
+    {
+        $this->createCooperative(9927, 0, 1, 92791);
+        $operator = $this->createOperatorDesa(9927, 92791);
+
+        $response = $this->actingAs($operator)->get(route('admin.dashboard'));
+
+        $response->assertOk();
+        $response->assertDontSee('Belum ada data anggota perorangan.');
+        $response->assertDontSee('Belum ada data pengurus yang tercatat.');
+        $response->assertDontSee('Belum ada data pengawas yang tercatat.');
+        $response->assertSee('Belum ada jenis usaha yang dipilih.');
+
+        $this->get(route('admin.dashboard', ['page' => 'database-anggota']))
+            ->assertOk()
+            ->assertSee('Belum ada data anggota perorangan.');
+        $this->get(route('admin.dashboard', ['page' => 'database-pengurus']))
+            ->assertOk()
+            ->assertSee('Belum ada data pengurus yang tercatat.')
+            ->assertSee('Belum ada data pengawas yang tercatat.');
     }
 
     public function test_operator_desa_can_add_a_manager_to_its_cooperative(): void
@@ -189,7 +399,7 @@ class AdminMemberManagementTest extends TestCase
             'id_branch' => 1,
             'flag_del' => 0,
         ]);
-        $page = $this->actingAs($operator)->get(route('admin.dashboard'));
+        $page = $this->actingAs($operator)->get(route('admin.dashboard', ['page' => 'database-anggota']));
         $page->assertSee('Anggota Tes');
         $page->assertDontSee($nik);
     }
@@ -258,8 +468,9 @@ class AdminMemberManagementTest extends TestCase
 
         $managerWithoutPhoto = $this->createManager(9907, $cooperative->id_koperasi);
         $operator = $this->createOperatorDesa(9904, 1);
-        $page = $this->actingAs($operator)->get(route('admin.dashboard'));
-        $page->assertSee('Unggah foto pengurus');
+        $page = $this->actingAs($operator)->get(route('admin.dashboard', ['page' => 'database-pengurus']));
+        $page->assertSee('Foto pengurus');
+        $page->assertSee('Unggah foto');
         $page->assertDontSee('id="map-members"', false);
         $page->assertSee(route('admin.pengurus.foto.operator'));
         $page->assertSee('value="'.$manager->id_kopsdm.'"', false);
