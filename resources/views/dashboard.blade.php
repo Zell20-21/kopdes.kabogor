@@ -1053,16 +1053,8 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 mb-10">
                 <!-- Col 1: Brand & Narasi RAPID / KMP (5 cols) -->
                 <div class="md:col-span-5 space-y-4">
-                    <div class="flex items-center space-x-3.5">
-                        <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-14 sm:h-16 w-auto object-contain drop-shadow-md shrink-0">
-                        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white p-1.5 flex items-center justify-center shadow-lg shrink-0 border border-white/50 overflow-hidden">
-                            <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="w-full h-full object-contain">
-                        </div>
-                        <div>
-                            <h4 class="text-lg sm:text-xl font-black text-white tracking-wide uppercase leading-tight">
-                                KMP BOGOR
-                            </h4>
-                        </div>
+                    <div>
+                        <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-14 sm:h-16 w-auto object-contain drop-shadow-md">
                     </div>
                     <p class="text-xs text-red-100/90 leading-relaxed text-justify max-w-md">
                         Memfasilitasi pemberdayaan dan kemandirian ekonomi desa/kelurahan di Kabupaten Bogor melalui penguatan kelembagaan koperasi gotong royong yang berdaya saing, modern, dan terintegrasi.
