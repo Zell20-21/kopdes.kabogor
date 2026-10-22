@@ -5,8 +5,8 @@
 @section('content')
 <div class="min-h-screen bg-slate-50 flex flex-col justify-between">
 
-    <!-- Top Navigation Header -->
-    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md sticky top-0 z-[100]">
+    <!-- Top Navigation Header (Stay / Fixed di atas saat di-scroll) -->
+    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md fixed top-0 left-0 right-0 z-[100] w-full">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-14 sm:h-16">
                 <div class="flex items-center space-x-2 sm:space-x-3.5 min-w-0 pr-1">
@@ -64,10 +64,10 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="flex-grow pb-12">
+    <main class="flex-grow pb-12 pt-14 sm:pt-16">
 
         <!-- Hero Welcome Banner -->
-        <section id="beranda" class="pt-8 pb-6 bg-gradient-to-b from-red-50/80 via-red-50/30 to-slate-50 border-b border-red-100/60">
+        <section id="beranda" class="pt-8 pb-6 bg-gradient-to-b from-red-50/80 via-red-50/30 to-slate-50 border-b border-red-100/60 scroll-mt-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#991b1b] tracking-tight uppercase">
                     KOPERASI DESA MERAH PUTIH
@@ -1053,18 +1053,15 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 mb-10">
                 <!-- Col 1: Brand & Narasi RAPID / KMP (5 cols) -->
                 <div class="md:col-span-5 space-y-4">
-                    <div class="flex items-center space-x-3">
-                        <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-11 sm:h-12 w-auto object-contain drop-shadow shrink-0">
+                    <div class="flex items-center space-x-3.5">
+                        <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-14 sm:h-16 w-auto object-contain drop-shadow-md shrink-0">
                         <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white p-1.5 flex items-center justify-center shadow-lg shrink-0 border border-white/50 overflow-hidden">
                             <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <h4 class="text-base font-extrabold text-white tracking-wide uppercase">
+                            <h4 class="text-lg sm:text-xl font-black text-white tracking-wide uppercase leading-tight">
                                 KMP BOGOR
                             </h4>
-                            <p class="text-[10px] text-red-200 font-semibold uppercase tracking-wider leading-none">
-                                Koperasi Merah Putih Terpadu
-                            </p>
                         </div>
                     </div>
                     <p class="text-xs text-red-100/90 leading-relaxed text-justify max-w-md">

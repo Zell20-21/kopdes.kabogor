@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth overflow-x-hidden w-full max-w-full">
+<html lang="id" class="scroll-smooth w-full max-w-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,7 +51,7 @@
     <style>
         html, body {
             max-width: 100%;
-            overflow-x: hidden;
+            overflow-x: clip;
             width: 100%;
         }
 
