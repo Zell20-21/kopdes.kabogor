@@ -1965,7 +1965,9 @@
                                 <!-- Footer Bar: Showing entries, Excel/Cetak/Tambah buttons, Pagination -->
                                 <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-2 text-xs text-slate-600">
                                     <div class="text-xs text-slate-500 font-medium">
-                                        Showing <strong class="font-bold text-slate-800">{{ $penguruses->firstItem() ?? 0 }}</strong> to <strong class="font-bold text-slate-800">{{ $penguruses->lastItem() ?? 0 }}</strong> of <strong class="font-bold text-slate-800">{{ number_format($penguruses->total()) }}</strong> entries
+                                        Showing <span class="font-bold text-slate-800">{{ $penguruses->firstItem() ?? 0 }}</span>
+                                        to <span class="font-bold text-slate-800">{{ $penguruses->lastItem() ?? 0 }}</span>
+                                        of <span class="font-bold text-slate-800">{{ number_format($penguruses->total()) }}</span> entries
                                     </div>
 
                                     <div class="flex items-center gap-2">
@@ -1986,9 +1988,46 @@
                                         </button>
                                     </div>
 
-                                    <div>
-                                        {{ $penguruses->appends(request()->except('page'))->links() }}
-                                    </div>
+                                    @if($penguruses->hasPages())
+                                        <nav class="flex items-center space-x-1">
+                                            {{-- Previous Page Link --}}
+                                            @if ($penguruses->onFirstPage())
+                                                <span class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-300 text-xs font-bold cursor-not-allowed">
+                                                    Previous
+                                                </span>
+                                            @else
+                                                <a href="{{ $penguruses->appends(request()->except('page'))->previousPageUrl() }}" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold transition">
+                                                    Previous
+                                                </a>
+                                            @endif
+
+                                            {{-- Pagination Elements --}}
+                                            @foreach ($penguruses->appends(request()->except('page'))->getUrlRange(1, $penguruses->lastPage()) as $page => $url)
+                                                @if ($page == $penguruses->currentPage())
+                                                    <span class="px-3 py-1.5 rounded-lg bg-[#0284c7] text-white text-xs font-black shadow-xs">
+                                                        {{ $page }}
+                                                    </span>
+                                                @elseif ($page <= 5 || $page == $penguruses->lastPage() || abs($page - $penguruses->currentPage()) <= 1)
+                                                    <a href="{{ $url }}" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold transition">
+                                                        {{ $page }}
+                                                    </a>
+                                                @elseif ($page == 6 && $penguruses->lastPage() > 7)
+                                                    <span class="px-2 py-1.5 text-slate-400">...</span>
+                                                @endif
+                                            @endforeach
+
+                                            {{-- Next Page Link --}}
+                                            @if ($penguruses->hasMorePages())
+                                                <a href="{{ $penguruses->appends(request()->except('page'))->nextPageUrl() }}" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold transition">
+                                                    Next
+                                                </a>
+                                            @else
+                                                <span class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-300 text-xs font-bold cursor-not-allowed">
+                                                    Next
+                                                </span>
+                                            @endif
+                                        </nav>
+                                    @endif
                                 </div>
                             </div>
 
@@ -2585,29 +2624,54 @@
                             </table>
                         </div>
 
-                        <!-- Pagination Footer matching screenshot -->
-                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-500">
-                            <div>
-                                Menampilkan
-                                <strong class="text-slate-800 font-bold">{{ $totalAnggota > 0 ? ($anggotaKoperasis->firstItem() ?? 0) : 0 }}</strong>
-                                sampai
-                                <strong class="text-slate-800 font-bold">{{ $totalAnggota > 0 ? ($anggotaKoperasis->lastItem() ?? 0) : 0 }}</strong>
-                                dari
-                                <strong class="text-slate-800 font-bold">{{ $totalAnggota > 0 ? number_format($anggotaKoperasis->total()) : 0 }}</strong>
-                                entri data
+                        <!-- Pagination Footer matching koperasi style -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2 text-xs">
+                            <div class="text-slate-500 font-medium">
+                                Showing <span class="font-bold text-slate-800">{{ $anggotaKoperasis->firstItem() ?? 0 }}</span>
+                                to <span class="font-bold text-slate-800">{{ $anggotaKoperasis->lastItem() ?? 0 }}</span>
+                                of <span class="font-bold text-slate-800">{{ number_format($anggotaKoperasis->total()) }}</span> entries
                             </div>
 
-                            <div class="flex items-center space-x-1">
-                                <button type="button" disabled class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 bg-slate-50 text-xs font-medium cursor-not-allowed">
-                                    Sebelumnya
-                                </button>
-                                <button type="button" class="px-3 py-1.5 rounded-lg border border-sky-500 bg-sky-50 text-sky-600 font-bold text-xs">
-                                    1
-                                </button>
-                                <button type="button" disabled class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 bg-slate-50 text-xs font-medium cursor-not-allowed">
-                                    Selanjutnya
-                                </button>
-                            </div>
+                            @if($anggotaKoperasis->hasPages())
+                                <nav class="flex items-center space-x-1">
+                                    {{-- Previous Page Link --}}
+                                    @if ($anggotaKoperasis->onFirstPage())
+                                        <span class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-300 text-xs font-bold cursor-not-allowed">
+                                            Previous
+                                        </span>
+                                    @else
+                                        <a href="{{ $anggotaKoperasis->appends(request()->except('page'))->previousPageUrl() }}" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold transition">
+                                            Previous
+                                        </a>
+                                    @endif
+
+                                    {{-- Pagination Elements --}}
+                                    @foreach ($anggotaKoperasis->appends(request()->except('page'))->getUrlRange(1, $anggotaKoperasis->lastPage()) as $page => $url)
+                                        @if ($page == $anggotaKoperasis->currentPage())
+                                            <span class="px-3 py-1.5 rounded-lg bg-[#0284c7] text-white text-xs font-black shadow-xs">
+                                                {{ $page }}
+                                            </span>
+                                        @elseif ($page <= 5 || $page == $anggotaKoperasis->lastPage() || abs($page - $anggotaKoperasis->currentPage()) <= 1)
+                                            <a href="{{ $url }}" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold transition">
+                                                {{ $page }}
+                                            </a>
+                                        @elseif ($page == 6 && $anggotaKoperasis->lastPage() > 7)
+                                            <span class="px-2 py-1.5 text-slate-400">...</span>
+                                        @endif
+                                    @endforeach
+
+                                    {{-- Next Page Link --}}
+                                    @if ($anggotaKoperasis->hasMorePages())
+                                        <a href="{{ $anggotaKoperasis->appends(request()->except('page'))->nextPageUrl() }}" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold transition">
+                                            Next
+                                        </a>
+                                    @else
+                                        <span class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-300 text-xs font-bold cursor-not-allowed">
+                                            Next
+                                        </span>
+                                    @endif
+                                </nav>
+                            @endif
                         </div>
                     </div>
 
