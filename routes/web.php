@@ -165,44 +165,46 @@ Route::post('/login', function (Request $request) {
     $loginInput = trim($request->username);
     $passwordInput = (string) $request->password;
 
-    // Cari user di tabel app_md_user
-    $user = User::where('login_user', $loginInput)
-        ->orWhere('email_user', $loginInput)
+    $user = User::where('flag_del', 0)
+        ->where(function ($query) use ($loginInput) {
+            $query->where('login_user', $loginInput)
+                ->orWhere('email_user', $loginInput);
+        })
         ->first();
 
-    // Fallback jika login dengan admin / admin_bogor
     if (! $user && in_array($loginInput, ['admin', 'admin_bogor', 'admin@bogorkab.go.id'])) {
-        $user = User::where('id_user', 1)->orWhere('level_user', 1)->first();
+        $user = User::where('flag_del', 0)
+            ->where(function ($query) {
+                $query->where('id_user', 1)->orWhere('level_user', 1);
+            })
+            ->first();
     }
 
     if (! $user) {
         return back()
-            ->with('error', 'Akun operator/pengguna tidak ditemukan dalam database kdkmp. Silakan cek username di phpMyAdmin.')
+            ->with('error', 'Username atau kata sandi tidak sesuai.')
             ->with('open_login', true)
             ->withInput($request->only('username'));
     }
 
-    // Verifikasi Password:
-    // 1. MD5 hash match (standar kdkmp_dbkoperasi app_md_user)
-    // 2. Plaintext match (jika di-update via phpMyAdmin sebagai teks biasa)
-    // 3. Hash::check (bcrypt)
-    // 4. Default password 'password', '123456', 'admin', atau sama dengan username
     $isValid = false;
-    $storedHash = (string) ($user->pswd ?? '');
+    foreach ([$user->pswd, $user->password] as $storedHash) {
+        $storedHash = (string) $storedHash;
 
-    if (md5($passwordInput) === $storedHash) {
-        $isValid = true;
-    } elseif ($passwordInput === $storedHash) {
-        $isValid = true;
-    } elseif ((str_starts_with($storedHash, '$2y$') || str_starts_with($storedHash, '$2a$')) && Hash::check($passwordInput, $storedHash)) {
-        $isValid = true;
-    } elseif (in_array($passwordInput, ['password', '123456', 'admin', $loginInput])) {
-        $isValid = true;
+        if (preg_match('/^[a-f0-9]{32}$/i', $storedHash) === 1) {
+            $isValid = hash_equals(strtolower($storedHash), md5($passwordInput));
+        } elseif (preg_match('~^\$2[ayb]\$\d{2}\$[./A-Za-z0-9]{53}$~', $storedHash) === 1) {
+            $isValid = Hash::check($passwordInput, $storedHash);
+        }
+
+        if ($isValid) {
+            break;
+        }
     }
 
     if (! $isValid) {
         return back()
-            ->with('error', 'Kata sandi tidak sesuai dengan database.')
+            ->with('error', 'Username atau kata sandi tidak sesuai.')
             ->with('open_login', true)
             ->withInput($request->only('username'));
     }

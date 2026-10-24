@@ -17,6 +17,121 @@
     .kecamatan-tooltip::before {
         border-top-color: rgba(15, 23, 42, 0.90) !important;
     }
+
+    @if($user->isOperatorKecamatan())
+        [data-dashboard-shell="operator-kecamatan"] {
+            --desk-accent: #9f1239;
+            --desk-accent-hover: #881337;
+            background-color: #f8fafc;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main {
+            width: 100%;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main > div > aside > div {
+            border-color: #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main > div > aside > div > div:first-child {
+            border-color: #ffe4e6;
+            background-color: #fff1f2;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main > div > aside > div > div:first-child > div:first-child {
+            border-color: #fecdd3;
+            background-color: #ffe4e6;
+            color: var(--desk-accent);
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main > div > aside nav a {
+            min-height: 2.75rem;
+            border-radius: 0.75rem;
+            font-size: 0.8125rem;
+            transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main > div > aside nav a:not(.bg-rose-800):hover {
+            border-color: #fecdd3;
+            background-color: #fff1f2;
+            color: var(--desk-accent-hover);
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main > div > aside nav a.bg-rose-800 {
+            background-color: var(--desk-accent-hover);
+            box-shadow: 0 4px 10px rgba(136, 19, 55, 0.16);
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main > div > aside nav a:focus-visible {
+            outline: 2px solid #be123c;
+            outline-offset: 2px;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section h1,
+        [data-dashboard-shell="operator-kecamatan"] main section h2 {
+            letter-spacing: -0.025em;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section article,
+        [data-dashboard-shell="operator-kecamatan"] main section [class*="bg-white"][class*="border"][class*="rounded"] {
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+        [data-dashboard-shell="operator-kecamatan"] main section select,
+        [data-dashboard-shell="operator-kecamatan"] main section textarea {
+            border-radius: 0.75rem;
+            border-color: #cbd5e1;
+            font-family: inherit;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):focus,
+        [data-dashboard-shell="operator-kecamatan"] main section select:focus,
+        [data-dashboard-shell="operator-kecamatan"] main section textarea:focus {
+            border-color: #be123c;
+            outline: 2px solid rgba(190, 18, 60, 0.2);
+            outline-offset: 1px;
+            --tw-ring-color: rgba(190, 18, 60, 0.25);
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section button:focus-visible,
+        [data-dashboard-shell="operator-kecamatan"] main section a:focus-visible {
+            outline: 2px solid #be123c;
+            outline-offset: 2px;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section button:disabled,
+        [data-dashboard-shell="operator-kecamatan"] main section input:disabled,
+        [data-dashboard-shell="operator-kecamatan"] main section select:disabled,
+        [data-dashboard-shell="operator-kecamatan"] main section textarea:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section table {
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.8125rem;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section table thead th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section table th,
+        [data-dashboard-shell="operator-kecamatan"] main section table td {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        [data-dashboard-shell="operator-kecamatan"] main section .overflow-x-auto {
+            max-width: 100%;
+        }
+    @endif
 </style>
 @endpush
 
@@ -125,29 +240,61 @@
                     <nav class="space-y-1.5 text-xs font-bold">
                         <!-- 1. INFORMASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'informasi']) }}"
+                           @if($isOperatorKecamatan && $activeTab === 'informasi') aria-current="page" @endif
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'informasi' ? ($isOperatorKecamatan ? 'bg-rose-800 text-white shadow-rose-900/20' : 'bg-[#0284c7] text-white shadow-sky-600/20') : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <span>Informasi</span>
+                            @if($isOperatorKecamatan)
+                                <span class="flex min-w-0 items-center gap-3">
+                                    <i class="fa-solid fa-chart-pie w-4 shrink-0 text-center {{ $activeTab === 'informasi' ? 'text-white' : 'text-rose-700' }}" aria-hidden="true"></i>
+                                    <span>Informasi</span>
+                                </span>
+                            @else
+                                <span>Informasi</span>
+                            @endif
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'informasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 2. DATABASE KOPERASI -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}"
+                           @if($isOperatorKecamatan && $activeTab === 'koperasi') aria-current="page" @endif
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'koperasi' ? ($isOperatorKecamatan ? 'bg-rose-800 text-white shadow-rose-900/20' : 'bg-[#0284c7] text-white shadow-sky-600/20') : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <span>Database Koperasi</span>
+                            @if($isOperatorKecamatan)
+                                <span class="flex min-w-0 items-center gap-3">
+                                    <i class="fa-solid fa-building-columns w-4 shrink-0 text-center {{ $activeTab === 'koperasi' ? 'text-white' : 'text-rose-700' }}" aria-hidden="true"></i>
+                                    <span>Database Koperasi</span>
+                                </span>
+                            @else
+                                <span>Database Koperasi</span>
+                            @endif
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'koperasi' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 3. DATABASE PENGURUS -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'pengurus']) }}"
+                           @if($isOperatorKecamatan && $activeTab === 'pengurus') aria-current="page" @endif
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'pengurus' ? ($isOperatorKecamatan ? 'bg-rose-800 text-white shadow-rose-900/20' : 'bg-[#0284c7] text-white shadow-sky-600/20') : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <span>Database Pengurus</span>
+                            @if($isOperatorKecamatan)
+                                <span class="flex min-w-0 items-center gap-3">
+                                    <i class="fa-solid fa-user-tie w-4 shrink-0 text-center {{ $activeTab === 'pengurus' ? 'text-white' : 'text-rose-700' }}" aria-hidden="true"></i>
+                                    <span>Database Pengurus</span>
+                                </span>
+                            @else
+                                <span>Database Pengurus</span>
+                            @endif
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'pengurus' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 
                         <!-- 4. DATABASE ANGGOTA -->
                         <a href="{{ route('admin.dashboard', ['tab' => 'anggota']) }}"
+                           @if($isOperatorKecamatan && $activeTab === 'anggota') aria-current="page" @endif
                            class="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition shadow-sm {{ $activeTab === 'anggota' ? ($isOperatorKecamatan ? 'bg-rose-800 text-white shadow-rose-900/20' : 'bg-[#0284c7] text-white shadow-sky-600/20') : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/70' }}">
-                            <span>Database Anggota</span>
+                            @if($isOperatorKecamatan)
+                                <span class="flex min-w-0 items-center gap-3">
+                                    <i class="fa-solid fa-users w-4 shrink-0 text-center {{ $activeTab === 'anggota' ? 'text-white' : 'text-rose-700' }}" aria-hidden="true"></i>
+                                    <span>Database Anggota</span>
+                                </span>
+                            @else
+                                <span>Database Anggota</span>
+                            @endif
                             <i class="fa-solid fa-chevron-right text-xs {{ $activeTab === 'anggota' ? 'text-white' : 'text-slate-300 group-hover:text-slate-500' }} transition-colors"></i>
                         </a>
 

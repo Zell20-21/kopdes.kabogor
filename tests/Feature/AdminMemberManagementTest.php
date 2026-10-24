@@ -150,6 +150,52 @@ class AdminMemberManagementTest extends TestCase
         $response->assertDontSee('Simpanan Wajib');
     }
 
+    public function test_operator_dashboard_counts_training_and_member_types_from_active_scoped_records(): void
+    {
+        $cooperative = $this->createCooperative(9920, 0, 1, 92001);
+        $cooperative->update(['st_latih' => 'SEBAGIAN']);
+        $foreignCooperative = $this->createCooperative(9922, 0, 1, 92002);
+        $memberType = KopangType::where('name_kopangtype', 'Petani')->firstOrFail();
+        Kopang::create([
+            'id_kopang' => 99201,
+            'name_kopang' => 'Anggota Lokal',
+            'id_kec' => 1,
+            'id_kel' => 92001,
+            'id_koperasi' => $cooperative->id_koperasi,
+            'id_kopangtype' => $memberType->id_kopangtype,
+            'flag_del' => 0,
+        ]);
+        Kopang::create([
+            'id_kopang' => 99202,
+            'name_kopang' => 'Anggota Wilayah Lain',
+            'id_kec' => 1,
+            'id_kel' => 92002,
+            'id_koperasi' => $foreignCooperative->id_koperasi,
+            'id_kopangtype' => $memberType->id_kopangtype,
+            'flag_del' => 0,
+        ]);
+        Kopang::create([
+            'id_kopang' => 99203,
+            'name_kopang' => 'Anggota Terhapus',
+            'id_kec' => 1,
+            'id_kel' => 92001,
+            'id_koperasi' => $cooperative->id_koperasi,
+            'id_kopangtype' => $memberType->id_kopangtype,
+            'flag_del' => 1,
+        ]);
+        $operator = $this->createOperatorDesa(9920, 92001);
+
+        $response = $this->actingAs($operator)->get(route('admin.dashboard'));
+
+        $response->assertOk()
+            ->assertViewHas('latihSebagian', 1)
+            ->assertViewHas('klasifikasiAnggota', function (array $categories) use ($memberType): bool {
+                $category = collect($categories)->firstWhere('nama', $memberType->name_kopangtype);
+
+                return $category !== null && $category['jumlah'] === 1;
+            });
+    }
+
     public function test_operator_desa_can_save_multiple_business_types_and_load_the_saved_choices(): void
     {
         $cooperative = $this->createCooperative(9925, 0, 1, 92591);
@@ -400,6 +446,89 @@ class AdminMemberManagementTest extends TestCase
             'id_kopsdm' => $manager->id_kopsdm,
             'flag_del' => 1,
         ]);
+    }
+
+    public function test_operator_cannot_move_a_foreign_manager_into_its_own_cooperative(): void
+    {
+        $this->createCooperative(9952, 2, 1, 95201);
+        $foreignCooperative = $this->createCooperative(9953, 2, 1, 95202);
+        $manager = $this->createManager(9952, $foreignCooperative->id_koperasi);
+        $operator = $this->createOperatorDesa(9952, 95201);
+
+        $response = $this->actingAs($operator)->put(route('admin.pengurus.update', $manager), [
+            'id_koperasi' => 9952,
+            'name_kopsdm' => 'Pengurus Dipindah',
+            'jab_kopsdm' => 'KETUA KOPERASI',
+            'type_kopsdm' => 'PENGURUS',
+        ]);
+
+        $response->assertNotFound();
+        $this->assertDatabaseHas('app_md_kopsdm', [
+            'id_kopsdm' => $manager->id_kopsdm,
+            'id_koperasi' => $foreignCooperative->id_koperasi,
+            'name_kopsdm' => 'Pengurus Tes 9952',
+        ]);
+    }
+
+    public function test_operator_kecamatan_exports_only_data_in_its_district_and_csv_values_are_safe(): void
+    {
+        $localCooperative = $this->createCooperative(
+            9954,
+            2,
+            9001,
+            95401
+        );
+        $localCooperative->update(['name_koperasi' => '=HYPERLINK("https://example.test","Open")']);
+        $foreignCooperative = $this->createCooperative(9955, 2, 9002, 95501);
+        $localManager = $this->createManager(9954, $localCooperative->id_koperasi);
+        $this->createManager(9955, $foreignCooperative->id_koperasi);
+        $memberType = KopangType::firstOrFail();
+        $operator = User::create([
+            'id_user' => 9954,
+            'name_user' => 'Operator Kecamatan',
+            'login_user' => 'operator_export_scope',
+            'pswd' => 'password',
+            'level_user' => 14,
+            'id_company' => 9001,
+            'id_branch' => 0,
+            'flag_del' => 0,
+        ]);
+
+        $memberResponse = $this->actingAs($operator)->post(route('admin.anggota.store'), [
+            'id_koperasi' => $localCooperative->id_koperasi,
+            'id_kopangtype' => $memberType->id_kopangtype,
+            'name_kopang' => 'Anggota Ekspor',
+            'nik_kopang' => '3201011234567890',
+        ]);
+        $memberResponse->assertRedirect();
+        $foreignMemberType = $memberType;
+        $this->actingAs(User::firstOrFail())->post(route('admin.anggota.store'), [
+            'id_koperasi' => $foreignCooperative->id_koperasi,
+            'id_kopangtype' => $foreignMemberType->id_kopangtype,
+            'name_kopang' => 'Anggota Wilayah Lain',
+            'nik_kopang' => '3201011234567891',
+        ])->assertRedirect();
+
+        $cooperativeCsv = $this->actingAs($operator)
+            ->get(route('admin.koperasi.export'))
+            ->assertStreamed()
+            ->streamedContent();
+        $this->assertStringContainsString("'=HYPERLINK", $cooperativeCsv);
+        $this->assertStringNotContainsString('Koperasi Tes 9955', $cooperativeCsv);
+
+        $managerCsv = $this->actingAs($operator)
+            ->get(route('admin.pengurus.export'))
+            ->assertStreamed()
+            ->streamedContent();
+        $this->assertStringContainsString('Pengurus Tes 9954', $managerCsv);
+        $this->assertStringNotContainsString('Pengurus Tes 9955', $managerCsv);
+
+        $memberCsv = $this->actingAs($operator)
+            ->get(route('admin.anggota.export'))
+            ->assertStreamed()
+            ->streamedContent();
+        $this->assertStringContainsString('=HYPERLINK', $memberCsv);
+        $this->assertStringNotContainsString('Koperasi Tes 9955', $memberCsv);
     }
 
     public function test_admin_can_add_an_individual_member_and_member_nik_is_encrypted(): void

@@ -57,6 +57,21 @@ class DashboardTest extends TestCase
         $this->assertStringContainsString('Rekapitulasi_KMP_Kabupaten_Bogor_2025.csv', $response->headers->get('Content-Disposition'));
     }
 
+    public function test_public_csv_export_escapes_spreadsheet_formulas(): void
+    {
+        Kecamatan::create([
+            'id_kopkec' => 9900,
+            'name_kopkec' => '=1+1',
+            'flag_del' => 0,
+        ]);
+
+        $response = $this->get(route('export.rekapitulasi'));
+
+        $response->assertOk()->assertStreamed();
+        $content = $response->streamedContent();
+        $this->assertStringContainsString("'=1+1", $content);
+    }
+
     public function test_portal_login_validation_and_captcha(): void
     {
         $this->get(route('captcha'));
@@ -78,7 +93,7 @@ class DashboardTest extends TestCase
             'id_user' => 55,
             'name_user' => 'KOP. PONDOK RAJEG [CIBINONG]',
             'login_user' => 'kop.pond2108',
-            'pswd' => 'f75191ede83d4e347ee30684227509e8',
+            'pswd' => md5('password'),
             'level_user' => 15,
             'id_company' => 1,
             'id_branch' => 1,
@@ -93,6 +108,45 @@ class DashboardTest extends TestCase
 
         $response->assertRedirect(route('admin.dashboard'));
         $this->assertAuthenticatedAs($operator);
+    }
+
+    public function test_login_rejects_plaintext_passwords_and_inactive_users(): void
+    {
+        User::create([
+            'id_user' => 56,
+            'name_user' => 'Akun Password Teks',
+            'login_user' => 'akun_password_teks',
+            'pswd' => 'password',
+            'level_user' => 15,
+            'id_company' => 1,
+            'id_branch' => 1,
+            'flag_del' => 0,
+        ]);
+        User::create([
+            'id_user' => 57,
+            'name_user' => 'Akun Nonaktif',
+            'login_user' => 'akun_nonaktif',
+            'pswd' => md5('password'),
+            'level_user' => 15,
+            'id_company' => 1,
+            'id_branch' => 1,
+            'flag_del' => 1,
+        ]);
+
+        foreach (['akun_password_teks', 'akun_nonaktif'] as $username) {
+            $this->get(route('captcha'));
+            $captcha = session('login_captcha');
+
+            $response = $this->post(route('portal.login'), [
+                'username' => $username,
+                'password' => 'password',
+                'captcha' => $captcha,
+            ]);
+
+            $response->assertRedirect()
+                ->assertSessionHas('error', 'Username atau kata sandi tidak sesuai.');
+            $this->assertGuest();
+        }
     }
 
     public function test_captcha_endpoint_returns_a_fresh_uncached_image(): void
@@ -131,6 +185,22 @@ class DashboardTest extends TestCase
         $response = $this->get(route('admin.dashboard'));
 
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_user_without_an_admin_role_cannot_access_admin_dashboard(): void
+    {
+        $user = User::create([
+            'id_user' => 58,
+            'name_user' => 'Pengguna Tanpa Role Admin',
+            'login_user' => 'pengguna_tanpa_role_admin',
+            'pswd' => md5('password'),
+            'level_user' => 16,
+            'id_company' => 0,
+            'id_branch' => 0,
+            'flag_del' => 0,
+        ]);
+
+        $this->actingAs($user)->get(route('admin.dashboard'))->assertForbidden();
     }
 
     public function test_authenticated_admin_can_access_admin_dashboard(): void
@@ -283,6 +353,43 @@ class DashboardTest extends TestCase
         $response->assertDontSee('KOPERASI LUAR WILAYAH');
         $response->assertDontSee('KECAMATAN LAIN');
         $response->assertDontSee('DESA LUAR WILAYAH');
+    }
+
+    public function test_operator_kecamatan_cannot_create_or_move_a_cooperative_outside_its_district(): void
+    {
+        $this->createKecamatan(9001, 'KECAMATAN TUGAS');
+        $this->createKecamatan(9002, 'KECAMATAN LAIN');
+        $this->createKelurahan(9101, 9001, 'DESA TUGAS');
+        $this->createKelurahan(9201, 9002, 'DESA LAIN');
+        $this->createCooperative(9301, 9101, 'KOPERASI TUGAS', 10, 9001);
+        $operator = $this->createOperatorKecamatan(9001);
+
+        $this->actingAs($operator)->post(route('admin.koperasi.store'), [
+            'name_koperasi' => 'KOPERASI DI LUAR WILAYAH',
+            'id_kec' => 9002,
+            'id_kel' => 9201,
+            'st_ops' => 'SUDAH',
+            'st_latih' => 'BELUM',
+            'st_sertifikat' => 'BELUM',
+        ])->assertNotFound();
+
+        $this->put(route('admin.koperasi.update', 9301), [
+            'name_koperasi' => 'KOPERASI TUGAS',
+            'id_kec' => 9002,
+            'id_kel' => 9201,
+            'st_ops' => 'SUDAH',
+            'st_latih' => 'BELUM',
+            'st_sertifikat' => 'BELUM',
+        ])->assertNotFound();
+
+        $this->assertDatabaseHas('app_md_koperasi', [
+            'id_koperasi' => 9301,
+            'id_kec' => 9001,
+            'id_kel' => 9101,
+        ]);
+        $this->assertDatabaseMissing('app_md_koperasi', [
+            'name_koperasi' => 'KOPERASI DI LUAR WILAYAH',
+        ]);
     }
 
     public function test_operator_desa_sees_only_its_own_cooperative_managers_and_member_count(): void

@@ -9,6 +9,9 @@ use App\Models\KopangType;
 use App\Models\Koperasi;
 use App\Models\Kopsdm;
 use App\Models\LampiranInformasi;
+use App\Models\User;
+use App\Support\CsvSanitizer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -16,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -26,29 +30,18 @@ class AdminController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
+        abort_unless(
+            $user->isSuperAdmin() || $user->isOperatorDesa() || $user->isOperatorKecamatan(),
+            403
+        );
+
         $isOperator = $user->isOperatorDesa() || $user->isOperatorKecamatan();
         $activeTab = $request->get('tab', 'informasi');
         if ($user->isOperatorKecamatan() && $activeTab === 'lampiran') {
             $activeTab = 'informasi';
         }
 
-        // Scoping based on user role
-        $baseQuery = Koperasi::query()->where('flag_del', 0);
-        if ($user->isOperatorDesa()) {
-            if ($user->id_branch > 0) {
-                $baseQuery->where('id_kel', $user->id_branch);
-            } else {
-                $baseQuery->whereRaw('1 = 0');
-            }
-        } elseif ($user->isOperatorKecamatan()) {
-            if ($user->id_company > 0) {
-                $baseQuery->where('id_kec', $user->id_company);
-            } else {
-                $baseQuery->whereRaw('1 = 0');
-            }
-        } elseif (! $user->isSuperAdmin()) {
-            $baseQuery->whereRaw('1 = 0');
-        }
+        $baseQuery = $this->visibleKoperasiQuery($user);
 
         // Allow Superadmin to filter scope if selected via dropdown
         if ($user->isSuperAdmin() && $filterKec = $request->get('filter_kec')) {
@@ -72,10 +65,10 @@ class AdminController extends Controller
         $opsBelumPersen = $totalKoperasi > 0 ? round(($opsBelum / $totalKoperasi) * 100, 2) : 0;
 
         $latihSudah = (clone $baseQuery)->where('st_latih', 'SUDAH')->count();
-        $latihSebagian = 0;
+        $latihSebagian = (clone $baseQuery)->where('st_latih', 'SEBAGIAN')->count();
         $latihBelum = (clone $baseQuery)->where('st_latih', 'BELUM')->count();
         $latihSudahPersen = $totalKoperasi > 0 ? round(($latihSudah / $totalKoperasi) * 100, 2) : 0;
-        $latihSebagianPersen = 0.00;
+        $latihSebagianPersen = $totalKoperasi > 0 ? round(($latihSebagian / $totalKoperasi) * 100, 2) : 0;
         $latihBelumPersen = $totalKoperasi > 0 ? round(($latihBelum / $totalKoperasi) * 100, 2) : 0;
 
         $sertifikatSudah = (clone $baseQuery)->where('st_sertifikat', 'SUDAH')->count();
@@ -83,14 +76,27 @@ class AdminController extends Controller
         $sertifikatSudahPersen = $totalKoperasi > 0 ? round(($sertifikatSudah / $totalKoperasi) * 100, 2) : 0;
         $sertifikatBelumPersen = $totalKoperasi > 0 ? round(($sertifikatBelum / $totalKoperasi) * 100, 2) : 0;
 
-        // Klasifikasi Anggota UMKM
-        $klasifikasiAnggota = [
-            ['nama' => 'Industri UMKM', 'jumlah' => 0, 'accent' => ''],
-            ['nama' => 'Pedagang UMKM', 'jumlah' => 0, 'accent' => ''],
-            ['nama' => 'Pengrajin UMKM', 'jumlah' => 0, 'accent' => 'border-l-4 border-rose-500 pl-2'],
-            ['nama' => 'Petani', 'jumlah' => 0, 'accent' => 'border-l-4 border-emerald-500 pl-2'],
-            ['nama' => 'Lainnya', 'jumlah' => 0, 'accent' => 'border-l-4 border-amber-500 pl-2'],
-        ];
+        $koperasiTypes = KopangType::where('flag_del', 0)
+            ->orderBy('name_kopangtype')
+            ->get();
+        $anggotaTypeCounts = Kopang::query()
+            ->where('flag_del', 0)
+            ->whereIn('id_koperasi', (clone $baseQuery)->select('id_koperasi'))
+            ->selectRaw('id_kopangtype, COUNT(*) as jumlah')
+            ->groupBy('id_kopangtype')
+            ->pluck('jumlah', 'id_kopangtype');
+        $klasifikasiAnggota = $koperasiTypes
+            ->map(fn (KopangType $type): array => [
+                'nama' => $type->name_kopangtype,
+                'jumlah' => (int) ($anggotaTypeCounts[$type->id_kopangtype] ?? 0),
+                'accent' => match (mb_strtolower($type->name_kopangtype)) {
+                    'pengrajin umkm' => 'border-l-4 border-rose-500 pl-2',
+                    'petani' => 'border-l-4 border-emerald-500 pl-2',
+                    'lainnya' => 'border-l-4 border-amber-500 pl-2',
+                    default => '',
+                },
+            ])
+            ->all();
 
         // Database Koperasi query with search & filter
         $query = (clone $baseQuery)->with(['kecamatan', 'kelurahan']);
@@ -147,9 +153,6 @@ class AdminController extends Controller
             ->orderByDesc('id_kopang')
             ->paginate(8, ['*'], 'member_page')
             ->withQueryString();
-        $koperasiTypes = KopangType::where('flag_del', 0)
-            ->orderBy('name_kopangtype')
-            ->get();
 
         // Database Pengurus statistics & query
         $pengurusBaseQuery = Kopsdm::where('flag_del', 0)
@@ -302,13 +305,17 @@ class AdminController extends Controller
             ->paginate($perPageAnggota, ['*'], 'anggota_page')
             ->withQueryString();
 
-        $kecamatansQuery = Kecamatan::with(['kelurahans' => function ($query) use ($user) {
-            if ($user->isOperatorDesa()) {
-                $query->where('id_kopkel', $user->id_branch);
-            }
+        $kecamatansQuery = Kecamatan::query()
+            ->where('flag_del', 0)
+            ->with(['kelurahans' => function ($query) use ($user) {
+                $query->where('flag_del', 0);
 
-            $query->orderBy('name_kopkel', 'asc');
-        }]);
+                if ($user->isOperatorDesa()) {
+                    $query->where('id_kopkel', $user->id_branch);
+                }
+
+                $query->orderBy('name_kopkel', 'asc');
+            }]);
 
         if ($user->isOperatorKecamatan()) {
             if ($user->id_company > 0) {
@@ -366,13 +373,17 @@ class AdminController extends Controller
         $rekapSubtab = $request->get('subtab', 'info');
 
         // Fetch kelurahans and kecamatans with scoping for rekapitulasi
-        $rekapKelurahansQuery = Kelurahan::with(['kecamatan:id_kopkec,name_kopkec', 'koperasi' => function ($q) {
-            $q->where('flag_del', 0)->select(['id_koperasi', 'id_kel', 'id_kec', 'name_koperasi', 'st_ops', 'st_latih', 'st_sertifikat', 'jum_anggota', 'no_ahu', 'no_inkop']);
-        }]);
+        $rekapKelurahansQuery = Kelurahan::query()
+            ->where('flag_del', 0)
+            ->with(['kecamatan:id_kopkec,name_kopkec', 'koperasi' => function ($q) {
+                $q->where('flag_del', 0)->select(['id_koperasi', 'id_kel', 'id_kec', 'name_koperasi', 'st_ops', 'st_latih', 'st_sertifikat', 'jum_anggota', 'no_ahu', 'no_inkop']);
+            }]);
 
-        $rekapKecamatansQuery = Kecamatan::with(['kelurahans', 'koperasis' => function ($q) {
-            $q->where('flag_del', 0)->select(['id_koperasi', 'id_kel', 'id_kec', 'name_koperasi', 'st_ops', 'st_latih', 'st_sertifikat', 'jum_anggota']);
-        }]);
+        $rekapKecamatansQuery = Kecamatan::query()
+            ->where('flag_del', 0)
+            ->with(['kelurahans' => fn ($query) => $query->where('flag_del', 0), 'koperasis' => function ($q) {
+                $q->where('flag_del', 0)->select(['id_koperasi', 'id_kel', 'id_kec', 'name_koperasi', 'st_ops', 'st_latih', 'st_sertifikat', 'jum_anggota']);
+            }]);
 
         if ($user->isOperatorKecamatan()) {
             if ($user->id_company > 0) {
@@ -455,10 +466,10 @@ class AdminController extends Controller
         } else {
             $tertinggi = $rekapDesaData->sortByDesc('jum_koperasi')->first();
             $terendah = $rekapDesaData->sortBy('jum_koperasi')->first();
-            $rekapTertinggiNama = $tertinggi['nama_desa'] ?? 'KELURAHAN PONDOK RAJEG';
-            $rekapTertinggiNilai = $tertinggi['jum_koperasi'] ?? 1;
-            $rekapTerendahNama = $terendah['nama_desa'] ?? 'KELURAHAN PONDOK RAJEG';
-            $rekapTerendahNilai = $terendah['jum_koperasi'] ?? 1;
+            $rekapTertinggiNama = $tertinggi['nama_desa'] ?? '-';
+            $rekapTertinggiNilai = $tertinggi['jum_koperasi'] ?? 0;
+            $rekapTerendahNama = $terendah['nama_desa'] ?? '-';
+            $rekapTerendahNilai = $terendah['jum_koperasi'] ?? 0;
         }
 
         $viewData = compact(
@@ -529,7 +540,7 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'id_koperasi' => ['required', 'integer', 'exists:app_md_koperasi,id_koperasi'],
-            'id_kopangtype' => ['nullable', 'integer'],
+            'id_kopangtype' => ['nullable', 'integer', Rule::exists('app_md_kopangtype', 'id_kopangtype')->where('flag_del', 0)],
             'name_kopang' => ['required', 'string', 'max:255'],
             'nik_kopang' => ['required', 'digits:16'],
             'id_kec' => ['nullable', 'integer'],
@@ -543,6 +554,11 @@ class AdminController extends Controller
         ]);
 
         $koperasi = $this->findVisibleKoperasi($request, (int) $validated['id_koperasi']);
+        foreach (['id_kec' => 'id_kec', 'id_kel' => 'id_kel'] as $input => $attribute) {
+            if (isset($validated[$input]) && (int) $validated[$input] !== (int) $koperasi->{$attribute}) {
+                abort(404);
+            }
+        }
 
         DB::transaction(function () use ($request, $validated, $koperasi): void {
             $nextId = (int) DB::table('app_md_kopang')
@@ -654,18 +670,25 @@ class AdminController extends Controller
      */
     public function storeKoperasi(Request $request)
     {
+        $user = $request->user();
+        abort_unless($user->isSuperAdmin() || $user->isOperatorKecamatan(), 403);
+
         $validated = $request->validate([
             'name_koperasi' => 'required|string|max:255',
-            'id_kec' => 'required|integer',
-            'id_kel' => 'required|integer',
+            'id_kec' => ['required', 'integer', Rule::exists('app_md_kopkec', 'id_kopkec')->where('flag_del', 0)],
+            'id_kel' => ['required', 'integer', Rule::exists('app_md_kopkel', 'id_kopkel')
+                ->where('id_kopkec', $request->input('id_kec'))
+                ->where('flag_del', 0)],
             'no_inkop' => 'nullable|string|max:100',
             'no_ahu' => 'nullable|string|max:100',
             'tgl_ahu' => 'nullable|date',
-            'st_ops' => 'required|string',
-            'st_latih' => 'required|string',
-            'st_sertifikat' => 'required|string',
-            'cat_koperasi' => 'nullable|string',
+            'st_ops' => ['required', 'string', 'in:SUDAH,BELUM'],
+            'st_latih' => ['required', 'string', 'in:SUDAH,SEBAGIAN,BELUM'],
+            'st_sertifikat' => ['required', 'string', 'in:SUDAH,BELUM'],
+            'cat_koperasi' => ['nullable', 'string', 'max:255'],
         ]);
+
+        $this->authorizeKoperasiLocation($user, (int) $validated['id_kec'], (int) $validated['id_kel']);
 
         $maxId = (int) Koperasi::max('id_koperasi');
         $validated['id_koperasi'] = $maxId + 1;
@@ -693,22 +716,20 @@ class AdminController extends Controller
     public function updateKoperasi(Request $request, Koperasi $koperasi)
     {
         $user = $request->user();
-        if ($user->isOperatorDesa() && $user->id_branch > 0 && $koperasi->id_kel != $user->id_branch) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mengubah data koperasi desa lain.');
-        } elseif ($user->isOperatorKecamatan() && $user->id_company > 0 && $koperasi->id_kec != $user->id_company) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mengubah data koperasi kecamatan lain.');
-        }
+        $this->findVisibleKoperasi($request, (int) $koperasi->id_koperasi);
 
         $rules = [
             'name_koperasi' => 'required|string|max:255',
-            'id_kec' => 'required|integer',
-            'id_kel' => 'required|integer',
+            'id_kec' => ['required', 'integer', Rule::exists('app_md_kopkec', 'id_kopkec')->where('flag_del', 0)],
+            'id_kel' => ['required', 'integer', Rule::exists('app_md_kopkel', 'id_kopkel')
+                ->where('id_kopkec', $request->input('id_kec'))
+                ->where('flag_del', 0)],
             'no_inkop' => 'nullable|string|max:100',
             'no_ahu' => 'nullable|string|max:100',
             'tgl_ahu' => 'nullable|date',
-            'st_ops' => 'required|string',
-            'st_latih' => 'required|string',
-            'st_sertifikat' => 'required|string',
+            'st_ops' => ['required', 'string', 'in:SUDAH,BELUM'],
+            'st_latih' => ['required', 'string', 'in:SUDAH,SEBAGIAN,BELUM'],
+            'st_sertifikat' => ['required', 'string', 'in:SUDAH,BELUM'],
             'cat_koperasi' => 'nullable|string',
             'jum_anggota' => 'nullable|integer|min:0',
             'jum_pengurus' => 'nullable|integer|min:0',
@@ -735,6 +756,7 @@ class AdminController extends Controller
         }
 
         $validated = $request->validate($rules);
+        $this->authorizeKoperasiLocation($user, (int) $validated['id_kec'], (int) $validated['id_kel']);
 
         if ($request->has('has_types_input')) {
             for ($i = 1; $i <= 13; $i++) {
@@ -754,12 +776,7 @@ class AdminController extends Controller
      */
     public function destroyKoperasi(Request $request, Koperasi $koperasi)
     {
-        $user = $request->user();
-        if ($user->isOperatorDesa() && $user->id_branch > 0 && $koperasi->id_kel != $user->id_branch) {
-            abort(403, 'Anda tidak memiliki hak akses.');
-        } elseif ($user->isOperatorKecamatan() && $user->id_company > 0 && $koperasi->id_kec != $user->id_company) {
-            abort(403, 'Anda tidak memiliki hak akses.');
-        }
+        $this->findVisibleKoperasi($request, (int) $koperasi->id_koperasi);
 
         $koperasi->update(['flag_del' => 1]);
 
@@ -772,6 +789,7 @@ class AdminController extends Controller
      */
     public function updateUsahaKoperasi(Request $request, Koperasi $koperasi)
     {
+        $koperasi = $this->findVisibleKoperasi($request, (int) $koperasi->id_koperasi);
         $hasTypesInput = $request->has('has_types_input');
         $rules = [
             'cat_koperasi' => [$hasTypesInput ? 'nullable' : 'required', 'string', 'max:255'],
@@ -791,8 +809,6 @@ class AdminController extends Controller
         }
 
         if ($hasTypesInput) {
-            $koperasi = $this->findVisibleKoperasi($request, (int) $koperasi->id_koperasi);
-
             for ($index = 1; $index <= 13; $index++) {
                 $key = "id_koperasitype{$index}";
                 $updates[$key] = $request->boolean('reset_types') || ! $request->boolean($key)
@@ -815,8 +831,10 @@ class AdminController extends Controller
      */
     public function uploadFotoKoperasi(Request $request, Koperasi $koperasi)
     {
+        $this->findVisibleKoperasi($request, (int) $koperasi->id_koperasi);
+
         $request->validate([
-            'foto' => 'required|image|max:5120',
+            'foto' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         if ($request->hasFile('foto')) {
@@ -832,7 +850,8 @@ class AdminController extends Controller
      */
     public function exportKoperasi(Request $request)
     {
-        $query = Koperasi::with(['kecamatan', 'kelurahan'])->where('flag_del', 0);
+        $query = $this->visibleKoperasiQuery($request->user())
+            ->with(['kecamatan', 'kelurahan']);
 
         if ($idKec = $request->get('id_kec')) {
             $query->where('id_kec', $idKec);
@@ -868,7 +887,7 @@ class AdminController extends Controller
             fputcsv($handle, ['No', 'NI-KOP', 'Nama Koperasi', 'Nomor AHU', 'Tanggal AHU', 'Kecamatan', 'Desa/Kelurahan', 'Status Operasional', 'Status Pelatihan', 'Status Sertifikat']);
 
             foreach ($items as $idx => $kop) {
-                fputcsv($handle, [
+                fputcsv($handle, array_map([CsvSanitizer::class, 'sanitize'], [
                     $idx + 1,
                     $kop->no_inkop ?? '-',
                     $kop->name_koperasi,
@@ -879,7 +898,7 @@ class AdminController extends Controller
                     $kop->st_ops,
                     $kop->st_latih,
                     $kop->st_sertifikat,
-                ]);
+                ]));
             }
 
             fclose($handle);
@@ -893,6 +912,8 @@ class AdminController extends Controller
      */
     public function storeLampiran(Request $request): RedirectResponse
     {
+        abort_unless($request->user()->isSuperAdmin(), 403);
+
         $request->validate([
             'judul' => 'required|string|max:255',
             'keterangan' => 'nullable|string|max:255',
@@ -936,6 +957,8 @@ class AdminController extends Controller
      */
     public function updateLampiran(Request $request, LampiranInformasi $lampiran): RedirectResponse
     {
+        abort_unless($request->user()->isSuperAdmin(), 403);
+
         $request->validate([
             'judul' => 'required|string|max:255',
             'keterangan' => 'nullable|string|max:255',
@@ -988,8 +1011,10 @@ class AdminController extends Controller
     /**
      * Delete an existing document attachment.
      */
-    public function destroyLampiran(LampiranInformasi $lampiran): RedirectResponse
+    public function destroyLampiran(Request $request, LampiranInformasi $lampiran): RedirectResponse
     {
+        abort_unless($request->user()->isSuperAdmin(), 403);
+
         $dir = base_path('informasi');
         if ($lampiran->file_path && $lampiran->file_path !== 'kdkp_maret_2026.pdf') {
             $path = $dir.'/'.$lampiran->file_path;
@@ -1043,6 +1068,7 @@ class AdminController extends Controller
     public function updatePengurus(Request $request, Kopsdm $pengurus): RedirectResponse
     {
         abort_unless($pengurus->flag_del == 0, 404);
+        $this->findVisibleKoperasi($request, (int) $pengurus->id_koperasi);
 
         $validated = $request->validate([
             'id_koperasi' => 'required|integer|exists:app_md_koperasi,id_koperasi',
@@ -1099,6 +1125,9 @@ class AdminController extends Controller
         $query = Kopsdm::with(['koperasi.kecamatan', 'koperasi.kelurahan'])
             ->where('flag_del', 0);
 
+        $visibleKoperasiIds = $this->visibleKoperasiQuery($request->user())->select('id_koperasi');
+        $query->whereIn('id_koperasi', $visibleKoperasiIds);
+
         if ($idKec = $request->get('filter_kec_pengurus')) {
             $query->whereHas('koperasi', fn ($q) => $q->where('id_kec', $idKec));
         }
@@ -1138,7 +1167,7 @@ class AdminController extends Controller
             fputcsv($handle, ['No', 'Unit Koperasi', 'Kecamatan', 'Nama Pengurus', 'Jabatan', 'Kategori', 'Urutan', 'Keterangan']);
 
             foreach ($items as $idx => $sdm) {
-                fputcsv($handle, [
+                fputcsv($handle, array_map([CsvSanitizer::class, 'sanitize'], [
                     $idx + 1,
                     $sdm->koperasi?->name_koperasi ?? '-',
                     $sdm->koperasi?->kecamatan?->name_kopkec ?? '-',
@@ -1147,7 +1176,7 @@ class AdminController extends Controller
                     $sdm->type_kopsdm,
                     $sdm->order_kopsdm,
                     $sdm->comt_kopsdm,
-                ]);
+                ]));
             }
 
             fclose($handle);
@@ -1161,23 +1190,7 @@ class AdminController extends Controller
      */
     public function exportAnggota(Request $request)
     {
-        $user = $request->user();
-        $baseQuery = Koperasi::query()->where('flag_del', 0);
-        if ($user->isOperatorDesa()) {
-            if ($user->id_branch > 0) {
-                $baseQuery->where('id_kel', $user->id_branch);
-            } else {
-                $baseQuery->whereRaw('1 = 0');
-            }
-        } elseif ($user->isOperatorKecamatan()) {
-            if ($user->id_company > 0) {
-                $baseQuery->where('id_kec', $user->id_company);
-            } else {
-                $baseQuery->whereRaw('1 = 0');
-            }
-        } elseif (! $user->isSuperAdmin()) {
-            $baseQuery->whereRaw('1 = 0');
-        }
+        $baseQuery = $this->visibleKoperasiQuery($request->user());
 
         $query = (clone $baseQuery)->with(['kecamatan', 'kelurahan']);
 
@@ -1214,13 +1227,13 @@ class AdminController extends Controller
             fputcsv($handle, ['No', 'Nama Koperasi', 'Kecamatan', 'Desa/Kelurahan', 'Jumlah Anggota Terdata']);
 
             foreach ($items as $idx => $kop) {
-                fputcsv($handle, [
+                fputcsv($handle, array_map([CsvSanitizer::class, 'sanitize'], [
                     $idx + 1,
                     $kop->name_koperasi,
                     $kop->kecamatan?->name_kopkec ?? '-',
                     $kop->kelurahan?->name_kopkel ?? '-',
                     $kop->jum_anggota,
-                ]);
+                ]));
             }
 
             fclose($handle);
@@ -1231,21 +1244,55 @@ class AdminController extends Controller
 
     private function findVisibleKoperasi(Request $request, int $koperasiId): Koperasi
     {
-        $user = $request->user();
+        return $this->visibleKoperasiQuery($request->user())->findOrFail($koperasiId);
+    }
 
+    private function visibleKoperasiQuery(User $user): Builder
+    {
         abort_unless(
             $user->isSuperAdmin() || $user->isOperatorDesa() || $user->isOperatorKecamatan(),
             403
         );
 
-        $query = Koperasi::where('flag_del', 0);
+        $query = Koperasi::query()->where('flag_del', 0);
 
         if ($user->isOperatorDesa()) {
-            $query->where('id_kel', $user->id_branch);
-        } elseif ($user->isOperatorKecamatan()) {
-            $query->where('id_kec', $user->id_company);
+            return $user->id_branch > 0
+                ? $query->where('id_kel', $user->id_branch)
+                : $query->whereRaw('1 = 0');
         }
 
-        return $query->findOrFail($koperasiId);
+        if ($user->isOperatorKecamatan()) {
+            return $user->id_company > 0
+                ? $query->where('id_kec', $user->id_company)
+                : $query->whereRaw('1 = 0');
+        }
+
+        return $query;
+    }
+
+    private function authorizeKoperasiLocation(User $user, int $districtId, int $villageId): void
+    {
+        if ($user->isSuperAdmin()) {
+            return;
+        }
+
+        if ($user->isOperatorKecamatan()) {
+            abort_unless($user->id_company > 0 && (int) $user->id_company === $districtId, 404);
+
+            return;
+        }
+
+        abort_unless(
+            $user->isOperatorDesa()
+                && $user->id_branch > 0
+                && (int) $user->id_branch === $villageId
+                && Kelurahan::query()
+                    ->where('id_kopkel', $villageId)
+                    ->where('id_kopkec', $districtId)
+                    ->where('flag_del', 0)
+                    ->exists(),
+            404
+        );
     }
 }

@@ -90,4 +90,32 @@ class AdminLampiranTest extends TestCase
         $deleteResponse->assertRedirect(route('admin.dashboard', ['tab' => 'lampiran']));
         $this->assertNull(LampiranInformasi::find($lampiran->id));
     }
+
+    public function test_operator_roles_cannot_manage_global_lampiran_endpoints(): void
+    {
+        $lampiran = LampiranInformasi::firstOrFail();
+
+        foreach ([14, 15] as $role) {
+            $operator = User::create([
+                'id_user' => 8800 + $role,
+                'name_user' => 'Operator Tes',
+                'login_user' => 'operator_lampiran_'.$role,
+                'pswd' => 'password',
+                'level_user' => $role,
+                'id_company' => 1,
+                'id_branch' => 1,
+                'flag_del' => 0,
+            ]);
+
+            $this->actingAs($operator)
+                ->post(route('admin.lampiran.store'), ['judul' => 'Tidak Diizinkan'])
+                ->assertForbidden();
+            $this->put(route('admin.lampiran.update', $lampiran), ['judul' => 'Tidak Diizinkan'])
+                ->assertForbidden();
+            $this->delete(route('admin.lampiran.destroy', $lampiran))
+                ->assertForbidden();
+        }
+
+        $this->assertDatabaseHas('app_lampiran_informasi', ['id' => $lampiran->id]);
+    }
 }

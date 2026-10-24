@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kecamatan;
 use App\Models\Koperasi;
 use App\Models\LampiranInformasi;
+use App\Support\CsvSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
@@ -458,7 +459,7 @@ class DashboardController extends Controller
             fputcsv($handle, ['No', 'Kecamatan', 'Kop. Desa', 'Kop. Kelurahan', 'Total Koperasi', 'Status', 'Daftar Desa/Kelurahan']);
 
             foreach ($kecamatans as $item) {
-                fputcsv($handle, [
+                fputcsv($handle, array_map([CsvSanitizer::class, 'sanitize'], [
                     $item->nomor_urut,
                     $item->nama,
                     $item->kop_desa,
@@ -466,7 +467,7 @@ class DashboardController extends Controller
                     $item->jumlah,
                     $item->status,
                     is_array($item->daftar_desa) ? implode(', ', $item->daftar_desa) : '',
-                ]);
+                ]));
             }
 
             // Summary row
