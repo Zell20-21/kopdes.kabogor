@@ -10,16 +10,18 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-14 sm:h-16">
                 <!-- Brand / Logo -->
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2 sm:space-x-3.5 group">
+                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2.5 sm:space-x-3.5 group">
                     <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-8 sm:h-10 w-auto object-contain drop-shadow shrink-0 transition-transform group-hover:scale-105">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white flex items-center justify-center p-1 shadow-md shrink-0 border border-white/50 overflow-hidden">
-                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain">
+                    <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center p-0.5 sm:p-1 shadow-md shrink-0 border border-white/60 overflow-hidden">
+                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain scale-105">
                     </div>
-                    <div class="flex flex-col">
-                        <span class="text-base sm:text-xl font-bold tracking-tight text-white group-hover:text-red-100 transition-colors leading-tight">
-                            Dashboard KMP
+                    <div class="flex items-baseline space-x-1.5 sm:space-x-2">
+                        <span class="font-black text-white text-base sm:text-2xl tracking-tight leading-none group-hover:text-red-100 transition-colors">
+                            Dashboard
                         </span>
-                        <span class="text-[10px] sm:text-xs text-red-200 font-medium">Kabupaten Bogor</span>
+                        <span class="text-xs sm:text-base font-semibold text-red-100 tracking-tight leading-none">
+                            KMP
+                        </span>
                     </div>
                 </a>
 
@@ -341,6 +343,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentFilter = 'all';
     let matchedRows = [...rows];
 
+    // Base URL for Koperasi routes (supports cPanel subfolder & root deployment)
+    const koperasiBaseUrl = "{{ url('/koperasi') }}";
+
     // Default center Kabupaten Bogor
     let defaultLat = -6.4828;
     let defaultLng = 106.8486;
@@ -348,7 +353,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const map = L.map('kecamatanMap', {
         zoomControl: true,
         scrollWheelZoom: false,
-        dragging: true
+        dragging: true,
+        tap: false
     }).setView([defaultLat, defaultLng], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -376,16 +382,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     popupAnchor: [0, -18]
                 });
 
+                const koperasiUrl = `${koperasiBaseUrl}/${p.id}`;
                 const popupHtml = `
-                    <div class="p-1 min-w-[200px]">
-                        <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold rounded-full mb-1">
-                            ${p.desa ? 'Desa ' + p.desa : 'Koperasi Merah Putih'}
-                        </span>
+                    <div class="p-1 min-w-[210px] select-text">
+                        <div class="flex items-center justify-between gap-1 mb-1.5">
+                            <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold rounded-full">
+                                ${p.desa ? 'Desa ' + p.desa : 'Koperasi Merah Putih'}
+                            </span>
+                        </div>
                         <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-tight mb-1">
                             ${p.nama}
                         </h4>
                         ${p.alamat ? `<p class="text-[11px] text-slate-600 line-clamp-2 mb-2.5"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i>${p.alamat}</p>` : ''}
-                        <a href="/koperasi/${p.id}" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                        <a href="${koperasiUrl}" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
                             <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
                             <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                         </a>
@@ -394,11 +403,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const marker = L.marker([lat, lng], { icon: icon })
                     .addTo(map)
-                    .bindPopup(popupHtml);
+                    .bindPopup(popupHtml, { autoPan: true, closeButton: true });
 
                 markersMap[p.id] = marker;
 
-                // When user clicks marker, highlight and slide to that row
+                // When user clicks marker (logo rumah): hanya munculkan pop up card & highlight tabel, TIDAK langsung redirect
                 marker.on('click', function () {
                     highlightRow(p.id);
                 });
@@ -408,7 +417,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (bounds.length > 0) {
         map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+
+        // Auto buka popup koperasi pertama setelah peta selesai rendering
+        if (points[0] && markersMap[points[0].id]) {
+            setTimeout(() => {
+                markersMap[points[0].id].openPopup();
+                highlightRow(points[0].id);
+            }, 450);
+        }
     }
+
+    // Ensure clicks inside popup don't get swallowed by Leaflet map drag/tap on mobile
+    map.on('popupopen', function (e) {
+        const popupNode = e.popup.getElement();
+        if (popupNode) {
+            L.DomEvent.disableClickPropagation(popupNode);
+            L.DomEvent.disableScrollPropagation(popupNode);
+        }
+    });
 
     // Reset Map View
     if (btnResetMap && bounds.length > 0) {
@@ -419,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Two-way interaction: Hover/Click row in table highlights pin on map
+    // Two-way interaction: Hover highlights pin on map; Click row opens pin popup
     rows.forEach(row => {
         const id = row.getAttribute('data-id');
 
@@ -438,11 +464,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const marker = markersMap[id];
             if (marker) {
-                map.flyTo(marker.getLatLng(), 15, { duration: 0.8 });
+                map.flyTo(marker.getLatLng(), 15, { duration: 0.6 });
                 marker.openPopup();
                 highlightRow(id);
-            } else {
-                window.location.href = '/koperasi/' + id;
             }
         });
     });

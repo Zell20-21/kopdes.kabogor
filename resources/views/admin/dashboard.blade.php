@@ -150,19 +150,20 @@
                     <!-- Lambang Kabupaten Bogor (Tegar Beriman) -->
                     <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-8 sm:h-11 w-auto object-contain drop-shadow shrink-0">
 
-                    <!-- Logo KOPDES Bulat (Sesuai Desain Asli) -->
-                    <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center p-1 sm:p-1.5 shadow-md shrink-0 border border-white/50 overflow-hidden">
-                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain">
+                    <!-- Logo KOPDES Bulat (Lebih Zoom & HD) -->
+                    <div class="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center p-0.5 sm:p-1 shadow-md shrink-0 border border-white/60 overflow-hidden">
+                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain transform scale-105">
                     </div>
 
                     <div class="flex flex-col justify-center min-w-0">
                         <div class="flex items-baseline space-x-1 sm:space-x-1.5">
-                            <span class="text-base sm:text-2xl font-bold tracking-tight text-white leading-tight">
-                                Dashboard
+                            <span class="text-base sm:text-2xl font-black tracking-tight text-white leading-tight">
+                                KMP
                             </span>
-                            <span class="hidden sm:inline text-sm sm:text-base font-semibold text-red-100">
-                                {{ $isOperatorKecamatan ? 'KMP Kab. Bogor' : 'KOPERASI MERAH PUTIH' }}
+                            <span class="text-sm sm:text-base font-semibold text-red-100 tracking-tight">
+                                {{ $isOperatorKecamatan ? 'Kab. Bogor' : 'MERAH PUTIH' }}
                             </span>
+                            <span class="sr-only">KMP Kab. Bogor</span>
                             <span class="sr-only">KOPERASI MERAH PUTIH</span>
                         </div>
                         <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
@@ -4097,7 +4098,7 @@
                             </div>` : ''}
                         </div>
                     </div>
-                    <a href="/koperasi/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
+                    <a href="{{ url('/koperasi') }}/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
                         <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Lihat Profil Koperasi
                     </a>
                 </div>
@@ -4221,7 +4222,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="/koperasi/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
+                    <a href="{{ url('/koperasi') }}/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
                         <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Lihat Profil Koperasi
                     </a>
                 </div>
@@ -4992,7 +4993,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="/koperasi/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
+                    <a href="{{ url('/koperasi') }}/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
                         <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Lihat Profil Koperasi
                     </a>
                 </div>

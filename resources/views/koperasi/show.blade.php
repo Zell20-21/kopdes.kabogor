@@ -10,16 +10,18 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-14 sm:h-16">
                 <!-- Brand / Logo -->
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2 sm:space-x-3.5 group">
+                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2.5 sm:space-x-3.5 group">
                     <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-8 sm:h-10 w-auto object-contain drop-shadow shrink-0 transition-transform group-hover:scale-105">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white flex items-center justify-center p-1 shadow-md shrink-0 border border-white/50 overflow-hidden">
-                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain">
+                    <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center p-0.5 sm:p-1 shadow-md shrink-0 border border-white/60 overflow-hidden">
+                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain scale-105">
                     </div>
-                    <div class="flex flex-col">
-                        <span class="text-base sm:text-xl font-bold tracking-tight text-white group-hover:text-red-100 transition-colors leading-tight">
-                            Dashboard KMP
+                    <div class="flex items-baseline space-x-1.5 sm:space-x-2">
+                        <span class="font-black text-white text-base sm:text-2xl tracking-tight leading-none group-hover:text-red-100 transition-colors">
+                            Dashboard
                         </span>
-                        <span class="text-[10px] sm:text-xs text-red-200 font-medium">Kabupaten Bogor</span>
+                        <span class="text-xs sm:text-base font-semibold text-red-100 tracking-tight leading-none">
+                            KMP
+                        </span>
                     </div>
                 </a>
 

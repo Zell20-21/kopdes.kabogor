@@ -13,22 +13,21 @@
                     <!-- Lambang Kabupaten Bogor (Tegar Beriman) -->
                     <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-8 sm:h-11 w-auto object-contain drop-shadow shrink-0">
 
-                    <!-- Logo KOPDES Bulat (Sesuai Desain Asli) -->
-                    <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center p-1 sm:p-1.5 shadow-md shrink-0 border border-white/50 overflow-hidden">
-                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain">
+                    <!-- Logo KOPDES Bulat (Lebih Zoom & HD) -->
+                    <div class="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center p-0.5 sm:p-1 shadow-md shrink-0 border border-white/60 overflow-hidden">
+                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain transform scale-105">
                     </div>
 
                     <div class="flex flex-col justify-center min-w-0">
                         <div class="flex items-baseline space-x-1 sm:space-x-1.5">
-                            <span class="text-base sm:text-2xl font-bold tracking-tight text-white leading-tight">
+                            <span class="text-base sm:text-2xl font-black tracking-tight text-white leading-tight">
                                 Dashboard
                             </span>
-                            <span class="hidden sm:inline text-sm sm:text-base font-semibold text-red-100">
-                                KMP Kab. Bogor
-                            </span>
+                            <span class="text-sm sm:text-base font-semibold text-red-100 tracking-tight">
+                                KMP                         </span>
                         </div>
                         <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
-                            Pemerintah Daerah Kabupaten Bogor
+                            Koperasi Desa Merah Putih Kab. Bogor
                         </p>
                     </div>
                 </div>
@@ -1201,27 +1200,27 @@
 
         <div class="mt-4 space-y-3 text-xs text-slate-600 overflow-y-auto pr-1 flex-1">
             <!-- 1. UUD 1945 Pasal 33 Ayat 1 (Merah) -->
-            <div id="card-regulasi-accordion-uud-1945" class="rounded-2xl border border-red-400 bg-red-50/80 shadow-md ring-2 ring-red-200/60 overflow-hidden transition-all duration-300">
+            <div id="card-regulasi-accordion-uud-1945" class="rounded-2xl border border-red-200/80 bg-white hover:bg-red-50/30 shadow-2xs overflow-hidden transition-all duration-300">
                 <button
                     type="button"
                     onclick="toggleRegulasiAccordion('accordion-uud-1945')"
-                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer"
+                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer group"
                 >
-                    <div class="flex items-start gap-2.5">
-                        <span id="badge-regulasi-accordion-uud-1945" class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white font-black text-xs shadow-xs transition-colors">
+                    <div class="flex items-start gap-2.5 sm:gap-3">
+                        <span id="badge-regulasi-accordion-uud-1945" class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-700 font-bold text-xs shadow-2xs transition-colors">
                             1
                         </span>
                         <div>
-                            <strong id="title-regulasi-accordion-uud-1945" class="text-red-950 font-black text-sm block transition-colors">Undang-Undang Dasar 1945 Pasal 33 Ayat (1)</strong>
+                            <strong id="title-regulasi-accordion-uud-1945" class="text-slate-900 font-bold text-sm block transition-colors">Undang-Undang Dasar 1945 Pasal 33 Ayat (1)</strong>
                             <p class="mt-0.5 text-slate-600 text-[11px] leading-snug">"Perekonomian disusun sebagai usaha bersama berdasar atas asas kekeluargaan."</p>
                         </div>
                     </div>
-                    <div id="label-regulasi-accordion-uud-1945" class="flex items-center gap-1.5 shrink-0 text-red-700 text-xs font-bold transition-colors">
-                        <span class="hidden sm:inline text-[11px]">Keterangan</span>
+                    <div id="label-regulasi-accordion-uud-1945" class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 group-hover:bg-slate-200 transition-colors">
+                        <span class="hidden sm:inline text-[11px]">Rincian</span>
                         <i id="accordion-icon-accordion-uud-1945" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                     </div>
                 </button>
-                <div id="accordion-uud-1945" class="px-3.5 sm:px-4 pb-4 pt-1 border-t border-red-100/90 space-y-2.5 text-slate-700 text-xs">
+                <div id="accordion-uud-1945" class="hidden px-3.5 sm:px-4 pb-4 pt-1 border-t border-red-100/90 space-y-2.5 text-slate-700 text-xs">
                     <div class="p-3 rounded-xl bg-white/95 border border-red-100 space-y-1.5 shadow-2xs">
                         <span class="font-bold text-red-900 block text-xs uppercase tracking-wider flex items-center gap-1.5">
                             <i class="fa-solid fa-quote-left text-red-500"></i> Bunyi & Amanat Konstitusi
@@ -1262,24 +1261,24 @@
             </div>
 
             <!-- 2. UU No. 25 Tahun 1992 (Biru) -->
-            <div id="card-regulasi-accordion-uu-25-1992" class="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300">
+            <div id="card-regulasi-accordion-uu-25-1992" class="rounded-2xl border border-blue-200/80 bg-white hover:bg-blue-50/30 shadow-2xs overflow-hidden transition-all duration-300">
                 <button
                     type="button"
                     onclick="toggleRegulasiAccordion('accordion-uu-25-1992')"
-                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer"
+                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer group"
                 >
-                    <div class="flex items-start gap-2.5">
-                        <span id="badge-regulasi-accordion-uu-25-1992" class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors">
+                    <div class="flex items-start gap-2.5 sm:gap-3">
+                        <span id="badge-regulasi-accordion-uu-25-1992" class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700 font-bold text-xs shadow-2xs transition-colors">
                             2
                         </span>
                         <div>
-                            <strong id="title-regulasi-accordion-uu-25-1992" class="text-slate-800 font-bold text-sm block transition-colors">Undang-Undang No. 25 Tahun 1992 tentang Perkoperasian</strong>
+                            <strong id="title-regulasi-accordion-uu-25-1992" class="text-slate-900 font-bold text-sm block transition-colors">Undang-Undang No. 25 Tahun 1992 tentang Perkoperasian</strong>
                             <p class="mt-0.5 text-slate-600 text-[11px] leading-snug">Tata kelola kelembagaan, permodalan, dan legalitas badan hukum koperasi nasional.</p>
                         </div>
                     </div>
-                    <div id="label-regulasi-accordion-uu-25-1992" class="flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors">
-                        <span class="hidden sm:inline text-[11px]">Keterangan</span>
-                        <i id="accordion-icon-accordion-uu-25-1992" class="fa-solid fa-chevron-down text-xs transition-transform duration-300 -rotate-90"></i>
+                    <div id="label-regulasi-accordion-uu-25-1992" class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 group-hover:bg-slate-200 transition-colors">
+                        <span class="hidden sm:inline text-[11px]">Rincian</span>
+                        <i id="accordion-icon-accordion-uu-25-1992" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                     </div>
                 </button>
                 <div id="accordion-uu-25-1992" class="hidden px-3.5 sm:px-4 pb-4 pt-1 border-t border-blue-100/90 space-y-2.5 text-slate-700 text-xs">
@@ -1322,24 +1321,24 @@
             </div>
 
             <!-- 3. Keputusan Terpadu KMP Bogor (Hijau / Emerald) -->
-            <div id="card-regulasi-accordion-kmp-bogor" class="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300">
+            <div id="card-regulasi-accordion-kmp-bogor" class="rounded-2xl border border-emerald-200/80 bg-white hover:bg-emerald-50/30 shadow-2xs overflow-hidden transition-all duration-300">
                 <button
                     type="button"
                     onclick="toggleRegulasiAccordion('accordion-kmp-bogor')"
-                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer"
+                    class="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-black/5 transition cursor-pointer group"
                 >
-                    <div class="flex items-start gap-2.5">
-                        <span id="badge-regulasi-accordion-kmp-bogor" class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors">
+                    <div class="flex items-start gap-2.5 sm:gap-3">
+                        <span id="badge-regulasi-accordion-kmp-bogor" class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 font-bold text-xs shadow-2xs transition-colors">
                             3
                         </span>
                         <div>
-                            <strong id="title-regulasi-accordion-kmp-bogor" class="text-slate-800 font-bold text-sm block transition-colors">Keputusan Terpadu KMP Kabupaten Bogor TA 2025/2026</strong>
+                            <strong id="title-regulasi-accordion-kmp-bogor" class="text-slate-900 font-bold text-sm block transition-colors">Keputusan Terpadu KMP Kabupaten Bogor TA 2025/2026</strong>
                             <p class="mt-0.5 text-slate-600 text-[11px] leading-snug">Implementasi percepatan pembentukan 435 unit Koperasi Desa & Kelurahan se-Kabupaten Bogor.</p>
                         </div>
                     </div>
-                    <div id="label-regulasi-accordion-kmp-bogor" class="flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors">
-                        <span class="hidden sm:inline text-[11px]">Keterangan</span>
-                        <i id="accordion-icon-accordion-kmp-bogor" class="fa-solid fa-chevron-down text-xs transition-transform duration-300 -rotate-90"></i>
+                    <div id="label-regulasi-accordion-kmp-bogor" class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 group-hover:bg-slate-200 transition-colors">
+                        <span class="hidden sm:inline text-[11px]">Rincian</span>
+                        <i id="accordion-icon-accordion-kmp-bogor" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                     </div>
                 </button>
                 <div id="accordion-kmp-bogor" class="hidden px-3.5 sm:px-4 pb-4 pt-1 border-t border-emerald-100/90 space-y-2.5 text-slate-700 text-xs">
@@ -1698,6 +1697,7 @@
             maxZoom: 18,
             scrollWheelZoom: false,
             dragging: true,
+            tap: false,
             maxBounds: [
                 [-7.1000, 106.2000],
                 [-6.1000, 107.4500]
@@ -1865,9 +1865,10 @@
 
             const marker = L.marker([item.latitude, item.longitude], { icon: customIcon });
 
-            // Popup content exactly matching the screenshot popup card
-            const popupContent = `
-                <div class="text-xs" style="min-width: 190px;">
+                    const kecamatanBaseUrl = "{{ url('/kecamatan') }}";
+                    const kecamatanUrl = `${kecamatanBaseUrl}/${item.id}`;
+                    const popupContent = `
+                <div class="text-xs cursor-pointer" style="min-width: 190px;" onclick="window.location.href='${kecamatanUrl}'">
                     <div class="font-bold text-slate-800 uppercase tracking-tight text-sm pb-1.5 mb-2 border-b border-red-100 flex items-center justify-between">
                         <span class="text-red-700">KECAMATAN ${item.nama}</span>
                     </div>
@@ -1885,7 +1886,7 @@
                             <strong class="font-black text-red-600">${item.jumlah} Kop</strong>
                         </div>
                     </div>
-                    <a href="/kecamatan/${item.id}" style="color: #ffffff !important;" class="w-full text-center py-2 px-3 bg-red-700 hover:bg-red-800 !text-white rounded-lg font-black text-xs transition shadow-sm flex items-center justify-center space-x-1.5 cursor-pointer">
+                    <a href="${kecamatanUrl}" onclick="event.stopPropagation(); window.location.href='${kecamatanUrl}'; return true;" style="color: #ffffff !important;" class="w-full text-center py-2 px-3 bg-red-700 hover:bg-red-800 !text-white rounded-lg font-black text-xs transition shadow-sm flex items-center justify-center space-x-1.5 cursor-pointer">
                         <span style="color: #ffffff !important;" class="!text-white font-black">Lihat Profil Kecamatan</span>
                         <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                     </a>
@@ -2251,16 +2252,16 @@
             titleId: 'title-regulasi-accordion-uud-1945',
             labelId: 'label-regulasi-accordion-uud-1945',
             active: {
-                card: 'rounded-2xl border border-red-400 bg-red-50/80 shadow-md ring-2 ring-red-200/60 overflow-hidden transition-all duration-300',
-                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white font-black text-xs shadow-xs transition-colors',
+                card: 'rounded-2xl border border-red-400 bg-red-50/70 shadow-md ring-2 ring-red-200/60 overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white font-black text-xs shadow-xs transition-colors',
                 title: 'text-red-950 font-black text-sm block transition-colors',
-                label: 'flex items-center gap-1.5 shrink-0 text-red-700 text-xs font-bold transition-colors'
+                label: 'flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 transition-colors'
             },
             inactive: {
-                card: 'rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300',
-                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors',
-                title: 'text-slate-800 font-bold text-sm block transition-colors',
-                label: 'flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors'
+                card: 'rounded-2xl border border-red-200/80 bg-white hover:bg-red-50/30 shadow-2xs overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-700 font-bold text-xs shadow-2xs transition-colors',
+                title: 'text-slate-900 font-bold text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 group-hover:bg-slate-200 transition-colors'
             }
         },
         'accordion-uu-25-1992': {
@@ -2269,16 +2270,16 @@
             titleId: 'title-regulasi-accordion-uu-25-1992',
             labelId: 'label-regulasi-accordion-uu-25-1992',
             active: {
-                card: 'rounded-2xl border border-blue-400 bg-blue-50/80 shadow-md ring-2 ring-blue-200/60 overflow-hidden transition-all duration-300',
-                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white font-black text-xs shadow-xs transition-colors',
+                card: 'rounded-2xl border border-blue-400 bg-blue-50/70 shadow-md ring-2 ring-blue-200/60 overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white font-black text-xs shadow-xs transition-colors',
                 title: 'text-blue-950 font-black text-sm block transition-colors',
-                label: 'flex items-center gap-1.5 shrink-0 text-blue-700 text-xs font-bold transition-colors'
+                label: 'flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 transition-colors'
             },
             inactive: {
-                card: 'rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300',
-                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors',
-                title: 'text-slate-800 font-bold text-sm block transition-colors',
-                label: 'flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors'
+                card: 'rounded-2xl border border-blue-200/80 bg-white hover:bg-blue-50/30 shadow-2xs overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700 font-bold text-xs shadow-2xs transition-colors',
+                title: 'text-slate-900 font-bold text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 group-hover:bg-slate-200 transition-colors'
             }
         },
         'accordion-kmp-bogor': {
@@ -2287,16 +2288,16 @@
             titleId: 'title-regulasi-accordion-kmp-bogor',
             labelId: 'label-regulasi-accordion-kmp-bogor',
             active: {
-                card: 'rounded-2xl border border-emerald-400 bg-emerald-50/80 shadow-md ring-2 ring-emerald-200/60 overflow-hidden transition-all duration-300',
-                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white font-black text-xs shadow-xs transition-colors',
+                card: 'rounded-2xl border border-emerald-400 bg-emerald-50/70 shadow-md ring-2 ring-emerald-200/60 overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black text-xs shadow-xs transition-colors',
                 title: 'text-emerald-950 font-black text-sm block transition-colors',
-                label: 'flex items-center gap-1.5 shrink-0 text-emerald-700 text-xs font-bold transition-colors'
+                label: 'flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 transition-colors'
             },
             inactive: {
-                card: 'rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 shadow-2xs overflow-hidden transition-all duration-300',
-                badge: 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-colors',
-                title: 'text-slate-800 font-bold text-sm block transition-colors',
-                label: 'flex items-center gap-1.5 shrink-0 text-slate-500 text-xs font-semibold transition-colors'
+                card: 'rounded-2xl border border-emerald-200/80 bg-white hover:bg-emerald-50/30 shadow-2xs overflow-hidden transition-all duration-300',
+                badge: 'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 font-bold text-xs shadow-2xs transition-colors',
+                title: 'text-slate-900 font-bold text-sm block transition-colors',
+                label: 'flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 group-hover:bg-slate-200 transition-colors'
             }
         }
     };
@@ -2341,8 +2342,7 @@
             const icon = document.getElementById('accordion-icon-' + otherId);
             if (content) content.classList.add('hidden');
             if (icon) {
-                icon.classList.add('-rotate-90');
-                icon.classList.remove('rotate-0');
+                icon.classList.remove('rotate-180');
             }
             setRegulasiTheme(otherId, false);
         });
@@ -2351,8 +2351,7 @@
         if (isCurrentlyHidden) {
             targetContent.classList.remove('hidden');
             if (targetIcon) {
-                targetIcon.classList.remove('-rotate-90');
-                targetIcon.classList.add('rotate-0');
+                targetIcon.classList.add('rotate-180');
             }
             setRegulasiTheme(id, true);
         }
