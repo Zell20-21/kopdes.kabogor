@@ -263,110 +263,6 @@
                     </div>
                 </div>
 
-                <!-- Trigger Button: Lihat Detail Fasilitas (Di Bawah Card Capaian Agregat) -->
-                @php
-                    $totalUnitFasilitas = array_sum(array_column($fasilitasOptions, 'count'));
-                @endphp
-                <div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div class="flex items-center space-x-2.5 text-xs text-slate-600">
-                        <span class="w-7 h-7 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">
-                            <i class="fa-solid fa-shop"></i>
-                        </span>
-                        <div>
-                            <span class="font-bold text-slate-800">Fasilitas & Gerai KDKMP:</span>
-                            <span class="text-slate-500 ml-1">13 Fasilitas ({{ $totalUnitFasilitas }} Unit Tersebar di Kab. Bogor)</span>
-                        </div>
-                    </div>
-                    <button
-                        type="button"
-                        onclick="toggleFacilitiesCard()"
-                        id="btnToggleFacilities"
-                        class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 active:scale-95 cursor-pointer self-start sm:self-auto shrink-0"
-                    >
-                        <span id="labelToggleFacilities">Lihat Detail Fasilitas</span>
-                        <i id="iconToggleFacilities" class="fa-solid fa-chevron-down text-[10px] transition-transform duration-300"></i>
-                    </button>
-                </div>
-
-                <!-- Section Fasilitas & Gerai KDKMP (Dropdown Turun ke Bawah, Hidden by Default) -->
-                <div id="facilitiesDropdownWrapper" class="hidden mt-4 pt-4 border-t border-dashed border-slate-200 space-y-3 transition-all duration-300 ease-in-out">
-                    <div class="mb-3">
-                        <h4 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-2">
-                            <i class="fa-solid fa-shop text-red-600"></i>
-                            <span>Jenis Fasilitas & Gerai KDKMP Kabupaten Bogor:</span>
-                        </h4>
-                        <p class="text-[11px] text-slate-500 mt-0.5">
-                            Klik tombol gerai di bawah untuk memfilter dan menampilkan sebaran titik lokasinya langsung di peta wilayah:
-                        </p>
-                    </div>
-
-                    <!-- 6 Featured Facility Buttons -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-                        @foreach(array_filter($fasilitasOptions, fn($f) => $f['featured']) as $item)
-                            <button
-                                type="button"
-                                onclick="filterMapByFacility({{ json_encode($item['type_ids']) }}, '{{ $item['nama'] }}', '{{ $item['bg'] }}', this)"
-                                class="facility-filter-btn group p-3 rounded-xl border flex flex-col justify-between text-left {{ $item['bg'] }} transition-all duration-200 hover:shadow-md transform active:scale-95 cursor-pointer relative"
-                                data-type-ids="{{ json_encode($item['type_ids']) }}"
-                                data-name="{{ $item['nama'] }}"
-                                title="Klik untuk memfilter {{ $item['nama'] }} di Peta"
-                            >
-                                <div class="flex items-center justify-between w-full mb-1">
-                                    <i class="{{ $item['icon'] }} text-base"></i>
-                                    <span class="text-[10px] font-black px-2 py-0.5 rounded-full {{ $item['badge'] }} text-white shadow-2xs">
-                                        {{ $item['count'] }} Unit
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-xs truncate leading-tight">{{ $item['nama'] }}</div>
-                                    <span class="text-[10px] opacity-75 group-hover:opacity-100 flex items-center space-x-1 mt-0.5 font-medium">
-                                        <span>Lihat di Peta</span>
-                                        <i class="fa-solid fa-arrow-down text-[9px] transform group-hover:translate-y-0.5 transition-transform"></i>
-                                    </span>
-                                </div>
-                            </button>
-                        @endforeach
-                    </div>
-
-                    <!-- Opsi Gerai Tambahan & Layanan Khusus Lainnya (7 Fasilitas, Langsung Ditampilkan Semua) -->
-                    <div class="mt-3 pt-3 border-t border-dashed border-slate-200 space-y-2">
-                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
-                            Opsi Gerai Tambahan & Layanan Khusus Lainnya:
-                        </div>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
-                            @foreach(array_filter($fasilitasOptions, fn($f) => !$f['featured']) as $item)
-                                <button
-                                    type="button"
-                                    onclick="filterMapByFacility({{ json_encode($item['type_ids']) }}, '{{ $item['nama'] }}', '{{ $item['bg'] }}', this)"
-                                    class="facility-filter-btn group p-2.5 rounded-xl border flex flex-col justify-between text-left {{ $item['bg'] }} transition-all duration-200 hover:shadow-md transform active:scale-95 cursor-pointer"
-                                    data-type-ids="{{ json_encode($item['type_ids']) }}"
-                                    data-name="{{ $item['nama'] }}"
-                                    title="Klik untuk memfilter {{ $item['nama'] }} di Peta"
-                                >
-                                    <div class="flex items-center justify-between w-full mb-1">
-                                        <i class="{{ $item['icon'] }} text-sm"></i>
-                                        <span class="text-[10px] font-black px-1.5 py-0.2 rounded-full {{ $item['badge'] }} text-white">
-                                            {{ $item['count'] }} Unit
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-[11px] truncate leading-tight">{{ $item['nama'] }}</div>
-                                        <span class="text-[9px] opacity-75 group-hover:opacity-100 flex items-center space-x-1 mt-0.5 font-medium">
-                                            <span>Lihat di Peta</span>
-                                            <i class="fa-solid fa-arrow-down text-[8px]"></i>
-                                        </span>
-                                    </div>
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card Footer Status -->
-                <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>Visi Nyata Ekonomi Berdikari</span>
-                    <span class="font-medium text-slate-600">Merah Putih untuk Indonesia Maju</span>
-                </div>
             </div>
 
             <!-- Section 2: Informasi Koperasi Merah Putih (Potensi, Jenis Usaha, SDM Koperasi & Dokumen Progres) -->
@@ -713,15 +609,15 @@
                             </p>
 
                             <!-- List breakdown jenis usaha with progress bars -->
-                            <div class="mt-3 space-y-2.5 text-xs">
+                            <div class="mt-3 space-y-2.5 text-xs max-h-[285px] overflow-y-auto pr-1.5">
                                 @foreach($jenisUsaha as $usaha)
                                     <div>
                                         <div class="flex justify-between items-center text-slate-700 mb-1">
-                                            <span class="font-medium truncate pr-2">{{ $usaha['nama'] }}</span>
+                                            <span class="font-medium truncate pr-2" title="{{ $usaha['nama'] }}">{{ $usaha['nama'] }}</span>
                                             <span class="font-bold text-slate-800 shrink-0">{{ $usaha['jumlah'] }} KMP ({{ number_format($usaha['persentase'], 2) }}%)</span>
                                         </div>
                                         <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                            <div class="{{ $usaha['color'] }} h-1.5 rounded-full" style="width: {{ min(100, max(2, $usaha['persentase'])) }}%"></div>
+                                            <div class="{{ $usaha['color'] }} h-1.5 rounded-full" style="width: {{ min(100, max($usaha['jumlah'] > 0 ? 2 : 0, $usaha['persentase'])) }}%"></div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -730,7 +626,7 @@
 
                         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                             <span>Fasilitas Terdaftar</span>
-                            <span class="font-semibold text-slate-700">250 Unit Operasional</span>
+                            <span class="font-semibold text-slate-700">{{ number_format($totalFasilitasTerdaftar ?? 0) }} Unit Terdata</span>
                         </div>
                     </div>
 
@@ -808,11 +704,6 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2.5">
-                        <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
-                            <span class="w-2 h-2 rounded-full bg-red-600"></span>
-                            <span>435 Kecamatan/Desa Terdata</span>
-                        </span>
-
                         <a href="{{ route('export.rekapitulasi') }}" class="inline-flex items-center space-x-2 bg-red-700 hover:bg-red-800 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm transition hover:shadow">
                             <i class="fa-solid fa-file-arrow-down"></i>
                             <span>Export ODK / XLS</span>
@@ -1102,21 +993,21 @@
                             <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white mt-0.5">
                                 <i class="fa-solid fa-location-dot"></i>
                             </div>
-                            <span class="leading-relaxed">Jl. Tegar Beriman No.1, Pakansari, Kec. Cibinong, Kabupaten Bogor, Jawa Barat 16914</span>
+                            <span class="leading-relaxed">Jalan KSR Dadi Kusmayadi, Kelurahan Tengah Cibinong, Bogor, Jawa Barat 16941, Indonesia</span>
                         </div>
 
                         <div class="flex items-center space-x-3">
                             <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white">
                                 <i class="fa-solid fa-phone"></i>
                             </div>
-                            <span>(021) 8758605</span>
+                            <span>081112004044</span>
                         </div>
 
                         <div class="flex items-center space-x-3">
                             <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white">
                                 <i class="fa-regular fa-envelope"></i>
                             </div>
-                            <span>diskop@bogorkab.go.id</span>
+                            <span> diskopukm@bogorkab.go.id</span>
                         </div>
                     </div>
                 </div>
@@ -1649,36 +1540,6 @@
         });
     }
 
-    // Toggle Card Jenis Fasilitas & Gerai (Dropdown Turun Kebawah Memunculkan Kartu Fasilitas)
-    function toggleFacilitiesCard() {
-        const wrapper = document.getElementById('facilitiesDropdownWrapper');
-        const label = document.getElementById('labelToggleFacilities');
-        const icon = document.getElementById('iconToggleFacilities');
-        const btn = document.getElementById('btnToggleFacilities');
-
-        if (!wrapper || !label || !icon) return;
-
-        if (wrapper.classList.contains('hidden')) {
-            wrapper.classList.remove('hidden');
-            wrapper.classList.add('animate-slide-down');
-            label.innerText = 'Tutup Detail Fasilitas';
-            icon.classList.add('rotate-180');
-            if (btn) {
-                btn.classList.add('bg-slate-800', 'hover:bg-slate-900');
-                btn.classList.remove('bg-red-600', 'hover:bg-red-700');
-            }
-        } else {
-            wrapper.classList.add('hidden');
-            wrapper.classList.remove('animate-slide-down');
-            label.innerText = 'Lihat Detail Fasilitas';
-            icon.classList.remove('rotate-180');
-            if (btn) {
-                btn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
-                btn.classList.add('bg-red-600', 'hover:bg-red-700');
-            }
-        }
-    }
-
     // ==========================================
     // 2. LEAFLET MAP & GEOSPATIAL LOGIC
     // ==========================================
@@ -1878,9 +1739,9 @@
 
             const marker = L.marker([item.latitude, item.longitude], { icon: customIcon });
 
-                    const kecamatanBaseUrl = "{{ url('/kecamatan') }}";
-                    const kecamatanUrl = `${kecamatanBaseUrl}/${item.id}`;
-                    const popupContent = `
+            const kecamatanBaseUrl = "{{ url('/kecamatan') }}";
+            const kecamatanUrl = `${kecamatanBaseUrl}/${item.id}`;
+            const popupContent = `
                 <div class="text-xs cursor-pointer" style="min-width: 190px;" onclick="window.location.href='${kecamatanUrl}'">
                     <div class="font-bold text-slate-800 uppercase tracking-tight text-sm pb-1.5 mb-2 border-b border-red-100 flex items-center justify-between">
                         <span class="text-red-700">KECAMATAN ${item.nama}</span>

@@ -241,15 +241,63 @@ class DashboardController extends Controller
             ];
         }
 
-        $jenisUsaha = [
-            ['nama' => 'Kios Mini Cafe', 'jumlah' => 224, 'persentase' => 51.49, 'color' => 'bg-emerald-500'],
-            ['nama' => 'Gerai Kantor Koperasi', 'jumlah' => 154, 'persentase' => 35.40, 'color' => 'bg-rose-500'],
-            ['nama' => 'Gerai Sembako', 'jumlah' => 72, 'persentase' => 16.55, 'color' => 'bg-blue-500'],
-            ['nama' => 'Pangkalan LPG', 'jumlah' => 5, 'persentase' => 1.15, 'color' => 'bg-cyan-500'],
-            ['nama' => 'Gerai Apotek Desa', 'jumlah' => 0, 'persentase' => 0.00, 'color' => 'bg-slate-300'],
-            ['nama' => 'Kios Pupuk & Simpan Pinjam', 'jumlah' => 8, 'persentase' => 1.84, 'color' => 'bg-amber-500'],
-            ['nama' => 'Logistik & Cold Chain', 'jumlah' => 2, 'persentase' => 0.46, 'color' => 'bg-indigo-500'],
+        $typeCounts = [];
+        for ($i = 1; $i <= 13; $i++) {
+            $typeCounts[$i] = $koperasiList->filter(function ($k) use ($i) {
+                return strtolower((string) $k->{'id_koperasitype'.$i}) === 'yes';
+            })->count();
+        }
+
+        // Sinkronisasi jumlah count pada fasilitasOptions dengan data riil database
+        foreach ($fasilitasOptions as &$fOpt) {
+            $fOpt['count'] = $koperasiList->filter(function ($k) use ($fOpt) {
+                foreach ($fOpt['type_ids'] as $tid) {
+                    if (strtolower((string) $k->{'id_koperasitype'.$tid}) === 'yes') {
+                        return true;
+                    }
+                }
+
+                return false;
+            })->count();
+        }
+        unset($fOpt);
+
+        // Metadata 13 Jenis Usaha & Gerai/Kios KDKMP Kabupaten Bogor
+        $typeMeta = [
+            1 => ['nama' => 'Gerai Sembako', 'color' => 'bg-emerald-500'],
+            2 => ['nama' => 'Gerai Apotek Desa', 'color' => 'bg-pink-500'],
+            3 => ['nama' => 'Gerai Kantor Koperasi', 'color' => 'bg-blue-500'],
+            4 => ['nama' => 'Unit Usaha Simpan Pinjam', 'color' => 'bg-violet-500'],
+            5 => ['nama' => 'Gerai Klinik Desa', 'color' => 'bg-rose-500'],
+            6 => ['nama' => 'Cold Storage / Cold Chain', 'color' => 'bg-cyan-500'],
+            7 => ['nama' => 'Gerai Logistik (Distribusi)', 'color' => 'bg-orange-500'],
+            8 => ['nama' => 'Usaha Lainnya (KBLI 2020)', 'color' => 'bg-slate-400'],
+            9 => ['nama' => 'Gerai Kios Pupuk', 'color' => 'bg-lime-500'],
+            10 => ['nama' => 'Gerai Pangkalan LPG', 'color' => 'bg-amber-500'],
+            11 => ['nama' => 'Gerai Agen Pos Indonesia', 'color' => 'bg-yellow-500'],
+            12 => ['nama' => 'Gerai Agen Laku Pandai', 'color' => 'bg-teal-500'],
+            13 => ['nama' => 'Akun Microsite Resmi', 'color' => 'bg-sky-500'],
         ];
+
+        $jenisUsaha = [];
+        $totalFasilitasTerdaftar = 0;
+
+        foreach ($typeMeta as $id => $meta) {
+            $count = $typeCounts[$id] ?? 0;
+            $totalFasilitasTerdaftar += $count;
+            $pct = $totalKoperasi > 0 ? round(($count / $totalKoperasi) * 100, 2) : 0;
+
+            $jenisUsaha[] = [
+                'id' => $id,
+                'nama' => $meta['nama'],
+                'jumlah' => $count,
+                'persentase' => $pct,
+                'color' => $meta['color'],
+            ];
+        }
+
+        // Urutkan berdasarkan jumlah unit terbanyak
+        usort($jenisUsaha, fn ($a, $b) => $b['jumlah'] <=> $a['jumlah']);
 
         $sdmKoperasi = [
             ['no' => 1, 'kategori' => 'Pengurus Domisili', 'jumlah' => 2610, 'persen' => '11.14%'],
@@ -315,6 +363,7 @@ class DashboardController extends Controller
             'timelineSlides',
             'koperasiMapPoints',
             'jenisUsaha',
+            'totalFasilitasTerdaftar',
             'sdmKoperasi',
             'totalSdm',
             'informasiFiles'
