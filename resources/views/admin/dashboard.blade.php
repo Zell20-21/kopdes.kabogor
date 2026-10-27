@@ -18,6 +18,32 @@
         border-top-color: rgba(15, 23, 42, 0.90) !important;
     }
 
+    .kec-icon-container {
+        background: transparent !important;
+        border: none !important;
+    }
+    .custom-kec-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #0284c7, #0369a1);
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        color: #ffffff;
+        font-size: 13px;
+        box-shadow: 0 4px 10px rgba(2, 132, 199, 0.45);
+        cursor: pointer;
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .custom-kec-marker:hover, .custom-kec-marker.active-pin {
+        transform: scale(1.25);
+        background: linear-gradient(135deg, #dc2626, #991b1b);
+        box-shadow: 0 6px 16px rgba(220, 38, 38, 0.6);
+        z-index: 9999 !important;
+    }
+
     @if($user->isOperatorKecamatan())
         [data-dashboard-shell="operator-kecamatan"] {
             --desk-accent: #9f1239;
@@ -1011,14 +1037,14 @@
                             <div class="absolute bottom-3 left-3 z-20 pointer-events-none bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-slate-200 shadow-md text-[11px] text-slate-700 space-y-1">
                                 <div class="font-bold text-slate-800 flex items-center space-x-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
-                                    <span>Wilayah: Kabupaten Bogor</span>
+                                    <span id="adminMapLegendWilayah">{{ $isOperator && $kecamatans->first() ? 'Wilayah: Kecamatan ' . $kecamatans->first()->name_kopkec : 'Wilayah: Kabupaten Bogor' }}</span>
                                 </div>
                                 <div class="flex items-center space-x-1.5 text-[10px] text-sky-700 font-semibold pt-0.5 border-t border-slate-100">
                                     <span class="w-3 h-1 bg-sky-500 rounded-sm"></span>
-                                    <span>Batas 40 Kecamatan</span>
+                                    <span id="adminMapLegendSub">{{ $isOperator ? 'Batas Wilayah Kecamatan' : 'Batas 40 Kecamatan' }}</span>
                                 </div>
                                 <div class="text-[10px] text-slate-500" id="adminMapLegendDetail">
-                                    Pusat Pemerintahan: Cibinong (-6.4828, 106.8486)
+                                    {{ $isOperator && $kecamatans->first() ? 'Kecamatan ' . $kecamatans->first()->name_kopkec . ' • ' . $gisKoperasis->count() . ' Koperasi' : 'Pusat Pemerintahan: Cibinong (-6.4828, 106.8486)' }}
                                 </div>
                             </div>
                         </div>
@@ -3479,9 +3505,13 @@
 <script>
     const kecamatansData = @json($kecamatansData);
     const gisKoperasisData = @json($gisKoperasis ?? []);
+    const isOperator = @json($isOperator);
+    const isOperatorKecamatan = @json($user->isOperatorKecamatan());
+    const isOperatorDesa = @json($user->isOperatorDesa());
+    const assignedKecamatanId = @json($assignedKecamatanId);
     const selectedKecId = @json($isOperator ? $assignedKecamatanId : request('id_kec', ''));
     const selectedKelId = @json($user->isOperatorDesa() ? $user->id_branch : request('id_kel', ''));
-    const isOperatorDesa = @json($user->isOperatorDesa());
+    const koperasiBaseUrl = @json(url('/koperasi'));
 
     function updateDesaDropdown(kecId, targetSelectId = 'filter_id_kel', selectedVal = selectedKelId) {
         const select = document.getElementById(targetSelectId);
@@ -3818,11 +3848,11 @@
 
         mapInstance = L.map('gis-koperasi-map', {
             center: bogorCenter,
-            zoom: 11,
-            minZoom: 9,
+            zoom: isOperator ? 12 : 11,
+            minZoom: isOperator ? 10 : 9,
             maxZoom: 18,
             scrollWheelZoom: false,
-            maxBounds: [
+            maxBounds: isOperator ? null : [
                 [-7.1000, 106.2000],
                 [-6.1000, 107.4500]
             ],
@@ -3845,25 +3875,95 @@
             maxZoom: 17
         });
 
+        // Initialize Coop Marker Layer right away so it is never null
+        adminCoopMarkerLayer = L.layerGroup().addTo(mapInstance);
+
         // 1. Add Subdistrict Boundary Polygons (Garis Antar Kecamatan Kabupaten Bogor)
         renderAdminKecamatanBoundaries();
 
-        // 2. Add Kecamatan Red Pin Summary Markers (like public)
-        adminKecamatanMarkersLayer = L.layerGroup().addTo(mapInstance);
-        renderAdminKecamatanMarkers();
+        if (isOperator) {
+            // Untuk Operator: Peta HANYA mencakup wilayah kecamatan itu saja & tampilkan SEMUA koperasi di kecamatan itu
+            const operatorKecId = String(assignedKecamatanId || selectedKecId || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''));
+            const cleanKecName = kecamatansData[0] ? (kecamatansData[0].name_kopkec || kecamatansData[0].nama || '').toUpperCase().trim() : '';
+            const targetPolygon = adminPolygonLayersMap[operatorKecId] || (cleanKecName ? adminPolygonLayersMap[cleanKecName] : null);
 
-        // Fit initial view to Kabupaten Bogor
-        mapInstance.fitBounds(bogorBounds);
+            // Highlight poligon kecamatan operator, samarkan batas kecamatan lain
+            if (adminKecamatanBoundaryLayer) {
+                adminKecamatanBoundaryLayer.eachLayer(layer => {
+                    if (layer === targetPolygon) {
+                        layer.setStyle({
+                            weight: 3.2,
+                            color: '#0284c7',
+                            fillColor: '#38bdf8',
+                            fillOpacity: 0.35
+                        });
+                        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                            layer.bringToFront();
+                        }
+                    } else {
+                        layer.setStyle({
+                            weight: 1,
+                            color: '#cbd5e1',
+                            fillColor: '#f1f5f9',
+                            fillOpacity: 0.05
+                        });
+                    }
+                });
+            }
 
-        // Check if desa or kecamatan is selected to zoom and pinpoint
-        if (selectedKelId) {
-            setTimeout(() => {
-                zoomToAdminDesa(selectedKelId, true);
-            }, 350);
-        } else if (selectedKecId) {
-            setTimeout(() => {
-                zoomToAdminKecamatan(selectedKecId, true);
-            }, 300);
+            // Tampilkan SEMUA koperasi di kecamatan tersebut sebagai marker individual
+            renderAdminKecamatanCoops(operatorKecId);
+
+            // Batasi peta agar HANYA mencakup wilayah kecamatan itu saja
+            let boundsToFit = null;
+            if (targetPolygon) {
+                boundsToFit = targetPolygon.getBounds();
+            } else {
+                const coopBounds = [];
+                gisKoperasisData.forEach(c => {
+                    const lat = parseFloat(c.gps_lat);
+                    const lng = parseFloat(c.gps_long);
+                    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                        coopBounds.push([lat, lng]);
+                    }
+                });
+                if (coopBounds.length > 0) {
+                    boundsToFit = L.latLngBounds(coopBounds);
+                }
+            }
+
+            if (boundsToFit && boundsToFit.isValid()) {
+                mapInstance.fitBounds(boundsToFit, { padding: [30, 30] });
+                mapInstance.setMinZoom(11);
+                mapInstance.setMaxBounds(boundsToFit.pad(0.35));
+            } else {
+                mapInstance.fitBounds(bogorBounds);
+            }
+
+            // Jika ada filter desa spesifik terpilih, sorot desa tersebut
+            if (selectedKelId) {
+                setTimeout(() => {
+                    zoomToAdminDesa(selectedKelId, true);
+                }, 400);
+            }
+        } else {
+            // Mode Superadmin: Tampilkan ringkasan pin seluruh 40 kecamatan
+            adminKecamatanMarkersLayer = L.layerGroup().addTo(mapInstance);
+            renderAdminKecamatanMarkers();
+
+            // Fit initial view to Kabupaten Bogor
+            mapInstance.fitBounds(bogorBounds);
+
+            // Check if desa or kecamatan is selected to zoom and pinpoint
+            if (selectedKelId) {
+                setTimeout(() => {
+                    zoomToAdminDesa(selectedKelId, true);
+                }, 350);
+            } else if (selectedKecId) {
+                setTimeout(() => {
+                    zoomToAdminKecamatan(selectedKecId, true);
+                }, 300);
+            }
         }
 
         setTimeout(() => updateAdminKoperasiLayerGlider(activeLayerKey), 80);
@@ -3926,11 +4026,19 @@
                     },
                     mouseout: function (e) {
                         const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_id_kec')?.value);
-                        if (!isSelected && adminKecamatanBoundaryLayer) {
+                        if (!isSelected && adminKecamatanBoundaryLayer && !isOperator) {
                             adminKecamatanBoundaryLayer.resetStyle(e.target);
                         }
                     },
                     click: function (e) {
+                        if (isOperator) {
+                            if (targetKec) {
+                                renderAdminKecamatanCoops(targetKec.id_kopkec);
+                                const bounds = targetPolygon ? targetPolygon.getBounds() : null;
+                                if (bounds) mapInstance.fitBounds(bounds, { padding: [30, 30] });
+                            }
+                            return;
+                        }
                         if (targetKec) {
                             selectAdminKecamatanFromMap(targetKec.id_kopkec);
                         }
@@ -4016,9 +4124,18 @@
         if (!adminCoopMarkerLayer) {
             adminCoopMarkerLayer = L.layerGroup().addTo(mapInstance);
         }
-        adminCoopMarkerLayer.clearLayers();
 
         if (!kelId) {
+            if (isOperator) {
+                renderAdminKecamatanCoops(assignedKecamatanId);
+                const operatorKecId = String(assignedKecamatanId || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''));
+                const cleanKecName = kecamatansData[0] ? (kecamatansData[0].name_kopkec || kecamatansData[0].nama || '').toUpperCase().trim() : '';
+                const targetPolygon = adminPolygonLayersMap[operatorKecId] || (cleanKecName ? adminPolygonLayersMap[cleanKecName] : null);
+                if (targetPolygon) {
+                    mapInstance.flyToBounds(targetPolygon.getBounds(), { padding: [30, 30], duration: 1.2 });
+                }
+                return;
+            }
             if (selectedKecId) {
                 zoomToAdminKecamatan(selectedKecId, true);
             } else {
@@ -4048,58 +4165,55 @@
             const kecName = coop.kecamatan ? (coop.kecamatan.name_kopkec || '') : '';
 
             const coopMarkerHtml = `
-                <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
-                    <span class="absolute w-12 h-12 rounded-full bg-red-600/35 animate-ping pointer-events-none"></span>
-                    <span class="absolute w-8 h-8 rounded-full bg-red-600/45 pointer-events-none"></span>
-                    <div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-red-700 to-rose-500 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm cursor-pointer hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-store"></i>
-                    </div>
-                    <div class="absolute -bottom-6 whitespace-nowrap bg-slate-900/90 text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-md border border-slate-700 pointer-events-none">
-                        ${coop.name_koperasi}
-                    </div>
+                <div class="custom-kec-marker active-pin" id="admin-coop-pin-${coop.id_koperasi}" title="${coop.name_koperasi}">
+                    <i class="fa-solid fa-store"></i>
                 </div>
             `;
 
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
+                    className: 'kec-icon-container',
                     html: coopMarkerHtml,
-                    className: '',
-                    iconSize: [0, 0],
-                    iconAnchor: [0, 0],
-                    popupAnchor: [0, -20]
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18],
+                    popupAnchor: [0, -18]
                 }),
-                zIndexOffset: 1200
+                zIndexOffset: 1500
+            });
+
+            marker.bindTooltip(coop.name_koperasi, {
+                direction: 'top',
+                offset: [0, -18],
+                className: 'kecamatan-tooltip'
             });
 
             const popupContent = `
-                <div class="p-2.5 text-xs" style="min-width: 250px;">
-                    <div class="flex items-center space-x-1.5 pb-2 mb-2 border-b border-red-100">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
-                        <span class="font-extrabold text-slate-900 text-xs uppercase leading-snug">${coop.name_koperasi}</span>
+                <div class="p-2.5 text-xs select-text" style="min-width: 230px; max-width: 290px;">
+                    <div class="flex items-center justify-between gap-1 pb-1.5 mb-2 border-b border-red-100">
+                        <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold rounded-full">
+                            ${desaName ? 'Desa ' + desaName : 'Koperasi Merah Putih'}
+                        </span>
+                        <span class="text-[10px] font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">
+                            ${coop.st_ops || 'SUDAH'}
+                        </span>
                     </div>
-                    <div class="space-y-1.5 mb-3 text-[11px] text-slate-600">
+                    <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-snug mb-2">
+                        ${coop.name_koperasi}
+                    </h4>
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 space-y-1 text-[11px] text-slate-600 mb-2.5">
                         <div class="flex items-start space-x-1.5">
-                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0"></i>
+                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0 text-xs"></i>
                             <span>Desa <strong>${desaName}</strong>, Kec. <strong>${kecName}</strong></span>
                         </div>
-                        <div class="bg-red-50/70 p-2 rounded-lg border border-red-100/80 space-y-1 text-[10px]">
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Koordinat GPS:</span>
-                                <span class="font-mono font-bold text-slate-800">${lat.toFixed(5)}, ${lng.toFixed(5)}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Status Operasi:</span>
-                                <span class="font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">${coop.st_ops || 'SUDAH'}</span>
-                            </div>
-                            ${coop.no_ahu ? `
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">No. AHU:</span>
-                                <span class="font-mono text-slate-800 font-semibold">${coop.no_ahu}</span>
-                            </div>` : ''}
-                        </div>
+                        ${coop.no_ahu && coop.no_ahu !== 'BELUM' ? `
+                        <div class="flex items-center space-x-1.5 text-[10px] text-slate-500">
+                            <i class="fa-solid fa-certificate text-blue-500 shrink-0"></i>
+                            <span>No. AHU: <strong class="font-mono text-slate-700">${coop.no_ahu}</strong></span>
+                        </div>` : ''}
                     </div>
-                    <a href="{{ url('/koperasi') }}/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
-                        <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Lihat Profil Koperasi
+                    <a href="${koperasiBaseUrl}/${coop.id_koperasi}" target="_blank" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                        <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                     </a>
                 </div>
             `;
@@ -4165,12 +4279,18 @@
     }
 
     function renderAdminKecamatanCoops(kecId) {
-        if (!adminCoopMarkerLayer || !gisKoperasisData) return;
+        if (!adminCoopMarkerLayer) {
+            adminCoopMarkerLayer = L.layerGroup().addTo(mapInstance);
+        }
         adminCoopMarkerLayer.clearLayers();
 
-        if (!kecId) return;
+        const targetKecId = kecId || (isOperator ? assignedKecamatanId : '');
+        if (!targetKecId && !isOperator) return;
 
-        const coops = gisKoperasisData.filter(k => String(k.id_kec) === String(kecId));
+        let coops = gisKoperasisData;
+        if (targetKecId) {
+            coops = coops.filter(k => String(k.id_kec) === String(targetKecId));
+        }
         if (!coops.length) return;
 
         coops.forEach((coop) => {
@@ -4182,48 +4302,55 @@
             const kecName = coop.kecamatan ? (coop.kecamatan.name_kopkec || '') : '';
 
             const coopMarkerHtml = `
-                <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
-                    <span class="absolute w-8 h-8 rounded-full bg-red-600/35 pointer-events-none"></span>
-                    <div class="relative w-8 h-8 rounded-full bg-gradient-to-tr from-red-700 to-rose-500 border-2 border-white shadow-xl flex items-center justify-center text-white text-xs cursor-pointer hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-store"></i>
-                    </div>
-                    <div class="absolute -bottom-5 whitespace-nowrap bg-slate-900/90 text-white font-extrabold text-[9px] px-1.5 py-0.5 rounded shadow-sm border border-slate-700 pointer-events-none max-w-[120px] truncate">
-                        ${coop.name_koperasi}
-                    </div>
+                <div class="custom-kec-marker" id="admin-coop-pin-${coop.id_koperasi}" title="${coop.name_koperasi}">
+                    <i class="fa-solid fa-store"></i>
                 </div>
             `;
 
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
+                    className: 'kec-icon-container',
                     html: coopMarkerHtml,
-                    className: '',
-                    iconSize: [0, 0],
-                    iconAnchor: [0, 0],
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16],
                     popupAnchor: [0, -18]
                 }),
                 zIndexOffset: 1200
             });
 
+            marker.bindTooltip(coop.name_koperasi, {
+                direction: 'top',
+                offset: [0, -18],
+                className: 'kecamatan-tooltip'
+            });
+
             const popupContent = `
-                <div class="p-2.5 text-xs" style="min-width: 230px;">
-                    <div class="flex items-center space-x-1.5 pb-2 mb-2 border-b border-red-100">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
-                        <span class="font-extrabold text-slate-900 text-xs uppercase leading-snug">${coop.name_koperasi}</span>
+                <div class="p-2.5 text-xs select-text" style="min-width: 230px; max-width: 290px;">
+                    <div class="flex items-center justify-between gap-1 pb-1.5 mb-2 border-b border-red-100">
+                        <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold rounded-full">
+                            ${desaName ? 'Desa ' + desaName : 'Koperasi Merah Putih'}
+                        </span>
+                        <span class="text-[10px] font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">
+                            ${coop.st_ops || 'SUDAH'}
+                        </span>
                     </div>
-                    <div class="space-y-1.5 mb-2.5 text-[11px] text-slate-600">
+                    <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-snug mb-2">
+                        ${coop.name_koperasi}
+                    </h4>
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 space-y-1 text-[11px] text-slate-600 mb-2.5">
                         <div class="flex items-start space-x-1.5">
-                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0"></i>
+                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0 text-xs"></i>
                             <span>Desa <strong>${desaName}</strong>, Kec. <strong>${kecName}</strong></span>
                         </div>
-                        <div class="bg-red-50/70 p-2 rounded-lg border border-red-100/80 space-y-1 text-[10px]">
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Status Operasi:</span>
-                                <span class="font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">${coop.st_ops || 'SUDAH'}</span>
-                            </div>
-                        </div>
+                        ${coop.no_ahu && coop.no_ahu !== 'BELUM' ? `
+                        <div class="flex items-center space-x-1.5 text-[10px] text-slate-500">
+                            <i class="fa-solid fa-certificate text-blue-500 shrink-0"></i>
+                            <span>No. AHU: <strong class="font-mono text-slate-700">${coop.no_ahu}</strong></span>
+                        </div>` : ''}
                     </div>
-                    <a href="{{ url('/koperasi') }}/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
-                        <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Lihat Profil Koperasi
+                    <a href="${koperasiBaseUrl}/${coop.id_koperasi}" target="_blank" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                        <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                     </a>
                 </div>
             `;
@@ -4240,6 +4367,10 @@
 
         // Jika pilih Semua Kecamatan (""): Zoom out kembali menampilkan seluruh Kabupaten Bogor
         if (!kecId) {
+            if (isOperator) {
+                renderAdminKecamatanCoops(assignedKecamatanId);
+                return;
+            }
             if (adminCoopMarkerLayer) {
                 adminCoopMarkerLayer.clearLayers();
             }
@@ -4301,8 +4432,8 @@
             mapInstance.flyTo([parseFloat(kec.latitude), parseFloat(kec.longitude)], 13, { duration: 1.2 });
         }
 
-        // Buka popup info kecamatan
-        if (openPopup && adminMarkersMap[String(kecId)]) {
+        // Buka popup info kecamatan (Hanya Superadmin, BUKAN Operator)
+        if (!isOperator && openPopup && adminMarkersMap[String(kecId)]) {
             setTimeout(() => {
                 adminMarkersMap[String(kecId)].openPopup();
             }, 600);
@@ -4310,7 +4441,7 @@
 
         // Perbarui detail legenda floating di pojok kiri bawah
         if (legendDetail) {
-            legendDetail.innerHTML = `<span class="font-bold text-sky-700">Fokus: Kec. ${kec.name_kopkec || kec.nama}</span> &bull; <strong>${kec.jumlah || kec.jum_koperasi || 0} Koperasi</strong>`;
+            legendDetail.innerHTML = `<span class="font-bold text-sky-700">Kecamatan ${kec.name_kopkec || kec.nama}</span> &bull; <strong>${kec.jumlah || kec.jum_koperasi || 0} Koperasi Terdata</strong>`;
         }
     }
 
