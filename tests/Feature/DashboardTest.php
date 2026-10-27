@@ -48,6 +48,19 @@ class DashboardTest extends TestCase
         ]);
     }
 
+    public function test_kecamatan_page_can_be_rendered(): void
+    {
+        $cisarua = Kecamatan::where('name_kopkec', 'CISARUA')->firstOrFail();
+
+        $response = $this->get(route('kecamatan.show', $cisarua));
+
+        $response->assertStatus(200);
+        $response->assertSee('KECAMATAN CISARUA');
+        $response->assertSee('Sebaran Koperasi Merah Putih');
+        $response->assertSee('kecamatanMap');
+        $response->assertSee('mapLoading');
+    }
+
     public function test_export_rekapitulasi_downloads_csv(): void
     {
         $response = $this->get(route('export.rekapitulasi'));

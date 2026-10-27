@@ -344,7 +344,7 @@ class DashboardController extends Controller
             ];
         });
 
-        if (request()->wantsJson() || request()->expectsJson() || app()->runningUnitTests()) {
+        if (request()->wantsJson() || request()->expectsJson() || request()->ajax()) {
             return response()->json([
                 'status' => 'success',
                 'data' => [
