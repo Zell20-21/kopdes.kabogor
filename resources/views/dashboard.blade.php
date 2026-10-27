@@ -852,9 +852,9 @@
                         <!-- Dropdown Filter Kecamatan -->
                         <div class="relative inline-block">
                             <select id="kecamatanFilterSelect" onchange="zoomToKecamatan(this.value)" class="bg-white text-xs font-semibold text-slate-700 border border-slate-300 rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer shadow-sm">
-                                <option value="all">Kecamatan (Semua)</option>
+                                <option value="all" selected>Kecamatan (Semua)</option>
                                 @foreach($kecamatans as $item)
-                                    <option value="{{ $item->id }}" {{ $item->nama === 'CISARUA' ? 'selected' : '' }}>
+                                    <option value="{{ $item->id }}">
                                         {{ $item->nomor_urut }}. {{ $item->nama }} ({{ $item->jumlah }} Kop)
                                     </option>
                                 @endforeach
@@ -1143,7 +1143,7 @@
         <div class="flex items-center justify-between pb-4 border-b border-slate-100">
             <div>
                 <span class="text-[10px] font-bold text-red-600 uppercase tracking-wider block">Rincian Wilayah KMP</span>
-                <h4 id="modalKecamatanTitle" class="text-lg font-bold text-slate-800">Kecamatan Cisarua</h4>
+                <h4 id="modalKecamatanTitle" class="text-lg font-bold text-slate-800">Detail Kecamatan</h4>
             </div>
             <button type="button" onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
@@ -1746,14 +1746,6 @@
 
         // Fit to Kabupaten Bogor
         map.fitBounds(bogorBounds);
-
-        // Open Cisarua popup by default as in screenshot
-        const cisarua = kecamatansData.find(k => k.nama === 'CISARUA');
-        if (cisarua) {
-            setTimeout(() => {
-                focusMarker(cisarua.id, false);
-            }, 500);
-        }
 
         setTimeout(() => updatePublicLayerGlider(activeLayerKey), 60);
     }
