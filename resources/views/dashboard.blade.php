@@ -1198,7 +1198,7 @@
             </button>
         </div>
 
-        <div class="mt-4 space-y-3 text-xs text-slate-600 overflow-y-auto pr-1 flex-1">
+        <div class="mt-3 space-y-3 text-xs text-slate-600 overflow-y-auto p-1.5 sm:p-2 pr-1.5 sm:pr-2.5 flex-1">
             <!-- 1. UUD 1945 Pasal 33 Ayat 1 (Merah) -->
             <div id="card-regulasi-accordion-uud-1945" class="rounded-2xl border border-red-200/80 bg-white hover:bg-red-50/30 shadow-2xs overflow-hidden transition-all duration-300">
                 <button
