@@ -1508,7 +1508,9 @@
 
     let map;
     let markersLayer;
+    let publicKecamatanCoopLayer;
     let kecamatanBoundaryLayer;
+    let publicPolygonLayersMap = {};
     let tileLayers = {};
     let activeLayerKey = 'osm';
     let currentFacilityFilter = null;
@@ -1729,6 +1731,7 @@
 
         // Markers group
         markersLayer = L.layerGroup().addTo(map);
+        publicKecamatanCoopLayer = L.layerGroup().addTo(map);
 
         renderKecamatanMarkers();
 
@@ -1756,6 +1759,8 @@
             return;
         }
 
+        publicPolygonLayersMap = {};
+
         kecamatanBoundaryLayer = L.geoJSON(window.BOGOR_KECAMATAN_GEOJSON, {
             style: function (feature) {
                 return {
@@ -1769,6 +1774,7 @@
             },
             onEachFeature: function (feature, layer) {
                 const name = feature.properties ? (feature.properties.fullName || feature.properties.name) : 'Kecamatan';
+                const cleanName = (feature.properties.name || '').toUpperCase().trim();
 
                 layer.bindTooltip(name, {
                     sticky: true,
@@ -1776,9 +1782,24 @@
                     className: 'kecamatan-tooltip'
                 });
 
+                const targetKec = kecamatansData.find(k => {
+                    const kn = k.nama.toUpperCase().trim();
+                    return kn === cleanName || cleanName.includes(kn) || kn.includes(cleanName);
+                });
+
+                if (targetKec) {
+                    publicPolygonLayersMap[String(targetKec.id)] = layer;
+                    publicPolygonLayersMap[cleanName] = layer;
+                }
+
                 layer.on({
                     mouseover: function (e) {
                         const targetLayer = e.target;
+                        const selectEl = document.getElementById('kecamatanFilterSelect');
+                        const isKecSelected = selectEl && selectEl.value && selectEl.value !== 'all';
+                        if (isKecSelected) {
+                            return;
+                        }
                         targetLayer.setStyle({
                             weight: 2.8,
                             color: '#0369a1',
@@ -1791,18 +1812,18 @@
                         }
                     },
                     mouseout: function (e) {
+                        const selectEl = document.getElementById('kecamatanFilterSelect');
+                        const isKecSelected = selectEl && selectEl.value && selectEl.value !== 'all';
+                        if (isKecSelected) {
+                            return;
+                        }
                         if (kecamatanBoundaryLayer) {
                             kecamatanBoundaryLayer.resetStyle(e.target);
                         }
                     },
                     click: function (e) {
-                        const cleanName = (feature.properties.name || '').toUpperCase().trim();
-                        const targetKec = kecamatansData.find(k => {
-                            const kn = k.nama.toUpperCase().trim();
-                            return kn === cleanName || cleanName.includes(kn) || kn.includes(cleanName);
-                        });
                         if (targetKec) {
-                            focusMarker(targetKec.id, true);
+                            zoomToKecamatan(targetKec.id);
                         }
                     }
                 });
@@ -2141,16 +2162,196 @@
         updatePublicLayerGlider(activeLayerKey);
     });
 
+    function renderPublicKecamatanCoops(kecId) {
+        if (!publicKecamatanCoopLayer) {
+            publicKecamatanCoopLayer = L.layerGroup().addTo(map);
+        }
+        publicKecamatanCoopLayer.clearLayers();
+
+        if (!kecId || kecId === 'all') return;
+
+        const coops = allKoperasiPoints.filter(k => String(k.id_kec) === String(kecId));
+        if (!coops.length) return;
+
+        coops.forEach(k => {
+            const lat = parseFloat(k.lat);
+            const lng = parseFloat(k.lng);
+            if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) return;
+
+            const coopMarkerHtml = `
+                <div class="kmp-store-marker" id="public-coop-pin-${k.id}" title="${k.nama}">
+                    <div class="kmp-store-halo"></div>
+                    <div class="kmp-store-pill">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                </div>
+            `;
+
+            const customIcon = L.divIcon({
+                className: 'kmp-store-div-icon',
+                html: coopMarkerHtml,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20],
+                popupAnchor: [0, -18]
+            });
+
+            const marker = L.marker([lat, lng], {
+                icon: customIcon,
+                zIndexOffset: 1200
+            });
+
+            const koperasiUrl = `{{ url('/koperasi') }}/${k.id}`;
+            const popupContent = `
+                <div class="p-2.5 text-xs select-text" style="min-width: 230px; max-width: 290px;">
+                    <div class="flex items-center justify-between gap-1 pb-1.5 mb-2 border-b border-red-100">
+                        <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold rounded-full">
+                            ${k.desa ? 'Desa ' + k.desa : 'Koperasi Merah Putih'}
+                        </span>
+                        <span class="text-[10px] font-bold text-slate-500">
+                            Kec. ${k.kecamatan}
+                        </span>
+                    </div>
+                    <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-snug mb-2">
+                        ${k.nama}
+                    </h4>
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 space-y-1 text-[11px] text-slate-600 mb-2.5">
+                        <div class="flex items-start space-x-1.5">
+                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0 text-xs"></i>
+                            <span>${k.alamat || 'Wilayah Desa ' + (k.desa || '')}</span>
+                        </div>
+                        ${k.telp && k.telp !== '-' ? `
+                        <div class="flex items-center space-x-1.5 text-[10px] text-slate-500">
+                            <i class="fa-solid fa-phone text-blue-500 shrink-0"></i>
+                            <span>${k.telp}</span>
+                        </div>` : ''}
+                    </div>
+                    <a href="${koperasiUrl}" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                        <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
+                    </a>
+                </div>
+            `;
+
+            marker.bindTooltip(k.nama, {
+                direction: 'top',
+                offset: [0, -18],
+                className: 'kecamatan-tooltip'
+            });
+
+            marker.bindPopup(popupContent, { autoPan: true, closeButton: true });
+            marker.addTo(publicKecamatanCoopLayer);
+        });
+    }
+
     function zoomToKecamatan(kecId) {
-        if (kecId === 'all') {
-            map.fitBounds([
+        if (!map) return;
+
+        if (kecId === 'all' || !kecId) {
+            if (publicKecamatanCoopLayer) {
+                publicKecamatanCoopLayer.clearLayers();
+            }
+            if (markersLayer && !map.hasLayer(markersLayer)) {
+                markersLayer.addTo(map);
+            }
+            if (kecamatanBoundaryLayer) {
+                kecamatanBoundaryLayer.eachLayer(layer => {
+                    kecamatanBoundaryLayer.resetStyle(layer);
+                    const name = layer.feature?.properties ? (layer.feature.properties.fullName || layer.feature.properties.name) : 'Kecamatan';
+                    if (!layer.getTooltip()) {
+                        layer.bindTooltip(name, {
+                            sticky: true,
+                            direction: 'top',
+                            className: 'kecamatan-tooltip'
+                        });
+                    }
+                });
+            }
+
+            map.flyToBounds([
                 [-6.8000, 106.4000],
                 [-6.3000, 107.2500]
-            ]);
+            ], { padding: [20, 20], duration: 1.2 });
+
+            const select = document.getElementById('kecamatanFilterSelect');
+            if (select) select.value = 'all';
+
+            document.querySelectorAll('tr[id^="row-kec-"]').forEach(tr => {
+                tr.classList.remove('bg-red-50', 'font-semibold', 'text-red-900', 'border-l-4', 'border-l-red-600');
+            });
             return;
         }
 
-        focusMarker(parseInt(kecId), true);
+        const kec = kecamatansData.find(k => String(k.id) === String(kecId));
+        if (!kec) return;
+
+        // Sembunyikan summary pins kecamatan agar peta fokus ke titik-titik koperasi
+        if (markersLayer && map.hasLayer(markersLayer)) {
+            map.removeLayer(markersLayer);
+        }
+
+        // Highlight poligon kecamatan terpilih
+        const cleanKecName = (kec.nama || '').toUpperCase().trim();
+        const targetPolygon = publicPolygonLayersMap[String(kecId)] || publicPolygonLayersMap[cleanKecName];
+
+        if (kecamatanBoundaryLayer) {
+            kecamatanBoundaryLayer.eachLayer(layer => {
+                if (layer === targetPolygon) {
+                    layer.setStyle({
+                        weight: 3.5,
+                        color: '#0284c7',
+                        fillColor: '#38bdf8',
+                        fillOpacity: 0.45,
+                        opacity: 1
+                    });
+                    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                        layer.bringToFront();
+                    }
+                    const name = layer.feature?.properties ? (layer.feature.properties.fullName || layer.feature.properties.name) : 'Kecamatan';
+                    if (!layer.getTooltip()) {
+                        layer.bindTooltip(name, {
+                            sticky: true,
+                            direction: 'top',
+                            className: 'kecamatan-tooltip'
+                        });
+                    }
+                } else {
+                    layer.setStyle({
+                        weight: 0,
+                        color: 'transparent',
+                        fillColor: 'transparent',
+                        fillOpacity: 0,
+                        opacity: 0
+                    });
+                    if (layer.getTooltip()) {
+                        layer.closeTooltip();
+                        layer.unbindTooltip();
+                    }
+                }
+            });
+        }
+
+        // Tampilkan semua koperasi yang ada di kecamatan tersebut dengan ikon toko merah
+        renderPublicKecamatanCoops(kecId);
+
+        // Arahkan ke poligon kecamatan
+        if (targetPolygon) {
+            const bounds = targetPolygon.getBounds();
+            map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 14, duration: 1.2 });
+        } else {
+            const coops = allKoperasiPoints.filter(k => String(k.id_kec) === String(kecId));
+            const coopBounds = [];
+            coops.forEach(k => {
+                const lat = parseFloat(k.lat);
+                const lng = parseFloat(k.lng);
+                if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) coopBounds.push([lat, lng]);
+            });
+            if (coopBounds.length > 0) {
+                map.flyToBounds(coopBounds, { padding: [40, 40], maxZoom: 14, duration: 1.2 });
+            } else if (kec.latitude && kec.longitude) {
+                map.flyTo([parseFloat(kec.latitude), parseFloat(kec.longitude)], 13, { duration: 1.2 });
+            }
+        }
+
         highlightTableRow(parseInt(kecId));
     }
 

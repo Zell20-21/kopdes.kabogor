@@ -8,8 +8,13 @@
         @endif
         <p class="px-3 pb-2 pt-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Pengelolaan data</p>
         <nav class="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1" aria-label="Database koperasi">
+            @php($isProfilActive = !in_array(request()->query('page'), ['database-pengurus', 'database-anggota'], true) && request()->query('tab') !== 'pengurus' && request()->query('tab') !== 'anggota')
+            <a href="{{ route('admin.dashboard') }}" @if($isProfilActive) aria-current="page" @endif class="flex min-h-11 items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-rose-300 {{ $isProfilActive ? 'border-rose-200 bg-rose-50 text-rose-800' : 'border-transparent text-slate-700 hover:border-rose-100 hover:bg-rose-50 hover:text-rose-800' }}">
+                <i class="fa-solid fa-building-columns w-5 text-center text-rose-700" aria-hidden="true"></i>
+                <span class="min-w-0 flex-1">Profil Koperasi</span>
+            </a>
             <a href="{{ route('admin.dashboard', ['page' => 'database-pengurus']) }}" @if(request()->query('page') === 'database-pengurus') aria-current="page" @endif class="flex min-h-11 items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-rose-300 {{ request()->query('page') === 'database-pengurus' ? 'border-rose-200 bg-rose-50 text-rose-800' : 'border-transparent text-slate-700 hover:border-rose-100 hover:bg-rose-50 hover:text-rose-800' }}">
-                <i class="fa-solid fa-people-group w-5 text-center text-rose-700" aria-hidden="true"></i>
+                <i class="fa-solid fa-user-tie w-5 text-center text-rose-700" aria-hidden="true"></i>
                 <span class="min-w-0 flex-1">Database Pengurus</span>
                 <span class="rounded-full bg-white/80 px-2 py-0.5 text-xs font-bold text-slate-600">{{ number_format($totalPengurusKoperasi + $totalPengawasKoperasi) }}</span>
             </a>

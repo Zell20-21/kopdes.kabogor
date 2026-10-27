@@ -8,41 +8,43 @@
 
 @section('content')
 <div class="min-h-screen bg-slate-50 text-slate-800">
-    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-lg">
-        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-4 px-4 py-4 sm:px-6 lg:px-8">
-            <div class="flex items-center space-x-2 sm:space-x-3.5 min-w-0 pr-1">
-                <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-8 sm:h-11 w-auto object-contain drop-shadow shrink-0">
-                <div class="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center p-0.5 sm:p-1 shadow-md shrink-0 border border-white/60 overflow-hidden">
-                    <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain transform scale-105">
-                </div>
-                <div class="flex flex-col justify-center min-w-0">
-                    <div class="flex items-baseline space-x-1 sm:space-x-1.5">
-                        <span class="text-base sm:text-2xl font-black tracking-tight text-white leading-tight">
-                            Dashboard
-                        </span>
-                        <span class="text-sm sm:text-base font-semibold text-red-100 tracking-tight">
-                            KMP
-                        </span>
+    <header class="bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14 sm:h-16">
+                <div class="flex items-center space-x-2 sm:space-x-3.5 min-w-0 pr-1">
+                    <img src="{{ asset('images/logo-kabupaten-bogor.png') }}" alt="Lambang Kabupaten Bogor" class="h-8 sm:h-11 w-auto object-contain drop-shadow shrink-0">
+                    <div class="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center p-0.5 sm:p-1 shadow-md shrink-0 border border-white/60 overflow-hidden">
+                        <img src="{{ asset('images/logo-kopdeskel-clean.png') }}" alt="Logo KOP DES KEL Merah Putih" class="w-full h-full object-contain transform scale-105">
                     </div>
-                    <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
-                        Pemerintah Daerah Kabupaten Bogor
-                    </p>
+                    <div class="flex flex-col justify-center min-w-0">
+                        <div class="flex items-baseline space-x-1 sm:space-x-1.5">
+                            <span class="text-base sm:text-2xl font-black tracking-tight text-white leading-tight">
+                                Dashboard
+                            </span>
+                            <span class="text-sm sm:text-base font-semibold text-red-100 tracking-tight">
+                                KMP
+                            </span>
+                        </div>
+                        <p class="text-[10px] sm:text-xs text-red-200 font-medium leading-none mt-0.5 truncate max-w-[140px] xs:max-w-[210px] sm:max-w-none">
+                            Pemerintah Daerah Kabupaten Bogor
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end">
-                <nav aria-label="Navigasi halaman" class="flex min-w-0 items-center gap-1 overflow-x-auto text-sm font-semibold sm:gap-2">
-                    <a href="{{ route('admin.dashboard') }}#jenis-usaha" class="shrink-0 rounded-lg px-3 py-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70">Jenis usaha</a>
-                    <a href="{{ route('admin.dashboard') }}#lokasi-koperasi" class="shrink-0 rounded-lg px-3 py-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70">Foto lokasi</a>
-                    <a href="{{ route('admin.dashboard', ['page' => 'database-pengurus']) }}#foto-pengurus" class="shrink-0 rounded-lg px-3 py-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70">Foto pengurus</a>
-                </nav>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/30 px-3 py-2 text-sm font-bold transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70 sm:px-4">
-                        <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
-                        Keluar
-                    </button>
-                </form>
+                <div class="flex items-center space-x-2 sm:space-x-4 shrink-0">
+                    <nav aria-label="Navigasi halaman" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
+                        <a href="{{ route('admin.dashboard') }}#jenis-usaha" class="shrink-0 rounded-full px-3.5 py-1.5 text-red-100 hover:text-white hover:bg-white/10 font-medium transition-all duration-200">Jenis usaha</a>
+                        <a href="{{ route('admin.dashboard') }}#lokasi-koperasi" class="shrink-0 rounded-full px-3.5 py-1.5 text-red-100 hover:text-white hover:bg-white/10 font-medium transition-all duration-200">Foto lokasi</a>
+                        <a href="{{ route('admin.dashboard', ['page' => 'database-pengurus']) }}#foto-pengurus" class="shrink-0 rounded-full px-3.5 py-1.5 text-red-100 hover:text-white hover:bg-white/10 font-medium transition-all duration-200">Foto pengurus</a>
+                    </nav>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-white/30 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70 active:scale-95 cursor-pointer">
+                            <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
@@ -83,11 +85,7 @@
         <section id="profil" aria-labelledby="ringkasan-heading" class="flex flex-col gap-5 scroll-mt-6">
             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
                 <div>
-                    <div class="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700">
-                        <span class="h-2 w-2 rounded-full bg-rose-600"></span>
-                        Profil Koperasi Desa / Kelurahan
-                    </div>
-                    <h2 id="ringkasan-heading" class="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
+                    <h2 id="ringkasan-heading" class="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
                         Selamat datang, {{ $user->name }}
                     </h2>
                     <p class="mt-1 text-sm text-slate-500">Lengkapi identitas, keanggotaan, struktur, dan pilihan jenis usaha koperasi.</p>

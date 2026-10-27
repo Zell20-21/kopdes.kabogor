@@ -82,6 +82,54 @@
             text-decoration: none !important;
         }
 
+        /* User requested cooperative marker: red vertical pill with white store icon and soft red circular halo */
+        .kmp-store-div-icon {
+            background: transparent !important;
+            border: none !important;
+        }
+        .kmp-store-marker {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .kmp-store-marker:hover, .kmp-store-marker.active-pin {
+            transform: scale(1.25);
+            z-index: 9999 !important;
+        }
+        .kmp-store-halo {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: rgba(225, 29, 72, 0.38);
+            box-shadow: 0 0 12px rgba(225, 29, 72, 0.45);
+            pointer-events: none;
+        }
+        .kmp-store-pill {
+            position: relative;
+            width: 20px;
+            height: 36px;
+            border-radius: 9999px;
+            background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+            border: 2px solid #ffffff;
+            box-shadow: 0 4px 10px rgba(185, 28, 28, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            z-index: 2;
+        }
+        .kmp-store-pill i {
+            color: #ffffff !important;
+            font-size: 11px;
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+        }
+
         .custom-kmp-pin {
             display: flex;
             align-items: center;

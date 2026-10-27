@@ -168,9 +168,9 @@
 <div data-dashboard-shell="{{ $isOperatorKecamatan ? 'operator-kecamatan' : 'default' }}" class="min-h-screen {{ $isOperatorKecamatan ? 'bg-slate-50' : 'bg-[#f8fafc]' }} flex flex-col justify-between text-slate-800 w-full max-w-full">
 
     <!-- Top Navigation Header GovTech KOP -->
-    <header class="{{ $isOperatorKecamatan ? 'bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] shadow-lg' : 'fixed top-0 inset-x-0 w-full bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] shadow-md z-[100]' }} text-white">
+    <header class="{{ $isOperatorKecamatan ? 'bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] shadow-md' : 'fixed top-0 inset-x-0 w-full bg-gradient-to-r from-[#881337] via-[#991b1b] to-[#7f1d1d] shadow-md z-[100]' }} text-white">
         <div class="{{ $isOperatorKecamatan ? 'mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8' : 'w-full px-4 sm:px-6 lg:px-8' }}">
-            <div class="{{ $isOperatorKecamatan ? 'flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-4' : 'flex items-center justify-between h-16' }}">
+            <div class="flex items-center justify-between h-14 sm:h-16">
                 <!-- Left: Lambang Kabupaten Bogor & Logo KOPDES Bulat (Sesuai Bagian Publik) -->
                 <div class="flex items-center space-x-2 sm:space-x-3.5 min-w-0 pr-1">
                     <!-- Lambang Kabupaten Bogor (Tegar Beriman) -->
@@ -203,9 +203,9 @@
 
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="{{ $isOperatorKecamatan ? 'inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 px-3 py-2 text-sm font-bold transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70 sm:px-4' : 'flex items-center space-x-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 border border-white/20 text-white px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm transition-all duration-200 hover:shadow transform active:scale-95 cursor-pointer' }}">
-                            <span>{{ $isOperatorKecamatan ? 'Keluar' : 'Log Out' }}</span>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70 active:scale-95 cursor-pointer">
                             <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                            <span>Logout</span>
                         </button>
                     </form>
                 </div>
@@ -1231,9 +1231,9 @@
 
                                             <!-- Koperasi Full Name -->
                                             <td class="py-3 px-4">
-                                                <div class="font-extrabold text-slate-900 leading-tight uppercase">
+                                                <a href="{{ route('koperasi.show', $kop->id_koperasi) }}" title="Lihat Profil {{ $kop->name_koperasi }}" class="font-extrabold text-slate-900 hover:text-blue-600 hover:underline leading-tight uppercase block transition-colors cursor-pointer">
                                                     {{ $kop->name_koperasi }}
-                                                </div>
+                                                </a>
                                             </td>
 
                                             <!-- Nomor AHU with Green Dot -->
@@ -1313,6 +1313,11 @@
                                                         </div>
                                                         <div class="flex flex-wrap items-center gap-2 pt-3">
                                                             <span class="font-black text-slate-700 tracking-wider uppercase text-[11px] mr-2">PROSES</span>
+                                                            <a href="{{ route('koperasi.show', $kop->id_koperasi) }}"
+                                                               class="px-3.5 py-1.5 bg-[#1d4ed8] hover:bg-[#1e40af] text-white text-xs font-bold rounded-md shadow-sm transition active:scale-95 inline-flex items-center space-x-1 cursor-pointer">
+                                                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                                                <span>Lihat Profil</span>
+                                                            </a>
                                                             <button type="button"
                                                                     onclick='openEditKoperasiModal(@json($kop))'
                                                                     class="px-3.5 py-1.5 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold rounded-md shadow-sm transition active:scale-95 cursor-pointer">
@@ -3887,7 +3892,7 @@
             const cleanKecName = kecamatansData[0] ? (kecamatansData[0].name_kopkec || kecamatansData[0].nama || '').toUpperCase().trim() : '';
             const targetPolygon = adminPolygonLayersMap[operatorKecId] || (cleanKecName ? adminPolygonLayersMap[cleanKecName] : null);
 
-            // Highlight poligon kecamatan operator, samarkan batas kecamatan lain
+            // Highlight poligon kecamatan operator, sembunyikan batas garis kecamatan lain
             if (adminKecamatanBoundaryLayer) {
                 adminKecamatanBoundaryLayer.eachLayer(layer => {
                     if (layer === targetPolygon) {
@@ -3895,18 +3900,21 @@
                             weight: 3.2,
                             color: '#0284c7',
                             fillColor: '#38bdf8',
-                            fillOpacity: 0.35
+                            fillOpacity: 0.35,
+                            opacity: 1
                         });
                         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                             layer.bringToFront();
                         }
                     } else {
                         layer.setStyle({
-                            weight: 1,
-                            color: '#cbd5e1',
-                            fillColor: '#f1f5f9',
-                            fillOpacity: 0.05
+                            weight: 0,
+                            color: 'transparent',
+                            fillColor: 'transparent',
+                            fillOpacity: 0,
+                            opacity: 0
                         });
+                        layer.closeTooltip();
                     }
                 });
             }
@@ -3974,8 +3982,44 @@
 
         adminPolygonLayersMap = {};
 
+        const activeKec = isOperator
+            ? String(assignedKecamatanId || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''))
+            : String(selectedKecId || document.getElementById('filter_id_kec')?.value || '');
+
         adminKecamatanBoundaryLayer = L.geoJSON(window.BOGOR_KECAMATAN_GEOJSON, {
             style: function (feature) {
+                const cleanName = (feature.properties?.name || '').toUpperCase().trim();
+                const targetKec = kecamatansData.find(k => {
+                    const kn = (k.name_kopkec || k.nama || '').toUpperCase().trim();
+                    return kn === cleanName || cleanName.includes(kn) || kn.includes(cleanName);
+                });
+
+                if (activeKec) {
+                    const isCurrentActive = targetKec && (
+                        String(targetKec.id_kopkec) === activeKec ||
+                        String(targetKec.id) === activeKec
+                    );
+                    if (isCurrentActive) {
+                        return {
+                            color: '#0284c7',
+                            weight: 3.2,
+                            opacity: 1,
+                            fillColor: '#38bdf8',
+                            fillOpacity: 0.35,
+                            dashArray: ''
+                        };
+                    } else {
+                        return {
+                            color: 'transparent',
+                            weight: 0,
+                            opacity: 0,
+                            fillColor: 'transparent',
+                            fillOpacity: 0,
+                            dashArray: ''
+                        };
+                    }
+                }
+
                 return {
                     color: '#0284c7', // Cyan/sky blue border matching public view
                     weight: 1.8,
@@ -3989,12 +4033,6 @@
                 const name = feature.properties ? (feature.properties.fullName || feature.properties.name) : 'Kecamatan';
                 const cleanName = (feature.properties.name || '').toUpperCase().trim();
 
-                layer.bindTooltip(name, {
-                    sticky: true,
-                    direction: 'top',
-                    className: 'kecamatan-tooltip'
-                });
-
                 // Map polygon to matching kecamatan in kecamatansData
                 const targetKec = kecamatansData.find(k => {
                     const kn = (k.name_kopkec || k.nama || '').toUpperCase().trim();
@@ -4007,11 +4045,49 @@
                     adminPolygonLayersMap[cleanName] = layer;
                 }
 
+                const isCurrentActive = targetKec && (
+                    String(targetKec.id_kopkec) === activeKec ||
+                    String(targetKec.id) === activeKec
+                );
+
+                if (!activeKec || isCurrentActive) {
+                    layer.bindTooltip(name, {
+                        sticky: true,
+                        direction: 'top',
+                        className: 'kecamatan-tooltip'
+                    });
+                }
+
                 layer.on({
                     mouseover: function (e) {
-                        const targetLayer = e.target;
-                        const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_id_kec')?.value);
-                        if (!isSelected) {
+                        const currentActive = isOperator
+                            ? String(assignedKecamatanId || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''))
+                            : String(document.getElementById('filter_id_kec')?.value || selectedKecId || '');
+
+                        // Jika sedang fokus pada suatu kecamatan (atau role operator), jangan tampilkan garis wilayah atau tooltip kecamatan lain saat kursor mengarah ke sana
+                        if (currentActive) {
+                            const isMatch = targetKec && (
+                                String(targetKec.id_kopkec) === currentActive ||
+                                String(targetKec.id) === currentActive
+                            );
+                            if (!isMatch) {
+                                e.target.setStyle({
+                                    weight: 0,
+                                    color: 'transparent',
+                                    fillColor: 'transparent',
+                                    fillOpacity: 0,
+                                    opacity: 0
+                                });
+                                if (layer.getTooltip()) {
+                                    layer.closeTooltip();
+                                }
+                                return;
+                            }
+                        }
+
+                        // Mode superadmin saat Semua Kecamatan terpilih
+                        if (!currentActive) {
+                            const targetLayer = e.target;
                             targetLayer.setStyle({
                                 weight: 2.8,
                                 color: '#0369a1',
@@ -4025,18 +4101,36 @@
                         }
                     },
                     mouseout: function (e) {
-                        const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_id_kec')?.value);
-                        if (!isSelected && adminKecamatanBoundaryLayer && !isOperator) {
+                        const currentActive = isOperator
+                            ? String(assignedKecamatanId || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''))
+                            : String(document.getElementById('filter_id_kec')?.value || selectedKecId || '');
+
+                        if (currentActive) {
+                            const isMatch = targetKec && (
+                                String(targetKec.id_kopkec) === currentActive ||
+                                String(targetKec.id) === currentActive
+                            );
+                            if (!isMatch) {
+                                e.target.setStyle({
+                                    weight: 0,
+                                    color: 'transparent',
+                                    fillColor: 'transparent',
+                                    fillOpacity: 0,
+                                    opacity: 0
+                                });
+                                if (layer.getTooltip()) {
+                                    layer.closeTooltip();
+                                }
+                                return;
+                            }
+                        }
+
+                        if (adminKecamatanBoundaryLayer && !isOperator && !currentActive) {
                             adminKecamatanBoundaryLayer.resetStyle(e.target);
                         }
                     },
                     click: function (e) {
                         if (isOperator) {
-                            if (targetKec) {
-                                renderAdminKecamatanCoops(targetKec.id_kopkec);
-                                const bounds = targetPolygon ? targetPolygon.getBounds() : null;
-                                if (bounds) mapInstance.fitBounds(bounds, { padding: [30, 30] });
-                            }
                             return;
                         }
                         if (targetKec) {
@@ -4165,17 +4259,20 @@
             const kecName = coop.kecamatan ? (coop.kecamatan.name_kopkec || '') : '';
 
             const coopMarkerHtml = `
-                <div class="custom-kec-marker active-pin" id="admin-coop-pin-${coop.id_koperasi}" title="${coop.name_koperasi}">
-                    <i class="fa-solid fa-store"></i>
+                <div class="kmp-store-marker active-pin" id="admin-coop-pin-${coop.id_koperasi}" title="${coop.name_koperasi}">
+                    <div class="kmp-store-halo"></div>
+                    <div class="kmp-store-pill">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
                 </div>
             `;
 
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
-                    className: 'kec-icon-container',
+                    className: 'kmp-store-div-icon',
                     html: coopMarkerHtml,
-                    iconSize: [36, 36],
-                    iconAnchor: [18, 18],
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20],
                     popupAnchor: [0, -18]
                 }),
                 zIndexOffset: 1500
@@ -4211,7 +4308,7 @@
                             <span>No. AHU: <strong class="font-mono text-slate-700">${coop.no_ahu}</strong></span>
                         </div>` : ''}
                     </div>
-                    <a href="${koperasiBaseUrl}/${coop.id_koperasi}" target="_blank" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                    <a href="${koperasiBaseUrl}/${coop.id_koperasi}" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
                         <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
                         <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                     </a>
@@ -4302,17 +4399,20 @@
             const kecName = coop.kecamatan ? (coop.kecamatan.name_kopkec || '') : '';
 
             const coopMarkerHtml = `
-                <div class="custom-kec-marker" id="admin-coop-pin-${coop.id_koperasi}" title="${coop.name_koperasi}">
-                    <i class="fa-solid fa-store"></i>
+                <div class="kmp-store-marker" id="admin-coop-pin-${coop.id_koperasi}" title="${coop.name_koperasi}">
+                    <div class="kmp-store-halo"></div>
+                    <div class="kmp-store-pill">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
                 </div>
             `;
 
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
-                    className: 'kec-icon-container',
+                    className: 'kmp-store-div-icon',
                     html: coopMarkerHtml,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16],
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20],
                     popupAnchor: [0, -18]
                 }),
                 zIndexOffset: 1200
@@ -4348,7 +4448,7 @@
                             <span>No. AHU: <strong class="font-mono text-slate-700">${coop.no_ahu}</strong></span>
                         </div>` : ''}
                     </div>
-                    <a href="${koperasiBaseUrl}/${coop.id_koperasi}" target="_blank" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                    <a href="${koperasiBaseUrl}/${coop.id_koperasi}" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
                         <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
                         <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                     </a>
@@ -4374,9 +4474,20 @@
             if (adminCoopMarkerLayer) {
                 adminCoopMarkerLayer.clearLayers();
             }
+            if (adminKecamatanMarkersLayer && !mapInstance.hasLayer(adminKecamatanMarkersLayer)) {
+                adminKecamatanMarkersLayer.addTo(mapInstance);
+            }
             if (adminKecamatanBoundaryLayer) {
                 adminKecamatanBoundaryLayer.eachLayer(layer => {
                     adminKecamatanBoundaryLayer.resetStyle(layer);
+                    const name = layer.feature?.properties ? (layer.feature.properties.fullName || layer.feature.properties.name) : 'Kecamatan';
+                    if (!layer.getTooltip()) {
+                        layer.bindTooltip(name, {
+                            sticky: true,
+                            direction: 'top',
+                            className: 'kecamatan-tooltip'
+                        });
+                    }
                 });
             }
 
@@ -4394,7 +4505,12 @@
         const kec = kecamatansData.find(k => String(k.id_kopkec) === String(kecId) || String(k.id) === String(kecId));
         if (!kec) return;
 
-        // Highlight poligon batas kecamatan terpilih dan samarkan yang lain
+        // Sembunyikan pin summary 40 kecamatan agar tidak menumpuk saat fokus ke kecamatan
+        if (adminKecamatanMarkersLayer && mapInstance.hasLayer(adminKecamatanMarkersLayer)) {
+            mapInstance.removeLayer(adminKecamatanMarkersLayer);
+        }
+
+        // Highlight poligon batas kecamatan terpilih dan sembunyikan total batas wilayah kecamatan lain
         const cleanKecName = (kec.name_kopkec || kec.nama || '').toUpperCase().trim();
         const targetPolygon = adminPolygonLayersMap[String(kecId)] || adminPolygonLayersMap[cleanKecName];
 
@@ -4405,18 +4521,32 @@
                         weight: 3.5,
                         color: '#0284c7',
                         fillColor: '#38bdf8',
-                        fillOpacity: 0.45
+                        fillOpacity: 0.45,
+                        opacity: 1
                     });
                     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                         layer.bringToFront();
                     }
+                    const name = layer.feature?.properties ? (layer.feature.properties.fullName || layer.feature.properties.name) : 'Kecamatan';
+                    if (!layer.getTooltip()) {
+                        layer.bindTooltip(name, {
+                            sticky: true,
+                            direction: 'top',
+                            className: 'kecamatan-tooltip'
+                        });
+                    }
                 } else {
                     layer.setStyle({
-                        weight: 1.2,
-                        color: '#94a3b8',
-                        fillColor: '#f1f5f9',
-                        fillOpacity: 0.12
+                        weight: 0,
+                        color: 'transparent',
+                        fillColor: 'transparent',
+                        fillOpacity: 0,
+                        opacity: 0
                     });
+                    if (layer.getTooltip()) {
+                        layer.closeTooltip();
+                        layer.unbindTooltip();
+                    }
                 }
             });
         }
@@ -4430,13 +4560,6 @@
             mapInstance.flyToBounds(bounds, { padding: [40, 40], maxZoom: 14, duration: 1.2 });
         } else if (kec.latitude && kec.longitude) {
             mapInstance.flyTo([parseFloat(kec.latitude), parseFloat(kec.longitude)], 13, { duration: 1.2 });
-        }
-
-        // Buka popup info kecamatan (Hanya Superadmin, BUKAN Operator)
-        if (!isOperator && openPopup && adminMarkersMap[String(kecId)]) {
-            setTimeout(() => {
-                adminMarkersMap[String(kecId)].openPopup();
-            }, 600);
         }
 
         // Perbarui detail legenda floating di pojok kiri bawah
@@ -4706,24 +4829,83 @@
         // 1. Add Subdistrict Boundary Polygons (Garis Antar Kecamatan)
         renderAnggotaKecamatanBoundaries();
 
-        // 2. Add Red Pin Markers with Numbers (NO blue dots!)
+        // 2. Add Red Pin Markers with Numbers
         adminAnggotaMarkersLayer = L.layerGroup().addTo(mapAnggotaInstance);
         renderAnggotaKecamatanMarkers();
 
-        // Fit view to Kabupaten Bogor
-        mapAnggotaInstance.fitBounds(bogorBounds);
+        // 3. Initialize Coop Marker Layer for Anggota Map
+        adminAnggotaCoopMarkerLayer = L.layerGroup().addTo(mapAnggotaInstance);
 
-        // Check if desa or kecamatan is selected to zoom and pinpoint
         const selectedAnggotaKec = "{{ request('filter_kec_anggota', '') }}";
         const selectedAnggotaKel = "{{ request('filter_kel_anggota', '') }}";
-        if (selectedAnggotaKel) {
-            setTimeout(() => {
-                zoomToAnggotaDesa(selectedAnggotaKel, true);
-            }, 500);
-        } else if (selectedAnggotaKec) {
-            setTimeout(() => {
-                zoomToAnggotaKecamatan(selectedAnggotaKec, false);
-            }, 450);
+
+        if (isOperator) {
+            // Untuk Operator: Peta fokus ke wilayah kecamatan operator & tampilkan SEMUA koperasi di kecamatan itu
+            const operatorKecId = String(assignedKecamatanId || selectedAnggotaKec || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''));
+            const cleanKecName = kecamatansData[0] ? (kecamatansData[0].name_kopkec || kecamatansData[0].nama || '').toUpperCase().trim() : '';
+            const targetPolygon = adminAnggotaPolygonLayersMap[operatorKecId] || (cleanKecName ? adminAnggotaPolygonLayersMap[cleanKecName] : null);
+
+            // Sembunyikan summary pins kecamatan
+            if (mapAnggotaInstance.hasLayer(adminAnggotaMarkersLayer)) {
+                mapAnggotaInstance.removeLayer(adminAnggotaMarkersLayer);
+            }
+
+            // Highlight poligon kecamatan operator
+            if (adminAnggotaBoundaryLayer) {
+                adminAnggotaBoundaryLayer.eachLayer(layer => {
+                    if (layer === targetPolygon) {
+                        layer.setStyle({
+                            weight: 3.2,
+                            color: '#0284c7',
+                            fillColor: '#38bdf8',
+                            fillOpacity: 0.35
+                        });
+                        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                            layer.bringToFront();
+                        }
+                    } else {
+                        layer.setStyle({
+                            weight: 0,
+                            color: 'transparent',
+                            fillColor: 'transparent',
+                            fillOpacity: 0,
+                            opacity: 0
+                        });
+                        layer.closeTooltip();
+                    }
+                });
+            }
+
+            // Tampilkan SEMUA koperasi di kecamatan tersebut dengan ikon toko merah
+            renderAnggotaKecamatanCoops(operatorKecId);
+
+            let boundsToFit = targetPolygon ? targetPolygon.getBounds() : null;
+            if (boundsToFit && boundsToFit.isValid()) {
+                mapAnggotaInstance.fitBounds(boundsToFit, { padding: [30, 30] });
+                mapAnggotaInstance.setMinZoom(11);
+                mapAnggotaInstance.setMaxBounds(boundsToFit.pad(0.35));
+            } else {
+                mapAnggotaInstance.fitBounds(bogorBounds);
+            }
+
+            if (selectedAnggotaKel) {
+                setTimeout(() => {
+                    zoomToAnggotaDesa(selectedAnggotaKel, true);
+                }, 400);
+            }
+        } else {
+            // Mode Superadmin
+            mapAnggotaInstance.fitBounds(bogorBounds);
+
+            if (selectedAnggotaKel) {
+                setTimeout(() => {
+                    zoomToAnggotaDesa(selectedAnggotaKel, true);
+                }, 500);
+            } else if (selectedAnggotaKec) {
+                setTimeout(() => {
+                    zoomToAnggotaKecamatan(selectedAnggotaKec, false);
+                }, 450);
+            }
         }
 
         setTimeout(() => updateAdminAnggotaLayerGlider(activeLayerAnggotaKey), 80);
@@ -4734,8 +4916,44 @@
 
         adminAnggotaPolygonLayersMap = {};
 
+        const activeKec = isOperator
+            ? String(assignedKecamatanId || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''))
+            : String(document.getElementById('filter_kec_anggota')?.value || selectedAnggotaKec || '');
+
         adminAnggotaBoundaryLayer = L.geoJSON(window.BOGOR_KECAMATAN_GEOJSON, {
             style: function (feature) {
+                const cleanName = (feature.properties?.name || '').toUpperCase().trim();
+                const targetKec = kecamatansData.find(k => {
+                    const kn = (k.name_kopkec || k.nama || '').toUpperCase().trim();
+                    return kn === cleanName || cleanName.includes(kn) || kn.includes(cleanName);
+                });
+
+                if (activeKec) {
+                    const isCurrentActive = targetKec && (
+                        String(targetKec.id_kopkec) === activeKec ||
+                        String(targetKec.id) === activeKec
+                    );
+                    if (isCurrentActive) {
+                        return {
+                            color: '#0284c7',
+                            weight: 3.2,
+                            opacity: 1,
+                            fillColor: '#38bdf8',
+                            fillOpacity: 0.35,
+                            dashArray: ''
+                        };
+                    } else {
+                        return {
+                            color: 'transparent',
+                            weight: 0,
+                            opacity: 0,
+                            fillColor: 'transparent',
+                            fillOpacity: 0,
+                            dashArray: ''
+                        };
+                    }
+                }
+
                 return {
                     color: '#0284c7',
                     weight: 1.8,
@@ -4749,12 +4967,6 @@
                 const name = feature.properties ? (feature.properties.fullName || feature.properties.name) : 'Kecamatan';
                 const cleanName = (feature.properties.name || '').toUpperCase().trim();
 
-                layer.bindTooltip(name, {
-                    sticky: true,
-                    direction: 'top',
-                    className: 'kecamatan-tooltip'
-                });
-
                 const targetKec = kecamatansData.find(k => {
                     const kn = (k.name_kopkec || k.nama || '').toUpperCase().trim();
                     return kn === cleanName || cleanName.includes(kn) || kn.includes(cleanName);
@@ -4766,11 +4978,47 @@
                     adminAnggotaPolygonLayersMap[cleanName] = layer;
                 }
 
+                const isCurrentActive = targetKec && (
+                    String(targetKec.id_kopkec) === activeKec ||
+                    String(targetKec.id) === activeKec
+                );
+
+                if (!activeKec || isCurrentActive) {
+                    layer.bindTooltip(name, {
+                        sticky: true,
+                        direction: 'top',
+                        className: 'kecamatan-tooltip'
+                    });
+                }
+
                 layer.on({
                     mouseover: function (e) {
-                        const targetLayer = e.target;
-                        const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_kec_anggota')?.value);
-                        if (!isSelected) {
+                        const currentActive = isOperator
+                            ? String(assignedKecamatanId || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''))
+                            : String(document.getElementById('filter_kec_anggota')?.value || selectedAnggotaKec || '');
+
+                        if (currentActive) {
+                            const isMatch = targetKec && (
+                                String(targetKec.id_kopkec) === currentActive ||
+                                String(targetKec.id) === currentActive
+                            );
+                            if (!isMatch) {
+                                e.target.setStyle({
+                                    weight: 0,
+                                    color: 'transparent',
+                                    fillColor: 'transparent',
+                                    fillOpacity: 0,
+                                    opacity: 0
+                                });
+                                if (layer.getTooltip()) {
+                                    layer.closeTooltip();
+                                }
+                                return;
+                            }
+                        }
+
+                        if (!currentActive) {
+                            const targetLayer = e.target;
                             targetLayer.setStyle({
                                 weight: 2.8,
                                 color: '#0369a1',
@@ -4784,12 +5032,38 @@
                         }
                     },
                     mouseout: function (e) {
-                        const isSelected = targetKec && String(targetKec.id_kopkec) === String(document.getElementById('filter_kec_anggota')?.value);
-                        if (!isSelected && adminAnggotaBoundaryLayer) {
+                        const currentActive = isOperator
+                            ? String(assignedKecamatanId || (kecamatansData[0] ? (kecamatansData[0].id_kopkec || kecamatansData[0].id) : ''))
+                            : String(document.getElementById('filter_kec_anggota')?.value || selectedAnggotaKec || '');
+
+                        if (currentActive) {
+                            const isMatch = targetKec && (
+                                String(targetKec.id_kopkec) === currentActive ||
+                                String(targetKec.id) === currentActive
+                            );
+                            if (!isMatch) {
+                                e.target.setStyle({
+                                    weight: 0,
+                                    color: 'transparent',
+                                    fillColor: 'transparent',
+                                    fillOpacity: 0,
+                                    opacity: 0
+                                });
+                                if (layer.getTooltip()) {
+                                    layer.closeTooltip();
+                                }
+                                return;
+                            }
+                        }
+
+                        if (adminAnggotaBoundaryLayer && !isOperator && !currentActive) {
                             adminAnggotaBoundaryLayer.resetStyle(e.target);
                         }
                     },
                     click: function (e) {
+                        if (isOperator) {
+                            return;
+                        }
                         if (targetKec) {
                             const sel = document.getElementById('filter_kec_anggota');
                             if (sel) {
@@ -4887,15 +5161,118 @@
         zoomToAnggotaKecamatan(kecId, true);
     }
 
+    function renderAnggotaKecamatanCoops(kecId) {
+        if (!adminAnggotaCoopMarkerLayer) {
+            adminAnggotaCoopMarkerLayer = L.layerGroup().addTo(mapAnggotaInstance);
+        }
+        adminAnggotaCoopMarkerLayer.clearLayers();
+
+        const targetKecId = kecId || (isOperator ? assignedKecamatanId : '');
+        if (!targetKecId && !isOperator) return;
+
+        let coops = gisKoperasisData;
+        if (targetKecId) {
+            coops = coops.filter(k => String(k.id_kec) === String(targetKecId));
+        }
+        if (!coops.length) return;
+
+        coops.forEach((coop) => {
+            const lat = parseFloat(coop.gps_lat);
+            const lng = parseFloat(coop.gps_long);
+            if (isNaN(lat) || isNaN(lng) || lat === 0) return;
+
+            const desaName = coop.kelurahan ? (coop.kelurahan.name_kopkel || '') : '';
+            const kecName = coop.kecamatan ? (coop.kecamatan.name_kopkec || '') : '';
+
+            const coopMarkerHtml = `
+                <div class="kmp-store-marker" id="admin-anggota-coop-pin-${coop.id_koperasi}" title="${coop.name_koperasi}">
+                    <div class="kmp-store-halo"></div>
+                    <div class="kmp-store-pill">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                </div>
+            `;
+
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'kmp-store-div-icon',
+                    html: coopMarkerHtml,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20],
+                    popupAnchor: [0, -18]
+                }),
+                zIndexOffset: 1200
+            });
+
+            marker.bindTooltip(coop.name_koperasi, {
+                direction: 'top',
+                offset: [0, -18],
+                className: 'kecamatan-tooltip'
+            });
+
+            const popupContent = `
+                <div class="p-2.5 text-xs select-text" style="min-width: 230px; max-width: 290px;">
+                    <div class="flex items-center justify-between gap-1 pb-1.5 mb-2 border-b border-red-100">
+                        <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold rounded-full">
+                            ${desaName ? 'Desa ' + desaName : 'Koperasi Merah Putih'}
+                        </span>
+                        <span class="text-[10px] font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">
+                            ${coop.st_ops || 'SUDAH'}
+                        </span>
+                    </div>
+                    <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-snug mb-2">
+                        ${coop.name_koperasi}
+                    </h4>
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 space-y-1 text-[11px] text-slate-600 mb-2.5">
+                        <div class="flex items-start space-x-1.5">
+                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0 text-xs"></i>
+                            <span>Desa <strong>${desaName}</strong>, Kec. <strong>${kecName}</strong></span>
+                        </div>
+                        ${coop.no_ahu && coop.no_ahu !== 'BELUM' ? `
+                        <div class="flex items-center space-x-1.5 text-[10px] text-slate-500">
+                            <i class="fa-solid fa-certificate text-blue-500 shrink-0"></i>
+                            <span>No. AHU: <strong class="font-mono text-slate-700">${coop.no_ahu}</strong></span>
+                        </div>` : ''}
+                    </div>
+                    <a href="${koperasiBaseUrl}/${coop.id_koperasi}" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                        <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
+                    </a>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, { autoPan: true, closeButton: true });
+            marker.addTo(adminAnggotaCoopMarkerLayer);
+        });
+    }
+
     function zoomToAnggotaKecamatan(kecId, openPopup = true) {
         if (!mapAnggotaInstance) return;
 
         const legendDetail = document.getElementById('anggotaMapLegendDetail');
 
         if (!kecId) {
+            if (isOperator) {
+                renderAnggotaKecamatanCoops(assignedKecamatanId);
+                return;
+            }
+            if (adminAnggotaCoopMarkerLayer) {
+                adminAnggotaCoopMarkerLayer.clearLayers();
+            }
+            if (adminAnggotaMarkersLayer && !mapAnggotaInstance.hasLayer(adminAnggotaMarkersLayer)) {
+                adminAnggotaMarkersLayer.addTo(mapAnggotaInstance);
+            }
             if (adminAnggotaBoundaryLayer) {
                 adminAnggotaBoundaryLayer.eachLayer(layer => {
                     adminAnggotaBoundaryLayer.resetStyle(layer);
+                    const name = layer.feature?.properties ? (layer.feature.properties.fullName || layer.feature.properties.name) : 'Kecamatan';
+                    if (!layer.getTooltip()) {
+                        layer.bindTooltip(name, {
+                            sticky: true,
+                            direction: 'top',
+                            className: 'kecamatan-tooltip'
+                        });
+                    }
                 });
             }
 
@@ -4913,6 +5290,11 @@
         const kec = kecamatansData.find(k => String(k.id_kopkec) === String(kecId) || String(k.id) === String(kecId));
         if (!kec) return;
 
+        // Sembunyikan pin summary 40 kecamatan agar tidak menumpuk
+        if (adminAnggotaMarkersLayer && mapAnggotaInstance.hasLayer(adminAnggotaMarkersLayer)) {
+            mapAnggotaInstance.removeLayer(adminAnggotaMarkersLayer);
+        }
+
         const cleanKecName = (kec.name_kopkec || kec.nama || '').toUpperCase().trim();
         const targetPolygon = adminAnggotaPolygonLayersMap[String(kecId)] || adminAnggotaPolygonLayersMap[cleanKecName];
 
@@ -4923,33 +5305,44 @@
                         weight: 3.5,
                         color: '#0284c7',
                         fillColor: '#38bdf8',
-                        fillOpacity: 0.45
+                        fillOpacity: 0.45,
+                        opacity: 1
                     });
                     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                         layer.bringToFront();
                     }
+                    const name = layer.feature?.properties ? (layer.feature.properties.fullName || layer.feature.properties.name) : 'Kecamatan';
+                    if (!layer.getTooltip()) {
+                        layer.bindTooltip(name, {
+                            sticky: true,
+                            direction: 'top',
+                            className: 'kecamatan-tooltip'
+                        });
+                    }
                 } else {
                     layer.setStyle({
-                        weight: 1.2,
-                        color: '#94a3b8',
-                        fillColor: '#f1f5f9',
-                        fillOpacity: 0.12
+                        weight: 0,
+                        color: 'transparent',
+                        fillColor: 'transparent',
+                        fillOpacity: 0,
+                        opacity: 0
                     });
+                    if (layer.getTooltip()) {
+                        layer.closeTooltip();
+                        layer.unbindTooltip();
+                    }
                 }
             });
         }
+
+        // Tampilkan titik-titik koperasi di kecamatan terpilih dengan ikon toko merah
+        renderAnggotaKecamatanCoops(kecId);
 
         if (targetPolygon) {
             const bounds = targetPolygon.getBounds();
             mapAnggotaInstance.flyToBounds(bounds, { padding: [45, 45], maxZoom: 14, duration: 1.4 });
         } else if (kec.latitude && kec.longitude) {
             mapAnggotaInstance.flyTo([parseFloat(kec.latitude), parseFloat(kec.longitude)], 13, { duration: 1.4 });
-        }
-
-        if (openPopup && adminAnggotaMarkersMap[String(kecId)]) {
-            setTimeout(() => {
-                adminAnggotaMarkersMap[String(kecId)].openPopup();
-            }, 600);
         }
 
         if (legendDetail) {
@@ -5041,8 +5434,6 @@
         }
     }
 
-    let adminAnggotaCoopMarkerLayer = null;
-
     function zoomToAnggotaDesa(kelId, openPopup = true) {
         if (!mapAnggotaInstance) return;
 
@@ -5079,53 +5470,58 @@
             const kecName = coop.kecamatan ? (coop.kecamatan.name_kopkec || '') : '';
 
             const coopMarkerHtml = `
-                <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
-                    <span class="absolute w-12 h-12 rounded-full bg-red-600/35 animate-ping pointer-events-none"></span>
-                    <span class="absolute w-8 h-8 rounded-full bg-red-600/45 pointer-events-none"></span>
-                    <div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-red-700 to-rose-500 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm cursor-pointer hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-users-viewfinder"></i>
-                    </div>
-                    <div class="absolute -bottom-6 whitespace-nowrap bg-slate-900/90 text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-md border border-slate-700 pointer-events-none">
-                        ${coop.name_koperasi}
+                <div class="kmp-store-marker active-pin" id="admin-anggota-coop-pin-${coop.id_koperasi}" title="${coop.name_koperasi}">
+                    <div class="kmp-store-halo"></div>
+                    <div class="kmp-store-pill">
+                        <i class="fa-solid fa-store"></i>
                     </div>
                 </div>
             `;
 
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
+                    className: 'kmp-store-div-icon',
                     html: coopMarkerHtml,
-                    className: '',
-                    iconSize: [0, 0],
-                    iconAnchor: [0, 0],
-                    popupAnchor: [0, -20]
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20],
+                    popupAnchor: [0, -18]
                 }),
-                zIndexOffset: 1200
+                zIndexOffset: 1500
+            });
+
+            marker.bindTooltip(coop.name_koperasi, {
+                direction: 'top',
+                offset: [0, -18],
+                className: 'kecamatan-tooltip'
             });
 
             const popupContent = `
-                <div class="p-2.5 text-xs" style="min-width: 250px;">
-                    <div class="flex items-center space-x-1.5 pb-2 mb-2 border-b border-red-100">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
-                        <span class="font-extrabold text-slate-900 text-xs uppercase leading-snug">${coop.name_koperasi}</span>
+                <div class="p-2.5 text-xs select-text" style="min-width: 230px; max-width: 290px;">
+                    <div class="flex items-center justify-between gap-1 pb-1.5 mb-2 border-b border-red-100">
+                        <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold rounded-full">
+                            ${desaName ? 'Desa ' + desaName : 'Koperasi Merah Putih'}
+                        </span>
+                        <span class="text-[10px] font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">
+                            ${coop.st_ops || 'SUDAH'}
+                        </span>
                     </div>
-                    <div class="space-y-1.5 mb-3 text-[11px] text-slate-600">
+                    <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-snug mb-2">
+                        ${coop.name_koperasi}
+                    </h4>
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 space-y-1 text-[11px] text-slate-600 mb-2.5">
                         <div class="flex items-start space-x-1.5">
-                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0"></i>
+                            <i class="fa-solid fa-location-dot text-red-500 mt-0.5 shrink-0 text-xs"></i>
                             <span>Desa <strong>${desaName}</strong>, Kec. <strong>${kecName}</strong></span>
                         </div>
-                        <div class="bg-red-50/70 p-2 rounded-lg border border-red-100/80 space-y-1 text-[10px]">
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Koordinat GPS:</span>
-                                <span class="font-mono font-bold text-slate-800">${lat.toFixed(5)}, ${lng.toFixed(5)}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Status Operasi:</span>
-                                <span class="font-bold ${coop.st_ops === 'SUDAH' ? 'text-emerald-700' : 'text-amber-700'}">${coop.st_ops || 'SUDAH'}</span>
-                            </div>
-                        </div>
+                        ${coop.no_ahu && coop.no_ahu !== 'BELUM' ? `
+                        <div class="flex items-center space-x-1.5 text-[10px] text-slate-500">
+                            <i class="fa-solid fa-certificate text-blue-500 shrink-0"></i>
+                            <span>No. AHU: <strong class="font-mono text-slate-700">${coop.no_ahu}</strong></span>
+                        </div>` : ''}
                     </div>
-                    <a href="{{ url('/koperasi') }}/${coop.id_koperasi}" class="block text-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-lg transition text-xs shadow-xs">
-                        <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Lihat Profil Koperasi
+                    <a href="${koperasiBaseUrl}/${coop.id_koperasi}" style="color: #ffffff !important; background-color: #2563eb !important;" class="inline-flex items-center justify-center space-x-1.5 w-full px-3 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] !text-white rounded-lg text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer">
+                        <span style="color: #ffffff !important;" class="!text-white font-black">Buka Profil Koperasi</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]" style="color: #ffffff !important;"></i>
                     </a>
                 </div>
             `;

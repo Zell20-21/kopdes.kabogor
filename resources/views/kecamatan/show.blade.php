@@ -395,12 +395,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
                         bounds.push([lat, lng]);
 
-                        // Create custom pin with house icon
+                        // Create custom pin with red store capsule and halo matching user request
                         const icon = L.divIcon({
-                            className: 'kec-icon-container',
-                            html: `<div class="custom-kec-marker" id="pin-${p.id}"><i class="fa-solid fa-house"></i></div>`,
-                            iconSize: [34, 34],
-                            iconAnchor: [17, 17],
+                            className: 'kmp-store-div-icon',
+                            html: `
+                                <div class="kmp-store-marker" id="pin-${p.id}" title="${p.nama}">
+                                    <div class="kmp-store-halo"></div>
+                                    <div class="kmp-store-pill">
+                                        <i class="fa-solid fa-store"></i>
+                                    </div>
+                                </div>
+                            `,
+                            iconSize: [40, 40],
+                            iconAnchor: [20, 20],
                             popupAnchor: [0, -18]
                         });
 

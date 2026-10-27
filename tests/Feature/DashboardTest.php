@@ -314,7 +314,7 @@ class DashboardTest extends TestCase
         $response->assertSee('KMP Kab. Bogor');
         $response->assertSee('data-dashboard-shell="operator-kecamatan"', false);
         $response->assertSee('max-w-7xl', false);
-        $response->assertSee('Keluar');
+        $response->assertSee('Logout');
         $response->assertDontSee('fixed top-0 inset-x-0', false);
         $response->assertDontSee('id="map-members"', false);
         $response->assertDontSee('KOPERASI LUAR WILAYAH');

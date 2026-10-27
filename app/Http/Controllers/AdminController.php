@@ -273,9 +273,13 @@ class AdminController extends Controller
                 ->orderBy('id_kopsdm')
                 ->get()
             : collect();
+        $locationPhotoSelect = Schema::hasColumn('app_md_koperasi', 'foto_lokasi')
+            ? ['id_koperasi', 'name_koperasi', 'foto_lokasi']
+            : ['id_koperasi', 'name_koperasi'];
+
         $locationPhotoKoperasis = $user->isOperatorDesa()
             ? (clone $baseQuery)
-                ->select(['id_koperasi', 'name_koperasi', 'foto_lokasi'])
+                ->select($locationPhotoSelect)
                 ->orderBy('name_koperasi')
                 ->get()
             : collect();

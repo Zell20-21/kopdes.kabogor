@@ -26,10 +26,17 @@
                 </a>
 
                 <!-- Back button / Kembali -->
-                <a href="{{ route('kecamatan.show', $koperasi->id_kec) }}" class="flex items-center space-x-2 text-xs sm:text-sm font-semibold text-white/95 hover:text-white bg-white/10 hover:bg-white/20 active:scale-95 px-4 py-1.5 rounded-full border border-white/20 transition-all shadow-sm">
-                    <i class="fa-solid fa-arrow-left text-xs transition-transform group-hover:-translate-x-0.5"></i>
-                    <span>Kembali ke Kecamatan</span>
-                </a>
+                @if(auth()->check())
+                    <a href="{{ route('admin.dashboard', ['tab' => 'koperasi']) }}" class="flex items-center space-x-2 text-xs sm:text-sm font-semibold text-white/95 hover:text-white bg-white/10 hover:bg-white/20 active:scale-95 px-4 py-1.5 rounded-full border border-white/20 transition-all shadow-sm">
+                        <i class="fa-solid fa-arrow-left text-xs transition-transform group-hover:-translate-x-0.5"></i>
+                        <span>Kembali ke Admin</span>
+                    </a>
+                @else
+                    <a href="{{ route('kecamatan.show', $koperasi->id_kec) }}" class="flex items-center space-x-2 text-xs sm:text-sm font-semibold text-white/95 hover:text-white bg-white/10 hover:bg-white/20 active:scale-95 px-4 py-1.5 rounded-full border border-white/20 transition-all shadow-sm">
+                        <i class="fa-solid fa-arrow-left text-xs transition-transform group-hover:-translate-x-0.5"></i>
+                        <span>Kembali ke Kecamatan</span>
+                    </a>
+                @endif
             </div>
         </div>
     </header>
