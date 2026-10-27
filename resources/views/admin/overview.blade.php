@@ -39,9 +39,9 @@
                     </nav>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-white/30 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70 active:scale-95 cursor-pointer">
-                            <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                        <button type="submit" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 border border-white/20 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold text-white shadow-sm transition-all duration-200 hover:shadow transform active:scale-95 cursor-pointer">
                             <span>Logout</span>
+                            <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                         </button>
                     </form>
                 </div>
