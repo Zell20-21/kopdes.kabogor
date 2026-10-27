@@ -158,21 +158,32 @@ Route::post('/login', function (Request $request) {
     }
 
     $request->validate([
-        'username' => 'required',
-        'password' => 'required',
+        'username' => ['required', 'string'],
+        'password' => ['required', 'string'],
     ]);
 
     $loginInput = trim($request->username);
-    $passwordInput = (string) $request->password;
+    $passwordInput = $request->password;
 
     $user = User::where('flag_del', 0)
-        ->where(function ($query) use ($loginInput) {
-            $query->where('login_user', $loginInput)
-                ->orWhere('email_user', $loginInput);
-        })
+        ->where('login_user', $loginInput)
         ->first();
+    $ambiguousEmail = false;
 
-    if (! $user && in_array($loginInput, ['admin', 'admin_bogor', 'admin@bogorkab.go.id'])) {
+    if (! $user) {
+        $emailMatches = User::where('flag_del', 0)
+            ->where('email_user', $loginInput)
+            ->limit(2)
+            ->get();
+
+        $ambiguousEmail = $emailMatches->count() > 1;
+
+        if ($emailMatches->count() === 1) {
+            $user = $emailMatches->first();
+        }
+    }
+
+    if (! $user && ! $ambiguousEmail && in_array($loginInput, ['admin', 'admin_bogor', 'admin@bogorkab.go.id'])) {
         $user = User::where('flag_del', 0)
             ->where(function ($query) {
                 $query->where('id_user', 1)->orWhere('level_user', 1);
